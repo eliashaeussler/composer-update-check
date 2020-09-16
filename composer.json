@@ -1,0 +1,35 @@
+{
+  "name": "eliashaeussler/composer-update-check",
+  "description": "Composer Plugin to check outdated packages, based on their requirements",
+  "type": "composer-plugin",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://haeussler.dev",
+  "authors": [{
+    "name": "Elias Häußler",
+    "email": "elias@haeussler.dev",
+    "homepage": "https://haeussler.dev",
+    "role": "Maintainer"
+  }],
+  "require": {
+    "composer-plugin-api": "^1.0"
+  },
+  "extra": {
+    "class": "EliasHaeussler\\ComposerUpdateCheck\\Plugin"
+  },
+  "autoload": {
+    "psr-4": {
+      "EliasHaeussler\\ComposerUpdateCheck\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0"
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml"
+  }
+}
