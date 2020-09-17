@@ -23,14 +23,16 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 use Composer\Command\BaseCommand;
 use Composer\Command\UpdateCommand;
-use Composer\IO\BufferIO;
+use Composer\IO\ConsoleIO;
 use Composer\Plugin\PluginEvents;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use Spatie\Emoji\Emoji;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -128,8 +130,8 @@ class UpdateCheckCommand extends BaseCommand
         }
 
         // Prepare IO
-        $io = new BufferIO();
-        $command->setIO($io);
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
 
         // Run update command
         $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . '  Checking for outdated packages...');
@@ -138,14 +140,14 @@ class UpdateCheckCommand extends BaseCommand
 
         // Handle command failures
         if ($result > 0) {
-            $this->symfonyStyle->writeln($io->getOutput());
+            $this->symfonyStyle->writeln($output->fetch());
             throw new \RuntimeException(
                 sprintf('Error during update check. Exit code from "composer update": %d', $result),
                 1600278536
             );
         }
 
-        return UpdateCheckResult::fromCommandOutput($io->getOutput());
+        return UpdateCheckResult::fromCommandOutput($output->fetch());
     }
 
     private function decorateResult(UpdateCheckResult $result): void
