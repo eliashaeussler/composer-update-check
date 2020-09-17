@@ -134,7 +134,7 @@ class UpdateCheckCommand extends BaseCommand
         $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
 
         // Run update command
-        $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . '  Checking for outdated packages...');
+        $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . ' Checking for outdated packages...');
         $input = new ArrayInput($arguments);
         $result = $command->run($input, new NullOutput());
 
