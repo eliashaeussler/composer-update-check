@@ -17,15 +17,18 @@ composer update-check
 # Skip dev-requirements
 composer update-check --no-dev
 
-# Ignore custom packages from update check
+# Exclude custom packages from update check
 composer update-check -i "my-vendor/*" -i "roave/security-advisories"
+
+# Exclude dev-requirements and custom packages
+composer update-check -i "my-vendor/*" --no-dev
 ```
 
 ## Run tests
 
 ```bash
 # Clone repository
-git clone git@gitlab.elias-haeussler.de:eliashaeussler/composer-update-check.git
+git clone https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.git
 cd composer-update-check
 
 # Install Composer dependencies
