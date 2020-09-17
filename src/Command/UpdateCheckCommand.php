@@ -130,7 +130,7 @@ class UpdateCheckCommand extends BaseCommand
         }
 
         // Prepare IO
-        $output = new BufferedOutput(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $output = new BufferedOutput();
         $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
 
         // Run update command
