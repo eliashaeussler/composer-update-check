@@ -10,12 +10,37 @@ before_script:
 stages:
   - test
 
-test:
+# Test template
+.test: &test-template
   stage: test
-  image: composer:1
+  image: webdevops/php-dev:${PHP_VERSION}
   script:
     - composer install --no-progress
     - composer test -- --colors=never --coverage-text --testdox
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   only:
     - branches
+
+# Test: PHP 7.1
+test:php7.1:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.1"
+
+# Test: PHP 7.2
+test:php7.2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.2"
+
+# Test: PHP 7.3
+test:php7.3:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.3"
+
+# Test: PHP 7.4
+test:php7.4:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.4"
