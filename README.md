@@ -1,3 +1,6 @@
+[![Pipeline](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/pipeline.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
+[![Coverage](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/coverage.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
+
 # Composer update check plugin
 
 > Composer Plugin to check outdated packages, based on their requirements
