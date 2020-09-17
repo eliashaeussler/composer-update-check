@@ -11,7 +11,8 @@
     "role": "Maintainer"
   }],
   "require": {
-    "composer-plugin-api": "^1.0"
+    "composer-plugin-api": "^1.0",
+    "spatie/emoji": "^2.1"
   },
   "extra": {
     "class": "EliasHaeussler\\ComposerUpdateCheck\\Plugin"
