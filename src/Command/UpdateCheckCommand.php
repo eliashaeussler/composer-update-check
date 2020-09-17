@@ -27,6 +27,7 @@ use Composer\IO\BufferIO;
 use Composer\Plugin\PluginEvents;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use Spatie\Emoji\Emoji;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -88,7 +89,7 @@ class UpdateCheckCommand extends BaseCommand
         $this->output = $output;
         $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
 
-
+        // Prepare command options
         $ignoredPackages = $input->getOption('ignore-packages');
         $noDev = $input->getOption('no-dev');
         $command = $this->getApplication()->find('update');
@@ -101,14 +102,8 @@ class UpdateCheckCommand extends BaseCommand
         // Resolve packages to be checked
         $packages = null;
         if ($ignoredPackages !== [] || $noDev) {
-            $this->symfonyStyle->comment('Resolving packages...');
+            $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
             $packages = $this->resolvePackagesForUpdateCheck($ignoredPackages ?? [], !$noDev);
-        }
-
-        // Print list of ignored packages
-        if ($output->isVerbose()) {
-            $this->symfonyStyle->note('The following packages will be ignored:');
-            $this->symfonyStyle->listing($this->ignoredPackages);
         }
 
         // Run update check
@@ -137,7 +132,7 @@ class UpdateCheckCommand extends BaseCommand
         $command->setIO($io);
 
         // Run update command
-        $this->symfonyStyle->comment('Running update check...');
+        $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . '  Checking for outdated packages...');
         $input = new ArrayInput($arguments);
         $result = $command->run($input, new NullOutput());
 
@@ -192,6 +187,8 @@ class UpdateCheckCommand extends BaseCommand
         if ($includeDevPackages) {
             $requiredDevPackages = array_keys($rootPackage->getDevRequires());
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
+        } else {
+            $this->symfonyStyle->writeln(Emoji::prohibited() . ' Skipped dev-requirements');
         }
         foreach ($ignoredPackages as $ignoredPackage) {
             $requiredPackages = $this->removeByIgnorePattern($ignoredPackage, $requiredPackages);
@@ -205,6 +202,7 @@ class UpdateCheckCommand extends BaseCommand
             if (!fnmatch($pattern, $package)) {
                 return true;
             }
+            $this->symfonyStyle->writeln(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package));
             $this->ignoredPackages[] = $package;
             return false;
         });
