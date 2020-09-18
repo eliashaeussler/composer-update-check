@@ -14,8 +14,9 @@
     "sort-packages": true
   },
   "require": {
-    "composer-plugin-api": "^1.0",
     "php": ">= 7.1 < 7.5",
+    "ext-json": "*",
+    "composer-plugin-api": "^1.0",
     "spatie/emoji": "^2.0"
   },
   "require-dev": {

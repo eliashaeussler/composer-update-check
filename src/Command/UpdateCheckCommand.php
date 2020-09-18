@@ -63,6 +63,11 @@ class UpdateCheckCommand extends BaseCommand
     private $symfonyStyle;
 
     /**
+     * @var bool
+     */
+    private $json = false;
+
+    /**
      * @var string[]
      */
     private $ignoredPackages = [];
@@ -85,6 +90,12 @@ class UpdateCheckCommand extends BaseCommand
             InputOption::VALUE_NONE,
             'Disables update check of require-dev packages.'
         );
+        $this->addOption(
+            'json',
+            'j',
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_NONE,
+            'Format update check as JSON'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -92,6 +103,7 @@ class UpdateCheckCommand extends BaseCommand
         $this->input = $input;
         $this->output = $output;
         $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
+        $this->json = $input->getOption('json');
 
         // Throw exception if update command is not available
         if (!$this->getApplication()->has('update')) {
@@ -105,7 +117,9 @@ class UpdateCheckCommand extends BaseCommand
         // Resolve packages to be checked
         $packages = null;
         if ($ignoredPackages !== [] || $noDev) {
-            $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
+            if (!$this->json) {
+                $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
+            }
             $packages = $this->resolvePackagesForUpdateCheck($ignoredPackages ?? [], !$noDev);
         }
 
@@ -140,7 +154,9 @@ class UpdateCheckCommand extends BaseCommand
         $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
 
         // Run update command
-        $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . ' Checking for outdated packages...');
+        if (!$this->json) {
+            $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . ' Checking for outdated packages...');
+        }
         $input = new ArrayInput($arguments);
         $result = $command->run($input, new NullOutput());
 
@@ -173,15 +189,22 @@ class UpdateCheckCommand extends BaseCommand
 
         // Print message if no packages are outdated
         if ($outdatedPackages === []) {
-            $this->symfonyStyle->success('All packages are up to date.');
+            if (!$this->json) {
+                $this->symfonyStyle->success('All packages are up to date.');
+            } else {
+                $this->buildJsonReport(['status' => 'All packages are up to date.']);
+            }
             return;
         }
 
         // Print header
         if (count($outdatedPackages) === 1) {
-            $this->symfonyStyle->warning('1 package is outdated.');
+            $statusLabel = '1 package is outdated.';
         } else {
-            $this->symfonyStyle->warning(sprintf('%d packages are outdated.', count($outdatedPackages)));
+            $statusLabel = sprintf('%d packages are outdated.', count($outdatedPackages));
+        }
+        if (!$this->json) {
+            $this->symfonyStyle->warning($statusLabel);
         }
 
         // Parse table rows
@@ -196,7 +219,26 @@ class UpdateCheckCommand extends BaseCommand
 
         // Print table
         $tableHeader = ['Package', 'Outdated version', 'New version'];
-        $this->symfonyStyle->table($tableHeader, $tableRows);
+        if (!$this->json) {
+            $this->symfonyStyle->table($tableHeader, $tableRows);
+        } else {
+            $result = [];
+            foreach ($tableRows as $tableRow) {
+                $result[] = array_combine($tableHeader, $tableRow);
+            }
+            $this->buildJsonReport([
+                'status' => $statusLabel,
+                'result' => $result,
+            ]);
+        }
+    }
+
+    private function buildJsonReport(array $report): void
+    {
+        if ($this->ignoredPackages !== []) {
+            $report['skipped'] = $this->ignoredPackages;
+        }
+        $this->output->writeln(json_encode($report));
     }
 
     private function resolvePackagesForUpdateCheck(array $ignoredPackages, bool $includeDevPackages): array
@@ -206,7 +248,7 @@ class UpdateCheckCommand extends BaseCommand
         if ($includeDevPackages) {
             $requiredDevPackages = array_keys($rootPackage->getDevRequires());
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
-        } else {
+        } else if (!$this->json) {
             $this->symfonyStyle->writeln(Emoji::prohibited() . ' Skipped dev-requirements');
         }
         foreach ($ignoredPackages as $ignoredPackage) {
@@ -221,7 +263,9 @@ class UpdateCheckCommand extends BaseCommand
             if (!fnmatch($pattern, $package)) {
                 return true;
             }
-            $this->symfonyStyle->writeln(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package));
+            if (!$this->json) {
+                $this->symfonyStyle->writeln(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package));
+            }
             $this->ignoredPackages[] = $package;
             return false;
         });
