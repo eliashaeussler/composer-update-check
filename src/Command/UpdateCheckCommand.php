@@ -22,8 +22,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
  */
 
 use Composer\Command\BaseCommand;
+use Composer\Command\InstallCommand;
 use Composer\Command\UpdateCommand;
 use Composer\IO\ConsoleIO;
+use Composer\IO\NullIO;
 use Composer\Plugin\PluginEvents;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
@@ -91,15 +93,14 @@ class UpdateCheckCommand extends BaseCommand
         $this->output = $output;
         $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
 
+        // Throw exception if update command is not available
+        if (!$this->getApplication()->has('update')) {
+            throw new \RuntimeException('Native update command is not available.', 1600274132);
+        }
+
         // Prepare command options
         $ignoredPackages = $input->getOption('ignore-packages');
         $noDev = $input->getOption('no-dev');
-        $command = $this->getApplication()->find('update');
-
-        // Throw exception if update command is not available
-        if (!($command instanceof UpdateCommand)) {
-            throw new \RuntimeException('Native update command is not available.', 1600274132);
-        }
 
         // Resolve packages to be checked
         $packages = null;
@@ -109,14 +110,14 @@ class UpdateCheckCommand extends BaseCommand
         }
 
         // Run update check
-        $result = $this->runUpdateCheck($command, $packages);
+        $result = $this->runUpdateCheck($packages);
         $this->dispatchPostUpdateCheckEvent($result);
         $this->decorateResult($result);
 
         return 0;
     }
 
-    private function runUpdateCheck(UpdateCommand $command, array $packages = null): UpdateCheckResult
+    private function runUpdateCheck(array $packages = null): UpdateCheckResult
     {
         // Prepare command arguments
         $arguments = [
@@ -129,8 +130,13 @@ class UpdateCheckCommand extends BaseCommand
             $arguments['packages'] = $packages;
         }
 
+        // Ensure dependencies are already installed
+        $this->installDependencies();
+
         // Prepare IO
         $output = new BufferedOutput();
+        /** @var UpdateCommand $command */
+        $command = $this->getApplication()->find('update');
         $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
 
         // Run update command
@@ -148,6 +154,17 @@ class UpdateCheckCommand extends BaseCommand
         }
 
         return UpdateCheckResult::fromCommandOutput($output->fetch());
+    }
+
+    private function installDependencies(): void
+    {
+        if (!$this->getApplication()->has('install')) {
+            return;
+        }
+        /** @var InstallCommand $command */
+        $command = $this->getApplication()->find('install');
+        $command->setIO(new NullIO());
+        $command->run(new ArrayInput([]), new NullOutput());
     }
 
     private function decorateResult(UpdateCheckResult $result): void
