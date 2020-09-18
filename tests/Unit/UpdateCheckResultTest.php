@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck\Tests;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".

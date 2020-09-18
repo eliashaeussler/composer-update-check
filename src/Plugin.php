@@ -33,6 +33,7 @@ use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ * @codeCoverageIgnore
  */
 class Plugin implements PluginInterface, Capable
 {
