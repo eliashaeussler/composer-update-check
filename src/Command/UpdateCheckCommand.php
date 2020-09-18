@@ -133,6 +133,11 @@ class UpdateCheckCommand extends BaseCommand
 
     private function runUpdateCheck(array $packages = null): UpdateCheckResult
     {
+        // Early return if no packages are listed for update check
+        if ($packages === []) {
+            return new UpdateCheckResult([]);
+        }
+
         // Prepare command arguments
         $arguments = [
             '--dry-run' => true,
