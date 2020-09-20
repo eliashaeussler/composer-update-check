@@ -165,7 +165,13 @@ class UpdateCheckCommand extends BaseCommand
 
         // Print message if no packages are outdated
         if ($outdatedPackages === []) {
-            $message = 'All packages are up to date.';
+            $countSkipped = count($this->ignoredPackages);
+            $message = sprintf(
+                'All packages are up to date%s.',
+                $countSkipped > 0
+                    ? sprintf(' (skipped %d package%s)', $countSkipped, $countSkipped !== 1 ? 's' : '')
+                    : ''
+            );
             $this->json ? $this->buildJsonReport(['status' => $message]) : $this->symfonyStyle->success($message);
             return;
         }

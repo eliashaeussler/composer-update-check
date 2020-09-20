@@ -81,7 +81,10 @@ class UpdateCheckCommandTest extends TestCase
     {
         $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/composer']]);
 
-        $expected = json_encode(['status' => 'All packages are up to date.', 'skipped' => ['composer/composer']]);
+        $expected = json_encode([
+            'status' => 'All packages are up to date (skipped 1 package).',
+            'skipped' => ['composer/composer']
+        ]);
         static::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
     }
 
