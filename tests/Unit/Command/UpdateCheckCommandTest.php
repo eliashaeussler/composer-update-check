@@ -79,13 +79,47 @@ class UpdateCheckCommandTest extends TestCase
      */
     public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped(): void
     {
-        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/composer']]);
+        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/*'], '--no-dev' => true]);
 
         $expected = json_encode([
-            'status' => 'All packages are up to date (skipped 1 package).',
-            'skipped' => ['composer/composer']
+            'status' => 'All packages are up to date (skipped 2 packages).',
+            'skipped' => ['phpunit/phpunit', 'composer/composer']
         ]);
         static::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    public function executePrintsListOfOutdatedPackagesWithoutDevRequirements(): void
+    {
+        $this->commandTester->execute(['--json' => true, '--no-dev' => true]);
+
+        $actualJson = json_decode($this->commandTester->getDisplay(), true);
+        $expectedStatus = '1 package is outdated.';
+
+        static::assertSame($expectedStatus, $actualJson['status']);
+        static::assertCount(1, $actualJson['result']);
+        static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
+        static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
+    }
+
+    /**
+     * @test
+     */
+    public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages(): void
+    {
+        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/composer']]);
+
+        $actualJson = json_decode($this->commandTester->getDisplay(), true);
+        $expectedStatus = '1 package is outdated.';
+
+        static::assertSame($expectedStatus, $actualJson['status']);
+        static::assertCount(1, $actualJson['result']);
+        static::assertSame('phpunit/phpunit', $actualJson['result'][0]['Package']);
+        static::assertSame('8.0.0', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('8.0.0', $actualJson['result'][0]['New version']);
     }
 
     /**
@@ -96,13 +130,18 @@ class UpdateCheckCommandTest extends TestCase
         $this->commandTester->execute(['--json' => true]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
-        $expectedStatus = '1 package is outdated.';
+        $expectedStatus = '2 packages are outdated.';
 
         static::assertSame($expectedStatus, $actualJson['status']);
-        static::assertCount(1, $actualJson['result']);
+        static::assertCount(2, $actualJson['result']);
+
         static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
         static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
         static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
+
+        static::assertSame('phpunit/phpunit', $actualJson['result'][1]['Package']);
+        static::assertSame('8.0.0', $actualJson['result'][1]['Outdated version']);
+        static::assertNotSame('8.0.0', $actualJson['result'][1]['New version']);
     }
 
     private function initializeApplication(): void
