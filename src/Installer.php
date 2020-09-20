@@ -46,6 +46,7 @@ final class Installer
         $result = ComposerInstaller::create(static::$io, $composer)
             ->setPreferSource($preferredInstall === 'source')
             ->setPreferDist($preferredInstall === 'dist')
+            ->setDevMode(true)
             ->setRunScripts(false)
             ->setIgnorePlatformRequirements(true)
             ->run();
@@ -60,6 +61,7 @@ final class Installer
             ->setDryRun(true)
             ->setPreferSource($preferredInstall === 'source')
             ->setPreferDist($preferredInstall === 'dist')
+            ->setDevMode(true)
             ->setUpdate(true)
             ->setUpdateAllowList($packages)
             ->setIgnorePlatformRequirements(true)
