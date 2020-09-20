@@ -80,13 +80,13 @@ class UpdateCheckCommand extends BaseCommand
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_NONE,
+            InputOption::VALUE_NONE,
             'Disables update check of require-dev packages.'
         );
         $this->addOption(
             'json',
             'j',
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_NONE,
+            InputOption::VALUE_NONE,
             'Format update check as JSON'
         );
     }
