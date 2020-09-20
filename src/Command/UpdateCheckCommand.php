@@ -222,11 +222,14 @@ class UpdateCheckCommand extends BaseCommand
     {
         $rootPackage = $this->getComposer()->getPackage();
         $requiredPackages = array_keys($rootPackage->getRequires());
+        $requiredDevPackages = array_keys($rootPackage->getDevRequires());
         if ($includeDevPackages) {
-            $requiredDevPackages = array_keys($rootPackage->getDevRequires());
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
-        } else if (!$this->json) {
-            $this->symfonyStyle->writeln(Emoji::prohibited() . ' Skipped dev-requirements');
+        } else {
+            $this->ignoredPackages = array_merge($this->ignoredPackages, $requiredDevPackages);
+            if (!$this->json) {
+                $this->symfonyStyle->writeln(Emoji::prohibited() . ' Skipped dev-requirements');
+            }
         }
         foreach ($ignoredPackages as $ignoredPackage) {
             $requiredPackages = $this->removeByIgnorePattern($ignoredPackage, $requiredPackages);
