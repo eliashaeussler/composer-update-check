@@ -2,4 +2,4 @@
 /vendor
 /.phpunit.result.cache
 /.build
-/tests/Build/vendor
+/tests/Build/test-application/vendor

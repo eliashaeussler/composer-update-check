@@ -37,6 +37,7 @@
     }
   },
   "scripts": {
-    "test": "phpunit -c phpunit.xml"
+    "test": "phpunit -c phpunit.xml",
+    "simulate": "bin/simulate-application.sh"
   }
 }

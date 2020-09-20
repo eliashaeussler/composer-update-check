@@ -147,7 +147,7 @@ class UpdateCheckCommandTest extends TestCase
     private function initializeApplication(): void
     {
         $this->backedUpDirectory = getcwd();
-        chdir('tests/Build');
+        chdir('tests/Build/test-application');
 
         $this->application = new Application();
         $this->application->add(new UpdateCheckCommand());
