@@ -16,6 +16,10 @@ stages:
   image: webdevops/php-dev:${PHP_VERSION}
   script:
     - composer install --no-progress
+    # Increase PHP memory limit and Composer process timeout
+    # to ensure tests with Xdebug can be executed
+    - export PHP_MEMORY_LIMIT=1G
+    - export COMPOSER_PROCESS_TIMEOUT=600
     - composer test -- --colors=never --coverage-text --log-junit=.build/coverage/junit.xml --testdox
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
