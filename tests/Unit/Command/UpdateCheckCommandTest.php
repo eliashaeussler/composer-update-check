@@ -25,8 +25,6 @@ use Composer\Composer;
 use Composer\Console\Application;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -60,26 +58,6 @@ class UpdateCheckCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->initializeApplication();
-    }
-
-    /**
-     * @test
-     */
-    public function executeThrowsExceptionIfNativeUpdateCommandIsNotAvailable(): void
-    {
-        $applicationMock = $this->getMockBuilder(Application::class)->getMock();
-        $applicationMock->method('getHelperSet')->willReturn(new HelperSet());
-        $applicationMock->method('getDefinition')->willReturn(new InputDefinition());
-        $applicationMock->method('getComposer')->willReturn($this->composer);
-        $applicationMock->method('has')->with('update')->willReturn(false);
-        $command = new UpdateCheckCommand();
-        $command->setApplication($applicationMock);
-        $commandTester = new CommandTester($command);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600274132);
-
-        $commandTester->execute([]);
     }
 
     /**

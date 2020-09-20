@@ -29,7 +29,15 @@ namespace EliasHaeussler\ComposerUpdateCheck;
  */
 class UpdateCheckResult
 {
-    protected const COMMAND_OUTPUT_PATTERN = '#^\\s*- Updating ([^\\s]+) \\(([^)]+)\\) to [^\\s]+ \\(([^)]+)\\)$#';
+    protected const COMMAND_OUTPUT_PATTERN =
+        '#^' .
+            '\\s*- Updating ' .
+            '(?P<name>[^\\s]+) \\(' .
+                '(?P<outdated>[^)]+)' .
+            '\\) to [^\\s]+ \\(' .
+                '(?P<new>[^)]+)' .
+            '\\)' .
+        '$#';
 
     /**
      * @var OutdatedPackage[]
@@ -54,7 +62,7 @@ class UpdateCheckResult
     {
         $outputParts = explode(PHP_EOL, $output);
         $packages = array_filter(array_map([static::class, 'parseCommandOutput'], $outputParts));
-        return new self($packages);
+        return new static($packages);
     }
 
     public static function parseCommandOutput(string $output): ?OutdatedPackage
@@ -62,20 +70,14 @@ class UpdateCheckResult
         if (!preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches)) {
             return null;
         }
-        $packageName = $matches[1];
-        $outdatedVersion = $matches[2];
-        $newVersion = $matches[3];
+        $packageName = $matches['name'];
+        $outdatedVersion = $matches['outdated'];
+        $newVersion = $matches['new'];
         return new OutdatedPackage($packageName, $outdatedVersion, $newVersion);
     }
 
     private function validateOutdatedPackages(): void
     {
-        if (!is_array($this->outdatedPackages)) {
-            throw new \InvalidArgumentException(
-                sprintf('Outdated packages must be of type array, "%s" given.', gettype($this->outdatedPackages)),
-                1600276510
-            );
-        }
         foreach ($this->outdatedPackages as $key => $outdatedPackage) {
             if (!($outdatedPackage instanceof OutdatedPackage)) {
                 throw new \InvalidArgumentException(

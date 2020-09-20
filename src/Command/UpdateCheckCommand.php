@@ -22,20 +22,13 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
  */
 
 use Composer\Command\BaseCommand;
-use Composer\Command\InstallCommand;
-use Composer\Command\UpdateCommand;
-use Composer\IO\ConsoleIO;
-use Composer\IO\NullIO;
 use Composer\Plugin\PluginEvents;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
+use EliasHaeussler\ComposerUpdateCheck\Installer;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use Spatie\Emoji\Emoji;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -87,7 +80,7 @@ class UpdateCheckCommand extends BaseCommand
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_NONE,
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_NONE,
             'Disables update check of require-dev packages.'
         );
         $this->addOption(
@@ -105,23 +98,15 @@ class UpdateCheckCommand extends BaseCommand
         $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
         $this->json = $input->getOption('json');
 
-        // Throw exception if update command is not available
-        if (!$this->getApplication()->has('update')) {
-            throw new \RuntimeException('Native update command is not available.', 1600274132);
-        }
-
         // Prepare command options
         $ignoredPackages = $input->getOption('ignore-packages');
         $noDev = $input->getOption('no-dev');
 
         // Resolve packages to be checked
-        $packages = null;
-        if ($ignoredPackages !== [] || $noDev) {
-            if (!$this->json) {
-                $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
-            }
-            $packages = $this->resolvePackagesForUpdateCheck($ignoredPackages ?? [], !$noDev);
+        if (!$this->json) {
+            $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
         }
+        $packages = $this->resolvePackagesForUpdateCheck($ignoredPackages, !$noDev);
 
         // Run update check
         $result = $this->runUpdateCheck($packages);
@@ -131,61 +116,47 @@ class UpdateCheckCommand extends BaseCommand
         return 0;
     }
 
-    private function runUpdateCheck(array $packages = null): UpdateCheckResult
+    private function runUpdateCheck(array $packages): UpdateCheckResult
     {
         // Early return if no packages are listed for update check
         if ($packages === []) {
             return new UpdateCheckResult([]);
         }
 
-        // Prepare command arguments
-        $arguments = [
-            '--dry-run' => true,
-            '--root-reqs' => true,
-            '--no-ansi' => true,
-            '--ignore-platform-reqs' => true,
-        ];
-        if ($packages !== null) {
-            $arguments['packages'] = $packages;
-        }
-
-        // Ensure dependencies are already installed
+        // Ensure dependencies are installed
         $this->installDependencies();
 
-        // Prepare IO
-        $output = new BufferedOutput();
-        /** @var UpdateCommand $command */
-        $command = $this->getApplication()->find('update');
-        $command->setIO(new ConsoleIO($this->input, $output, new HelperSet()));
-
-        // Run update command
+        // Run Composer installer
         if (!$this->json) {
             $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . ' Checking for outdated packages...');
         }
-        $input = new ArrayInput($arguments);
-        $result = $command->run($input, new NullOutput());
+        $result = Installer::runUpdate($packages, $this->getComposer());
 
-        // Handle command failures
+        // Handle installer failures
         if ($result > 0) {
-            $this->symfonyStyle->writeln($output->fetch());
+            $this->symfonyStyle->writeln(Installer::getLastOutput());
             throw new \RuntimeException(
-                sprintf('Error during update check. Exit code from "composer update": %d', $result),
+                sprintf('Error during update check. Exit code from Composer installer: %d', $result),
                 1600278536
             );
         }
 
-        return UpdateCheckResult::fromCommandOutput($output->fetch());
+        return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput());
     }
 
     private function installDependencies(): void
     {
-        if (!$this->getApplication()->has('install')) {
-            return;
+        // Run Composer installer
+        $result = Installer::runInstall($this->getComposer());
+
+        // Handle installer failures
+        if ($result > 0) {
+            $this->symfonyStyle->writeln(Installer::getLastOutput());
+            throw new \RuntimeException(
+                sprintf('Error during dependency install. Exit code from Composer installer: %d', $result),
+                1600614218
+            );
         }
-        /** @var InstallCommand $command */
-        $command = $this->getApplication()->find('install');
-        $command->setIO(new NullIO());
-        $command->run(new ArrayInput([]), new NullOutput());
     }
 
     private function decorateResult(UpdateCheckResult $result): void
@@ -194,20 +165,15 @@ class UpdateCheckCommand extends BaseCommand
 
         // Print message if no packages are outdated
         if ($outdatedPackages === []) {
-            if (!$this->json) {
-                $this->symfonyStyle->success('All packages are up to date.');
-            } else {
-                $this->buildJsonReport(['status' => 'All packages are up to date.']);
-            }
+            $message = 'All packages are up to date.';
+            $this->json ? $this->buildJsonReport(['status' => $message]) : $this->symfonyStyle->success($message);
             return;
         }
 
         // Print header
-        if (count($outdatedPackages) === 1) {
-            $statusLabel = '1 package is outdated.';
-        } else {
-            $statusLabel = sprintf('%d packages are outdated.', count($outdatedPackages));
-        }
+        $statusLabel = count($outdatedPackages) === 1
+            ? '1 package is outdated.'
+            : sprintf('%d packages are outdated.', count($outdatedPackages));
         if (!$this->json) {
             $this->symfonyStyle->warning($statusLabel);
         }
@@ -243,7 +209,7 @@ class UpdateCheckCommand extends BaseCommand
         if ($this->ignoredPackages !== []) {
             $report['skipped'] = $this->ignoredPackages;
         }
-        $this->output->writeln(json_encode($report));
+        $this->symfonyStyle->writeln(json_encode($report));
     }
 
     private function resolvePackagesForUpdateCheck(array $ignoredPackages, bool $includeDevPackages): array
