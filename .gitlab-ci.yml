@@ -16,8 +16,11 @@ stages:
   image: webdevops/php-dev:${PHP_VERSION}
   script:
     - composer install --no-progress
-    - composer test -- --colors=never --coverage-text --testdox
+    - composer test -- --colors=never --coverage-text --log-junit=.build/coverage/junit.xml --testdox
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      junit: .build/coverage/junit.xml
   only:
     - branches
 
