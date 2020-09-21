@@ -5,3 +5,4 @@
 /.gitignore         export-ignore
 /.gitlab-ci.yml     export-ignore
 /phpunit.xml        export-ignore
+/phpunit.ci.xml     export-ignore
