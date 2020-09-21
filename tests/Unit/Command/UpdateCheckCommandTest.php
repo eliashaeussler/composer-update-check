@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Command;
 use Composer\Composer;
 use Composer\Console\Application;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -35,6 +36,8 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class UpdateCheckCommandTest extends TestCase
 {
+    use TestApplicationTrait;
+
     /**
      * @var Application
      */
@@ -50,14 +53,14 @@ class UpdateCheckCommandTest extends TestCase
      */
     private $commandTester;
 
-    /**
-     * @var string
-     */
-    private $backedUpDirectory;
-
     protected function setUp(): void
     {
-        $this->initializeApplication();
+        $this->goToTestDirectory();
+
+        $this->application = new Application();
+        $this->application->add(new UpdateCheckCommand());
+        $this->composer = $this->application->getComposer();
+        $this->commandTester = new CommandTester($this->application->find('update-check'));
     }
 
     /**
@@ -144,21 +147,8 @@ class UpdateCheckCommandTest extends TestCase
         static::assertNotSame('8.0.0', $actualJson['result'][1]['New version']);
     }
 
-    private function initializeApplication(): void
-    {
-        $this->backedUpDirectory = getcwd();
-        chdir('tests/Build/test-application');
-
-        $this->application = new Application();
-        $this->application->add(new UpdateCheckCommand());
-        $this->composer = $this->application->getComposer();
-        $this->commandTester = new CommandTester($this->application->find('update-check'));
-    }
-
     protected function tearDown(): void
     {
-        if ($this->backedUpDirectory !== false) {
-            chdir($this->backedUpDirectory);
-        }
+        $this->goBackToInitialDirectory();
     }
 }
