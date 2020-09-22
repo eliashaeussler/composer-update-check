@@ -57,16 +57,19 @@ final class Installer
     {
         static::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $result = ComposerInstaller::create(static::$io, $composer)
+        $installer = ComposerInstaller::create(static::$io, $composer)
             ->setDryRun(true)
             ->setPreferSource($preferredInstall === 'source')
             ->setPreferDist($preferredInstall === 'dist')
             ->setDevMode(true)
             ->setUpdate(true)
-            ->setUpdateAllowList($packages)
-            ->setIgnorePlatformRequirements(true)
-            ->run();
-        return $result;
+            ->setIgnorePlatformRequirements(true);
+        if (method_exists($installer, 'setUpdateAllowList')) {
+            $installer->setUpdateAllowList($packages);
+        } else {
+            $installer->setUpdateWhitelist($packages);
+        }
+        return $installer->run();
     }
 
     public static function getLastOutput(): ?string
