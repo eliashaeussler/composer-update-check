@@ -25,6 +25,7 @@ use Composer\Command\BaseCommand;
 use Composer\Plugin\PluginEvents;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\Installer;
+use EliasHaeussler\ComposerUpdateCheck\Security;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use Spatie\Emoji\Emoji;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,6 +85,12 @@ class UpdateCheckCommand extends BaseCommand
             'Disables update check of require-dev packages.'
         );
         $this->addOption(
+            'security-scan',
+            's',
+            InputOption::VALUE_NONE,
+            'Run security scan for all outdated packages'
+        );
+        $this->addOption(
             'json',
             'j',
             InputOption::VALUE_NONE,
@@ -101,6 +108,7 @@ class UpdateCheckCommand extends BaseCommand
         // Prepare command options
         $ignoredPackages = $input->getOption('ignore-packages');
         $noDev = $input->getOption('no-dev');
+        $securityScan = $input->getOption('security-scan');
 
         // Resolve packages to be checked
         if (!$this->json) {
@@ -110,8 +118,15 @@ class UpdateCheckCommand extends BaseCommand
 
         // Run update check
         $result = $this->runUpdateCheck($packages);
+
+        // Overlay security scan
+        if ($securityScan) {
+            $result = Security::scanAndOverlayResult($result);
+        }
+
+        // Dispatch event and print result
         $this->dispatchPostUpdateCheckEvent($result);
-        $this->decorateResult($result);
+        $this->decorateResult($result, $securityScan);
 
         return 0;
     }
@@ -159,7 +174,7 @@ class UpdateCheckCommand extends BaseCommand
         }
     }
 
-    private function decorateResult(UpdateCheckResult $result): void
+    private function decorateResult(UpdateCheckResult $result, bool $flagInsecurePackages = false): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
 
@@ -187,11 +202,19 @@ class UpdateCheckCommand extends BaseCommand
         // Parse table rows
         $tableRows = [];
         foreach ($outdatedPackages as $outdatedPackage) {
-            $tableRows[] = [
+            $report = [
                 $outdatedPackage->getName(),
                 $outdatedPackage->getOutdatedVersion(),
                 $outdatedPackage->getNewVersion(),
             ];
+            if ($flagInsecurePackages) {
+                if (!$this->json && $outdatedPackage->isInsecure()) {
+                    $report[1] .= ' <fg=red;options=bold>insecure</>';
+                } else if ($this->json) {
+                    $report[] = $outdatedPackage->isInsecure();
+                }
+            }
+            $tableRows[] = $report;
         }
 
         // Print table
@@ -200,6 +223,9 @@ class UpdateCheckCommand extends BaseCommand
             $this->symfonyStyle->table($tableHeader, $tableRows);
         } else {
             $result = [];
+            if ($flagInsecurePackages) {
+                $tableHeader[] = 'Insecure';
+            }
             foreach ($tableRows as $tableRow) {
                 $result[] = array_combine($tableHeader, $tableRow);
             }

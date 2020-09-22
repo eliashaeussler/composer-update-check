@@ -39,7 +39,7 @@ class OutdatedPackageTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->subject = new OutdatedPackage('foo', '1.0.0', '1.0.5');
+        $this->subject = new OutdatedPackage('foo', '1.0.0', '1.0.5', true);
     }
 
     /**
@@ -53,6 +53,15 @@ class OutdatedPackageTest extends TestCase
     /**
      * @test
      */
+    public function setNameSetsNameOfOutdatedPackage(): void
+    {
+        $this->subject->setName('baz');
+        static::assertSame('baz', $this->subject->getName());
+    }
+
+    /**
+     * @test
+     */
     public function getOutdatedVersionReturnsOutdatedPackageVersion(): void
     {
         static::assertSame('1.0.0', $this->subject->getOutdatedVersion());
@@ -61,8 +70,43 @@ class OutdatedPackageTest extends TestCase
     /**
      * @test
      */
+    public function setOutdatedVersionSetsOutdatedPackageVersionOfOutdatedPackage(): void
+    {
+        $this->subject->setOutdatedVersion('1.0.4');
+        static::assertSame('1.0.4', $this->subject->getOutdatedVersion());
+    }
+
+    /**
+     * @test
+     */
     public function getNewVersionReturnsNewPackageVersionOfOutdatedPackage(): void
     {
         static::assertSame('1.0.5', $this->subject->getNewVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function setNewVersionSetsNewPackageVersionOfOutdatedPackage(): void
+    {
+        $this->subject->setNewVersion('1.1.0');
+        static::assertSame('1.1.0', $this->subject->getNewVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function isInsecureReturnsSecurityStateOfOutdatedPackage(): void
+    {
+        static::assertTrue($this->subject->isInsecure());
+    }
+
+    /**
+     * @test
+     */
+    public function setInsecureSetsSecurityStateOfOutdatedPackage(): void
+    {
+        $this->subject->setInsecure(false);
+        static::assertFalse($this->subject->isInsecure());
     }
 }

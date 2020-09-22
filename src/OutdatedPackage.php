@@ -44,11 +44,17 @@ class OutdatedPackage
      */
     private $newVersion;
 
-    public function __construct(string $name, string $outdatedVersion, string $newVersion)
+    /**
+     * @var bool
+     */
+    private $insecure;
+
+    public function __construct(string $name, string $outdatedVersion, string $newVersion, bool $insecure = false)
     {
         $this->name = $name;
         $this->outdatedVersion = $outdatedVersion;
         $this->newVersion = $newVersion;
+        $this->insecure = $insecure;
     }
 
     public function getName(): string
@@ -56,13 +62,42 @@ class OutdatedPackage
         return $this->name;
     }
 
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
     public function getOutdatedVersion(): string
     {
         return $this->outdatedVersion;
     }
 
+    public function setOutdatedVersion(string $outdatedVersion): self
+    {
+        $this->outdatedVersion = $outdatedVersion;
+        return $this;
+    }
+
     public function getNewVersion(): string
     {
         return $this->newVersion;
+    }
+
+    public function setNewVersion(string $newVersion): self
+    {
+        $this->newVersion = $newVersion;
+        return $this;
+    }
+
+    public function isInsecure(): bool
+    {
+        return $this->insecure;
+    }
+
+    public function setInsecure(bool $insecure): self
+    {
+        $this->insecure = $insecure;
+        return $this;
     }
 }

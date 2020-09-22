@@ -121,8 +121,8 @@ class UpdateCheckCommandTest extends TestCase
         static::assertSame($expectedStatus, $actualJson['status']);
         static::assertCount(1, $actualJson['result']);
         static::assertSame('phpunit/phpunit', $actualJson['result'][0]['Package']);
-        static::assertSame('8.0.0', $actualJson['result'][0]['Outdated version']);
-        static::assertNotSame('8.0.0', $actualJson['result'][0]['New version']);
+        static::assertSame('5.0.10', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('5.0.10', $actualJson['result'][0]['New version']);
     }
 
     /**
@@ -143,8 +143,32 @@ class UpdateCheckCommandTest extends TestCase
         static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
 
         static::assertSame('phpunit/phpunit', $actualJson['result'][1]['Package']);
-        static::assertSame('8.0.0', $actualJson['result'][1]['Outdated version']);
-        static::assertNotSame('8.0.0', $actualJson['result'][1]['New version']);
+        static::assertSame('5.0.10', $actualJson['result'][1]['Outdated version']);
+        static::assertNotSame('5.0.10', $actualJson['result'][1]['New version']);
+    }
+
+    /**
+     * @test
+     */
+    public function executePrintsListOfOutdatedPackagesAndFlagsInsecurePackages(): void
+    {
+        $this->commandTester->execute(['--json' => true, '--security-scan' => true]);
+
+        $actualJson = json_decode($this->commandTester->getDisplay(), true);
+        $expectedStatus = '2 packages are outdated.';
+
+        static::assertSame($expectedStatus, $actualJson['status']);
+        static::assertCount(2, $actualJson['result']);
+
+        static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
+        static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
+        static::assertFalse($actualJson['result'][0]['Insecure']);
+
+        static::assertSame('phpunit/phpunit', $actualJson['result'][1]['Package']);
+        static::assertSame('5.0.10', $actualJson['result'][1]['Outdated version']);
+        static::assertNotSame('5.0.10', $actualJson['result'][1]['New version']);
+        static::assertTrue($actualJson['result'][1]['Insecure']);
     }
 
     protected function tearDown(): void
