@@ -24,7 +24,7 @@ stages:
         vendor/bin/pcov clobber
       fi
     - composer install --no-progress
-    - composer test:ci -- --testdox
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
