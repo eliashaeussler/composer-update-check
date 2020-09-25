@@ -121,6 +121,9 @@ class UpdateCheckCommand extends BaseCommand
 
         // Overlay security scan
         if ($securityScan) {
+            if (!$this->json) {
+                $this->symfonyStyle->writeln(Emoji::policeCarLight() . ' Checking for insecure packages...');
+            }
             $result = Security::scanAndOverlayResult($result);
         }
 
