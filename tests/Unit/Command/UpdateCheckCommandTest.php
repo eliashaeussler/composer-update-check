@@ -24,8 +24,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Command;
 use Composer\Composer;
 use Composer\Console\Application;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -34,24 +34,24 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckCommandTest extends TestCase
+class UpdateCheckCommandTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
     /**
      * @var Application
      */
-    private $application;
+    protected $application;
 
     /**
      * @var Composer
      */
-    private $composer;
+    protected $composer;
 
     /**
      * @var CommandTester
      */
-    private $commandTester;
+    protected $commandTester;
 
     protected function setUp(): void
     {
@@ -174,5 +174,6 @@ class UpdateCheckCommandTest extends TestCase
     protected function tearDown(): void
     {
         $this->goBackToInitialDirectory();
+        parent::tearDown();
     }
 }

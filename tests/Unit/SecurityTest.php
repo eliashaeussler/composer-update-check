@@ -24,7 +24,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
-use PHPUnit\Framework\TestCase;
 use SensioLabs\Security\Exception\RuntimeException;
 
 /**
@@ -33,14 +32,14 @@ use SensioLabs\Security\Exception\RuntimeException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityTest extends TestCase
+class SecurityTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
     /**
      * @var string|false
      */
-    private $backedUpComposerEnvVariable;
+    protected $backedUpComposerEnvVariable;
 
     protected function setUp(): void
     {
@@ -88,10 +87,13 @@ class SecurityTest extends TestCase
     protected function tearDown(): void
     {
         $this->goBackToInitialDirectory();
+
         if ($this->backedUpComposerEnvVariable === false) {
             putenv('COMPOSER');
         } else {
             putenv('COMPOSER=' . $this->backedUpComposerEnvVariable);
         }
+
+        parent::tearDown();
     }
 }

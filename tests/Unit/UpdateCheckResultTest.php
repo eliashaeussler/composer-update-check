@@ -23,7 +23,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * UpdateCheckResultTest
@@ -31,7 +30,7 @@ use PHPUnit\Framework\TestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckResultTest extends TestCase
+class UpdateCheckResultTest extends AbstractTestCase
 {
     /**
      * @test

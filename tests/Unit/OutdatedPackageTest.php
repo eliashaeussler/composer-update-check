@@ -22,7 +22,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  */
 
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
-use PHPUnit\Framework\TestCase;
 
 /**
  * OutdatedPackageTest
@@ -30,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OutdatedPackageTest extends TestCase
+class OutdatedPackageTest extends AbstractTestCase
 {
     /**
      * @var OutdatedPackage

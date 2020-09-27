@@ -24,8 +24,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 use Composer\Composer;
 use Composer\Console\Application;
 use EliasHaeussler\ComposerUpdateCheck\Installer;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
-use PHPUnit\Framework\TestCase;
 
 /**
  * InstallerTest
@@ -33,14 +31,14 @@ use PHPUnit\Framework\TestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class InstallerTest extends TestCase
+class InstallerTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
     /**
      * @var Composer
      */
-    private $composer;
+    protected $composer;
 
     protected function setUp(): void
     {
@@ -104,5 +102,6 @@ class InstallerTest extends TestCase
     protected function tearDown(): void
     {
         $this->goBackToInitialDirectory();
+        parent::tearDown();
     }
 }
