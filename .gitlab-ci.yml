@@ -9,6 +9,8 @@ before_script:
 
 stages:
   - test
+  - docs
+  - deploy
 
 # Test template
 .test: &test-template
@@ -17,6 +19,8 @@ stages:
   before_script:
     - pecl install pcov
     - docker-php-ext-enable pcov
+    - composer self-update
+    - composer global require hirak/prestissimo --no-progress
   script:
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
@@ -59,3 +63,42 @@ test:php7.4:
   <<: *test-template
   variables:
     PHP_VERSION: "7.4"
+
+docs:
+  stage: docs
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - apk add --no-cache docker-compose
+  script:
+    - docker-compose run docs build
+  artifacts:
+    paths:
+      - site/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - docs/
+      when: on_success
+
+deploy:docs:
+  stage: deploy
+  image: instrumentisto/rsync-ssh
+  dependencies:
+    - docs
+  before_script:
+    - which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan cp140.sp-server.net >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - docs/
+      when: on_success

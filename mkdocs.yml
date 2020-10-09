@@ -1,0 +1,64 @@
+# Site configuration
+site_name: Composer update check plugin
+site_url: http://docs.elias-haeussler.de/composer-update-check/
+site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-check"
+site_author: Elias Häußler
+
+# Repository configuration
+repo_url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
+
+# Navigation
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Features: features.md
+  - Usage: usage.md
+  - 'Source code': https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
+
+# Theme configuration
+theme:
+  name: material
+  custom_dir: docs/theme
+  favicon: images/favicon.ico
+  icon:
+    logo: material/alarm
+  features:
+    - navigation.instant
+use_directory_urls: false
+extra:
+  social:
+    - icon: fontawesome/solid/globe-americas
+      link: https://haeussler.dev
+    - icon: fontawesome/brands/twitter
+      link: https://haeussler.dev/twitter
+    - icon: fontawesome/brands/gitlab
+      link: https://haeussler.dev/gitlab
+    - icon: fontawesome/solid/paper-plane
+      link: https://haeussler.dev/mail
+
+# Plugins and extensions
+plugins:
+  - search
+  - localsearch
+  - git-revision-date
+markdown_extensions:
+  - attr_list
+  - markdown.extensions.admonition
+  - markdown.extensions.toc:
+      permalink: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
