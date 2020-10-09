@@ -23,6 +23,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Command;
 
 use Composer\Composer;
 use Composer\Console\Application;
+use Composer\Json\JsonValidationException;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
@@ -53,6 +54,9 @@ class UpdateCheckCommandTest extends AbstractTestCase
      */
     protected $commandTester;
 
+    /**
+     * @throws JsonValidationException
+     */
     protected function setUp(): void
     {
         $this->goToTestDirectory();
@@ -68,8 +72,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
      */
     public function executePrintsNoOutdatedPackagesMessageIfNoPackagesAreRequired(): void
     {
-        $this->composer->getPackage()->setRequires([]);
-        $this->composer->getPackage()->setDevRequires([]);
+        $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
         $this->commandTester->execute(['--json' => true]);
 
@@ -86,7 +89,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
 
         $expected = json_encode([
             'status' => 'All packages are up to date (skipped 2 packages).',
-            'skipped' => ['phpunit/phpunit', 'composer/composer']
+            'skipped' => ['phpunit/phpunit', 'composer/composer'],
         ]);
         static::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
     }

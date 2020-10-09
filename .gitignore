@@ -3,3 +3,6 @@
 /.phpunit.result.cache
 /.build
 /tests/Build/test-application/vendor
+/tests/Build/test-application-empty/vendor
+/tests/Build/test-application-erroneous/vendor
+/site

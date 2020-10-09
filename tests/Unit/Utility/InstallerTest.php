@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
@@ -23,7 +23,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 use Composer\Composer;
 use Composer\Console\Application;
-use EliasHaeussler\ComposerUpdateCheck\Installer;
+use Composer\Json\JsonValidationException;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
+use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 
 /**
  * InstallerTest
@@ -40,6 +43,9 @@ class InstallerTest extends AbstractTestCase
      */
     protected $composer;
 
+    /**
+     * @throws JsonValidationException
+     */
     protected function setUp(): void
     {
         $this->goToTestDirectory();

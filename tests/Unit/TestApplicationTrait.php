@@ -34,10 +34,11 @@ trait TestApplicationTrait
      */
     protected $initialDirectory;
 
-    protected function goToTestDirectory(): void
+    protected function goToTestDirectory(string $applicationPath = AbstractTestCase::TEST_APPLICATION_NORMAL): void
     {
+        $this->goBackToInitialDirectory();
         $this->initialDirectory = getcwd();
-        chdir('tests/Build/test-application');
+        chdir($applicationPath);
     }
 
     protected function goBackToInitialDirectory(): void

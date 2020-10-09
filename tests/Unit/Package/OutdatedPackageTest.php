@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
@@ -21,7 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 
 /**
  * OutdatedPackageTest

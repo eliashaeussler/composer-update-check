@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
@@ -22,6 +22,7 @@ namespace EliasHaeussler\ComposerUpdateCheck;
  */
 
 use Composer\Factory;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use SensioLabs\Security\SecurityChecker;
 
 /**

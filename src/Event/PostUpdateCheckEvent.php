@@ -22,7 +22,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Event;
  */
 
 use Composer\Plugin\CommandEvent;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 
 /**
  * PostUpdateCheckEvent

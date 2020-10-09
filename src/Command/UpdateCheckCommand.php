@@ -22,12 +22,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
  */
 
 use Composer\Command\BaseCommand;
-use Composer\Plugin\PluginEvents;
-use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
-use EliasHaeussler\ComposerUpdateCheck\Installer;
-use EliasHaeussler\ComposerUpdateCheck\Security;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
-use Spatie\Emoji\Emoji;
+use Composer\Factory;
+use Composer\IO\BufferIO;
+use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,16 +40,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class UpdateCheckCommand extends BaseCommand
 {
     /**
-     * @var InputInterface
-     */
-    private $input;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
      * @var SymfonyStyle
      */
     private $symfonyStyle;
@@ -60,11 +48,6 @@ class UpdateCheckCommand extends BaseCommand
      * @var bool
      */
     private $json = false;
-
-    /**
-     * @var string[]
-     */
-    private $ignoredPackages = [];
 
     protected function configure(): void
     {
@@ -100,9 +83,7 @@ class UpdateCheckCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input = $input;
-        $this->output = $output;
-        $this->symfonyStyle = new SymfonyStyle($this->input, $this->output);
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
         $this->json = $input->getOption('json');
 
         // Prepare command options
@@ -110,87 +91,37 @@ class UpdateCheckCommand extends BaseCommand
         $noDev = $input->getOption('no-dev');
         $securityScan = $input->getOption('security-scan');
 
-        // Resolve packages to be checked
-        if (!$this->json) {
-            $this->symfonyStyle->writeln(Emoji::package() . ' Resolving packages...');
-        }
-        $packages = $this->resolvePackagesForUpdateCheck($ignoredPackages, !$noDev);
+        // Initialize IO
+        $output->setVerbosity($this->json ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
 
         // Run update check
-        $result = $this->runUpdateCheck($packages);
+        $composer = Factory::create(new BufferIO());
+        $updateChecker = new UpdateChecker($composer, $input, $output);
+        $updateChecker->setSecurityScan($securityScan);
+        $result = $updateChecker->run($ignoredPackages, !$noDev);
 
-        // Overlay security scan
-        if ($securityScan) {
-            if (!$this->json) {
-                $this->symfonyStyle->writeln(Emoji::policeCarLight() . ' Checking for insecure packages...');
-            }
-            $result = Security::scanAndOverlayResult($result);
-        }
-
-        // Dispatch event and print result
-        $this->dispatchPostUpdateCheckEvent($result);
-        $this->decorateResult($result, $securityScan);
+        // Decorate update check result
+        $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $securityScan);
 
         return 0;
     }
 
-    private function runUpdateCheck(array $packages): UpdateCheckResult
-    {
-        // Early return if no packages are listed for update check
-        if ($packages === []) {
-            return new UpdateCheckResult([]);
-        }
-
-        // Ensure dependencies are installed
-        $this->installDependencies();
-
-        // Run Composer installer
-        if (!$this->json) {
-            $this->symfonyStyle->writeln(Emoji::hourglassNotDone() . ' Checking for outdated packages...');
-        }
-        $result = Installer::runUpdate($packages, $this->getComposer());
-
-        // Handle installer failures
-        if ($result > 0) {
-            $this->symfonyStyle->writeln(Installer::getLastOutput());
-            throw new \RuntimeException(
-                sprintf('Error during update check. Exit code from Composer installer: %d', $result),
-                1600278536
-            );
-        }
-
-        return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput());
-    }
-
-    private function installDependencies(): void
-    {
-        // Run Composer installer
-        $result = Installer::runInstall($this->getComposer());
-
-        // Handle installer failures
-        if ($result > 0) {
-            $this->symfonyStyle->writeln(Installer::getLastOutput());
-            throw new \RuntimeException(
-                sprintf('Error during dependency install. Exit code from Composer installer: %d', $result),
-                1600614218
-            );
-        }
-    }
-
-    private function decorateResult(UpdateCheckResult $result, bool $flagInsecurePackages = false): void
+    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
 
         // Print message if no packages are outdated
         if ($outdatedPackages === []) {
-            $countSkipped = count($this->ignoredPackages);
+            $countSkipped = count($ignoredPackages);
             $message = sprintf(
                 'All packages are up to date%s.',
-                $countSkipped > 0
-                    ? sprintf(' (skipped %d package%s)', $countSkipped, $countSkipped !== 1 ? 's' : '')
-                    : ''
+                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, $countSkipped !== 1 ? 's' : '') : ''
             );
-            $this->json ? $this->buildJsonReport(['status' => $message]) : $this->symfonyStyle->success($message);
+            if ($this->json) {
+                $this->buildJsonReport(['status' => $message], $ignoredPackages);
+            } else {
+                $this->symfonyStyle->success($message);
+            }
             return;
         }
 
@@ -232,65 +163,15 @@ class UpdateCheckCommand extends BaseCommand
             foreach ($tableRows as $tableRow) {
                 $result[] = array_combine($tableHeader, $tableRow);
             }
-            $this->buildJsonReport([
-                'status' => $statusLabel,
-                'result' => $result,
-            ]);
+            $this->buildJsonReport(['status' => $statusLabel, 'result' => $result], $ignoredPackages);
         }
     }
 
-    private function buildJsonReport(array $report): void
+    private function buildJsonReport(array $report, array $ignoredPackages = []): void
     {
-        if ($this->ignoredPackages !== []) {
-            $report['skipped'] = $this->ignoredPackages;
+        if ($ignoredPackages !== []) {
+            $report['skipped'] = $ignoredPackages;
         }
         $this->symfonyStyle->writeln(json_encode($report));
-    }
-
-    private function resolvePackagesForUpdateCheck(array $ignoredPackages, bool $includeDevPackages): array
-    {
-        $rootPackage = $this->getComposer()->getPackage();
-        $requiredPackages = array_keys($rootPackage->getRequires());
-        $requiredDevPackages = array_keys($rootPackage->getDevRequires());
-        if ($includeDevPackages) {
-            $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
-        } else {
-            $this->ignoredPackages = array_merge($this->ignoredPackages, $requiredDevPackages);
-            if (!$this->json) {
-                $this->symfonyStyle->writeln(Emoji::prohibited() . ' Skipped dev-requirements');
-            }
-        }
-        foreach ($ignoredPackages as $ignoredPackage) {
-            $requiredPackages = $this->removeByIgnorePattern($ignoredPackage, $requiredPackages);
-        }
-        return $requiredPackages;
-    }
-
-    private function removeByIgnorePattern(string $pattern, array $packages): array
-    {
-        return array_filter($packages, function (string $package) use ($pattern) {
-            if (!fnmatch($pattern, $package)) {
-                return true;
-            }
-            if (!$this->json) {
-                $this->symfonyStyle->writeln(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package));
-            }
-            $this->ignoredPackages[] = $package;
-            return false;
-        });
-    }
-
-    private function dispatchPostUpdateCheckEvent(UpdateCheckResult $result): void
-    {
-        $commandEvent = new PostUpdateCheckEvent(
-            PluginEvents::COMMAND,
-            'update-check',
-            $this->input,
-            $this->output,
-            [],
-            [],
-            $result
-        );
-        $this->getComposer()->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
     }
 }

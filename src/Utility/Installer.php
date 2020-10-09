@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
@@ -67,6 +67,7 @@ final class Installer
         if (method_exists($installer, 'setUpdateAllowList')) {
             $installer->setUpdateAllowList($packages);
         } else {
+            /** @noinspection PhpDeprecationInspection */
             $installer->setUpdateWhitelist($packages);
         }
         return $installer->run();
