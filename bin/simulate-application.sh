@@ -12,6 +12,14 @@ if [ ! -w "${TEMP_DIR}" ]; then
 fi
 TEMP_PATH="${TEMP_DIR}/update-check-test"
 
+# Define cleanup function for INT signals
+function cleanup() {
+  trap SIGINT
+  rm -rf "${TEMP_PATH}"
+  exit
+}
+trap "cleanup" INT
+
 # Prepare temporary application
 cp -r "${APP_PATH}" "${TEMP_PATH}"
 rm -rf "${TEMP_PATH}/vendor"
@@ -23,3 +31,6 @@ composer update-check --working-dir "${TEMP_PATH}" --ansi "$@"
 
 # Clear temporary application
 rm -rf "${TEMP_PATH}"
+
+# Restore INT signal handling
+trap SIGINT
