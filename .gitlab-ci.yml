@@ -78,8 +78,6 @@ docs:
       - site/
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
-      changes:
-        - docs/
       when: on_success
 
 deploy:docs:
@@ -99,6 +97,4 @@ deploy:docs:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
-      changes:
-        - docs/
       when: on_success
