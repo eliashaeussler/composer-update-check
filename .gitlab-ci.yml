@@ -8,54 +8,95 @@ before_script:
   - composer global require hirak/prestissimo --no-progress
 
 stages:
-  - test
+#  - test
+  - docs
+  - deploy
 
-# Test template
-.test: &test-template
-  stage: test
-  image: webdevops/php:${PHP_VERSION}
+## Test template
+#.test: &test-template
+#  stage: test
+#  image: webdevops/php:${PHP_VERSION}
+#  before_script:
+#    - pecl install pcov
+#    - docker-php-ext-enable pcov
+#    - composer self-update
+#    - composer global require hirak/prestissimo --no-progress
+#  script:
+#    - >
+#      if [[ $TEST_COMPATIBILITY ]]; then
+#        composer require --dev pcov/clobber
+#        vendor/bin/pcov clobber
+#      fi
+#    - composer install --no-progress
+#    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+#  retry:
+#    max: 1
+#    when: script_failure
+#  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+#  artifacts:
+#    reports:
+#      junit: .build/coverage/junit.xml
+#  only:
+#    - branches
+#
+## Test: PHP 7.1
+#test:php7.1:
+#  <<: *test-template
+#  variables:
+#    PHP_VERSION: "7.1"
+#    TEST_COMPATIBILITY: "1"
+#
+## Test: PHP 7.2
+#test:php7.2:
+#  <<: *test-template
+#  variables:
+#    PHP_VERSION: "7.2"
+#
+## Test: PHP 7.3
+#test:php7.3:
+#  <<: *test-template
+#  variables:
+#    PHP_VERSION: "7.3"
+#
+## Test: PHP 7.4
+#test:php7.4:
+#  <<: *test-template
+#  variables:
+#    PHP_VERSION: "7.4"
+
+docs:
+  stage: docs
+  image: docker
+  services:
+    - docker:dind
   before_script:
-    - pecl install pcov
-    - docker-php-ext-enable pcov
+    - apk add --no-cache docker-compose
   script:
-    - >
-      if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
-      fi
-    - composer install --no-progress
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
-  retry:
-    max: 1
-    when: script_failure
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+    - docker-compose run docs build
   artifacts:
-    reports:
-      junit: .build/coverage/junit.xml
-  only:
-    - branches
+    paths:
+      - site/
+#  only:
+#    refs:
+#      - master
+#    changes:
+#      - docs/
 
-# Test: PHP 7.1
-test:php7.1:
-  <<: *test-template
-  variables:
-    PHP_VERSION: "7.1"
-    TEST_COMPATIBILITY: "1"
-
-# Test: PHP 7.2
-test:php7.2:
-  <<: *test-template
-  variables:
-    PHP_VERSION: "7.2"
-
-# Test: PHP 7.3
-test:php7.3:
-  <<: *test-template
-  variables:
-    PHP_VERSION: "7.3"
-
-# Test: PHP 7.4
-test:php7.4:
-  <<: *test-template
-  variables:
-    PHP_VERSION: "7.4"
+deploy:docs:
+  stage: deploy
+  image: instrumentisto/rsync-ssh
+  dependencies:
+    - docs
+  before_script:
+    - which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan cp140.sp-server.net >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "master"'
+#      when: on_success
