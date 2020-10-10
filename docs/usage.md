@@ -72,12 +72,13 @@ Initializes a new `UpdateChecker` object for the given Composer installation
 | Parameter | Description |
 | --------- | ----------- |
 | `Composer $composer` | A `Composer` object defining the Composer installation to be checked. |
-| `IOInterface $io = null` | An instance of `IOInterface` for user-oriented output. To enable output of progress messages, set the verbosity to at least _verbose_. |
+| `InputInterface $input = null` | An instance of `InputInterface` handling user input. |
+| `OutputInterface $output = null` | An instance of `OutputInterface` for user-oriented output. To enable output of progress messages, set the verbosity to at least _verbose_. |
 
 Example:
 
-```bash
-new UpdateChecker($composer, new ConsoleIO($input, $output, new HelperSet()));
+```php
+new UpdateChecker($composer, $input, $output);
 ```
 
 ### `UpdateChecker::run()`
