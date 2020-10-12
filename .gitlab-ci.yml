@@ -3,10 +3,6 @@ variables:
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_NO_INTERACTION: "1"
 
-before_script:
-  - composer self-update
-  - composer global require hirak/prestissimo --no-progress
-
 stages:
   - test
   - docs
@@ -17,6 +13,7 @@ stages:
   stage: test
   image: webdevops/php:${PHP_VERSION}
   before_script:
+    - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
     - composer self-update
