@@ -21,6 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use GuzzleHttp\Psr7\Uri;
+
 /**
  * OutdatedPackage
  *
@@ -29,6 +31,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  */
 class OutdatedPackage
 {
+    private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
+
     /**
      * @var string
      */
@@ -49,12 +53,18 @@ class OutdatedPackage
      */
     private $insecure;
 
+    /**
+     * @var Uri
+     */
+    private $providerLink;
+
     public function __construct(string $name, string $outdatedVersion, string $newVersion, bool $insecure = false)
     {
         $this->name = $name;
         $this->outdatedVersion = $outdatedVersion;
         $this->newVersion = $newVersion;
         $this->insecure = $insecure;
+        $this->providerLink = $this->generateProviderLink();
     }
 
     public function getName(): string
@@ -99,5 +109,23 @@ class OutdatedPackage
     {
         $this->insecure = $insecure;
         return $this;
+    }
+
+    public function getProviderLink(): Uri
+    {
+        return $this->providerLink;
+    }
+
+    public function setProviderLink(Uri $providerLink): self
+    {
+        $this->providerLink = $providerLink;
+        return $this;
+    }
+
+    private function generateProviderLink(): Uri
+    {
+        $versionHash = explode(' ', $this->newVersion, 2)[0];
+        $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
+        return new Uri($uri);
     }
 }
