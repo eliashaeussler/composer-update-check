@@ -30,7 +30,7 @@ stages:
     - composer install --no-progress
     - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   retry:
-    max: 1
+    max: 2
     when: script_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
