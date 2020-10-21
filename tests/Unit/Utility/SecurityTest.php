@@ -43,7 +43,7 @@ class SecurityTest extends AbstractTestCase
      */
     protected $backedUpComposerEnvVariable;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->goToTestDirectory();
         $this->backedUpComposerEnvVariable = getenv('COMPOSER');
@@ -52,7 +52,7 @@ class SecurityTest extends AbstractTestCase
     /**
      * @test
      */
-    public function scanThrowsExceptionIfComposerLockFileIsNotAvailable(): void
+    public function scanThrowsExceptionIfComposerLockFileIsNotAvailable()
     {
         putenv('COMPOSER=/foo');
 
@@ -64,7 +64,7 @@ class SecurityTest extends AbstractTestCase
     /**
      * @test
      */
-    public function scanReturnsSecurityVulnerabilities(): void
+    public function scanReturnsSecurityVulnerabilities()
     {
         $scan = Security::scan();
         static::assertArrayHasKey('phpunit/phpunit', $scan);
@@ -74,7 +74,7 @@ class SecurityTest extends AbstractTestCase
     /**
      * @test
      */
-    public function scanAndOverlayResultsAppliesInsecureFlagsToInsecureOutdatedPackages(): void
+    public function scanAndOverlayResultsAppliesInsecureFlagsToInsecureOutdatedPackages()
     {
         $securePackage = new OutdatedPackage('composer/composer', '1.0.0', '1.3.3');
         $insecurePackage = new OutdatedPackage('phpunit/phpunit', '5.0.10', '5.3.0');
@@ -86,7 +86,7 @@ class SecurityTest extends AbstractTestCase
         static::assertTrue($insecurePackage->isInsecure());
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $this->goBackToInitialDirectory();
 

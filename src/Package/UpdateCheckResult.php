@@ -29,7 +29,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  */
 class UpdateCheckResult
 {
-    protected const COMMAND_OUTPUT_PATTERN =
+    const COMMAND_OUTPUT_PATTERN =
         '#^' .
             '\\s*- Updating ' .
             '(?P<name>[^\\s]+) \\(' .
@@ -65,7 +65,7 @@ class UpdateCheckResult
         return new static($packages);
     }
 
-    public static function parseCommandOutput(string $output): ?OutdatedPackage
+    public static function parseCommandOutput(string $output)
     {
         if (!preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches)) {
             return null;
@@ -76,7 +76,7 @@ class UpdateCheckResult
         return new OutdatedPackage($packageName, $outdatedVersion, $newVersion);
     }
 
-    private function validateOutdatedPackages(): void
+    private function validateOutdatedPackages()
     {
         foreach ($this->outdatedPackages as $key => $outdatedPackage) {
             if (!($outdatedPackage instanceof OutdatedPackage)) {

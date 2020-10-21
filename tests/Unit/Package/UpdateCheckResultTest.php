@@ -36,7 +36,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @test
      */
-    public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid(): void
+    public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
@@ -47,7 +47,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @test
      */
-    public function getOutdatedPackagesReturnsListOfOutdatedPackages(): void
+    public function getOutdatedPackagesReturnsListOfOutdatedPackages()
     {
         $outdatedPackage1 = new OutdatedPackage('foo', '1.0.0', '1.0.5');
         $outdatedPackage2 = new OutdatedPackage('baz', '2.0.1', '2.1.2');
@@ -66,8 +66,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
         array $expected
-    ): void
-    {
+    ) {
         $subject = UpdateCheckResult::fromCommandOutput($commandOutput);
         $outdatedPackages = $subject->getOutdatedPackages();
 
@@ -89,7 +88,7 @@ class UpdateCheckResultTest extends AbstractTestCase
      * @param string $commandOutput
      * @param OutdatedPackage|null $expected
      */
-    public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, ?OutdatedPackage $expected): void
+    public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, OutdatedPackage $expected = null)
     {
         static::assertEquals($expected, UpdateCheckResult::parseCommandOutput($commandOutput));
     }

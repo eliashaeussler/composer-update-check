@@ -11,21 +11,22 @@ stages:
 # Test template
 .test: &test-template
   stage: test
-  image: webdevops/php:${PHP_VERSION}
+  image: webdevops/$DOCKER_IMAGE
   before_script:
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
     - composer self-update
     - composer global require hirak/prestissimo --no-progress
   script:
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
+        TEST_SCRIPT="test:ci:legacy"
+      else
+        TEST_SCRIPT="test:ci"
+        pecl channel-update pecl.php.net
+        pecl install pcov
+        docker-php-ext-enable pcov
       fi
     - composer install --no-progress
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer "$TEST_SCRIPT" -- --testdox
   retry:
     max: 2
     when: script_failure
@@ -36,30 +37,37 @@ stages:
   only:
     - branches
 
+# Test: PHP 7.0
+test:php7.0:
+  <<: *test-template
+  variables:
+    DOCKER_IMAGE: "php-dev:7.0"
+    TEST_COMPATIBILITY: "1"
+
 # Test: PHP 7.1
 test:php7.1:
   <<: *test-template
   variables:
-    PHP_VERSION: "7.1"
+    DOCKER_IMAGE: "php-dev:7.1"
     TEST_COMPATIBILITY: "1"
 
 # Test: PHP 7.2
 test:php7.2:
   <<: *test-template
   variables:
-    PHP_VERSION: "7.2"
+    DOCKER_IMAGE: "php:7.2"
 
 # Test: PHP 7.3
 test:php7.3:
   <<: *test-template
   variables:
-    PHP_VERSION: "7.3"
+    DOCKER_IMAGE: "php:7.3"
 
 # Test: PHP 7.4
 test:php7.4:
   <<: *test-template
   variables:
-    PHP_VERSION: "7.4"
+    DOCKER_IMAGE: "php:7.4"
 
 docs:
   stage: docs

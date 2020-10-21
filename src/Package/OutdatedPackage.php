@@ -31,7 +31,7 @@ use GuzzleHttp\Psr7\Uri;
  */
 class OutdatedPackage
 {
-    private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
+    const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
 
     /**
      * @var string

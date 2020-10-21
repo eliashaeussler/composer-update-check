@@ -43,7 +43,7 @@ class OutdatedPackageTest extends AbstractTestCase
      */
     protected $subjectWithBranch;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->subjectWithVersion = new OutdatedPackage(
             'foo',
@@ -62,7 +62,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function getNameReturnsOutdatedPackageName(): void
+    public function getNameReturnsOutdatedPackageName()
     {
         static::assertSame('foo', $this->subjectWithVersion->getName());
         static::assertSame('buu', $this->subjectWithBranch->getName());
@@ -71,7 +71,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setNameSetsNameOfOutdatedPackage(): void
+    public function setNameSetsNameOfOutdatedPackage()
     {
         $this->subjectWithVersion->setName('baz');
         static::assertSame('baz', $this->subjectWithVersion->getName());
@@ -82,7 +82,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function getOutdatedVersionReturnsOutdatedPackageVersion(): void
+    public function getOutdatedVersionReturnsOutdatedPackageVersion()
     {
         static::assertSame('1.0.0', $this->subjectWithVersion->getOutdatedVersion());
         static::assertSame('dev-master 12345', $this->subjectWithBranch->getOutdatedVersion());
@@ -91,7 +91,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setOutdatedVersionSetsOutdatedPackageVersionOfOutdatedPackage(): void
+    public function setOutdatedVersionSetsOutdatedPackageVersionOfOutdatedPackage()
     {
         $this->subjectWithVersion->setOutdatedVersion('1.0.4');
         static::assertSame('1.0.4', $this->subjectWithVersion->getOutdatedVersion());
@@ -102,7 +102,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function getNewVersionReturnsNewPackageVersionOfOutdatedPackage(): void
+    public function getNewVersionReturnsNewPackageVersionOfOutdatedPackage()
     {
         static::assertSame('1.0.5', $this->subjectWithVersion->getNewVersion());
         static::assertSame('dev-master 67890', $this->subjectWithBranch->getNewVersion());
@@ -111,7 +111,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setNewVersionSetsNewPackageVersionOfOutdatedPackage(): void
+    public function setNewVersionSetsNewPackageVersionOfOutdatedPackage()
     {
         $this->subjectWithVersion->setNewVersion('1.1.0');
         static::assertSame('1.1.0', $this->subjectWithVersion->getNewVersion());
@@ -122,7 +122,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function isInsecureReturnsSecurityStateOfOutdatedPackage(): void
+    public function isInsecureReturnsSecurityStateOfOutdatedPackage()
     {
         static::assertTrue($this->subjectWithVersion->isInsecure());
         static::assertFalse($this->subjectWithBranch->isInsecure());
@@ -131,7 +131,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setInsecureSetsSecurityStateOfOutdatedPackage(): void
+    public function setInsecureSetsSecurityStateOfOutdatedPackage()
     {
         $this->subjectWithVersion->setInsecure(false);
         static::assertFalse($this->subjectWithVersion->isInsecure());
@@ -142,7 +142,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function getProviderLinkReturnsProviderLinkOfOutdatedPackage(): void
+    public function getProviderLinkReturnsProviderLinkOfOutdatedPackage()
     {
         $expected = new Uri('https://packagist.org/packages/foo#1.0.5');
         static::assertEquals($expected, $this->subjectWithVersion->getProviderLink());
@@ -153,7 +153,7 @@ class OutdatedPackageTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setProviderLinkSetsProviderLinkOfOutdatedPackage(): void
+    public function setProviderLinkSetsProviderLinkOfOutdatedPackage()
     {
         $uri = new Uri('https://example.org/foo');
         $this->subjectWithVersion->setProviderLink($uri);

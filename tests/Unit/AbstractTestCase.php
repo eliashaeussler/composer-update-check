@@ -31,14 +31,14 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractTestCase extends TestCase
 {
-    public const TEST_APPLICATION_NORMAL = 'tests/Build/test-application';
-    public const TEST_APPLICATION_EMPTY = 'tests/Build/test-application-empty';
-    public const TEST_APPLICATION_ERRONEOUS = 'tests/Build/test-application-erroneous';
+    const TEST_APPLICATION_NORMAL = 'tests/Build/test-application';
+    const TEST_APPLICATION_EMPTY = 'tests/Build/test-application-empty';
+    const TEST_APPLICATION_ERRONEOUS = 'tests/Build/test-application-erroneous';
 
     /**
      * @throws \ReflectionException
      */
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $reflection = new \ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {

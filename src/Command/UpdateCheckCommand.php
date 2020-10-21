@@ -49,7 +49,7 @@ class UpdateCheckCommand extends BaseCommand
      */
     private $json = false;
 
-    protected function configure(): void
+    protected function configure()
     {
         $this->setName('update-check');
         $this->setDescription('Checks your root requirements for available updates.');
@@ -106,7 +106,7 @@ class UpdateCheckCommand extends BaseCommand
         return 0;
     }
 
-    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
+    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false)
     {
         $outdatedPackages = $result->getOutdatedPackages();
 
@@ -167,7 +167,7 @@ class UpdateCheckCommand extends BaseCommand
         }
     }
 
-    private function buildJsonReport(array $report, array $ignoredPackages = []): void
+    private function buildJsonReport(array $report, array $ignoredPackages = [])
     {
         if ($ignoredPackages !== []) {
             $report['skipped'] = $ignoredPackages;

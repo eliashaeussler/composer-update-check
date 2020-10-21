@@ -134,7 +134,7 @@ class UpdateChecker
         return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput());
     }
 
-    private function installDependencies(): void
+    private function installDependencies()
     {
         // Run Composer installer
         $result = Installer::runInstall($this->composer);
@@ -183,7 +183,7 @@ class UpdateChecker
         });
     }
 
-    private function dispatchPostUpdateCheckEvent(UpdateCheckResult $result): void
+    private function dispatchPostUpdateCheckEvent(UpdateCheckResult $result)
     {
         $commandEvent = new PostUpdateCheckEvent(
             PluginEvents::COMMAND,

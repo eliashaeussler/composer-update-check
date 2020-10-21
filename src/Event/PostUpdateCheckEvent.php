@@ -51,7 +51,7 @@ class PostUpdateCheckEvent extends CommandEvent
         $this->updateCheckResult = $updateCheckResult;
     }
 
-    public function getUpdateCheckResult(): ?UpdateCheckResult
+    public function getUpdateCheckResult()
     {
         return $this->updateCheckResult;
     }

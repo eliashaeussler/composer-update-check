@@ -46,7 +46,7 @@ class InstallerTest extends AbstractTestCase
     /**
      * @throws JsonValidationException
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->goToTestDirectory();
 
@@ -57,7 +57,7 @@ class InstallerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runInstallInstallsComposerDependencies(): void
+    public function runInstallInstallsComposerDependencies()
     {
         static::assertSame(0, Installer::runInstall($this->composer));
         static::assertStringContainsString(
@@ -73,7 +73,7 @@ class InstallerTest extends AbstractTestCase
      * @param string $expected
      * @param string|null $notExpected
      */
-    public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null): void
+    public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null)
     {
         // Ensure dependencies are installed
         Installer::runInstall($this->composer);
@@ -105,7 +105,7 @@ class InstallerTest extends AbstractTestCase
         ];
     }
     
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $this->goBackToInitialDirectory();
         parent::tearDown();

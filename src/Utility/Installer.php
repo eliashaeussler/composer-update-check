@@ -73,7 +73,7 @@ final class Installer
         return $installer->run();
     }
 
-    public static function getLastOutput(): ?string
+    public static function getLastOutput()
     {
         if (static::$io instanceof BufferIO) {
             return static::$io->getOutput();

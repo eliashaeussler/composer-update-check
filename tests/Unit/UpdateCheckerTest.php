@@ -51,7 +51,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @throws JsonValidationException
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->goToTestDirectory();
 
@@ -64,7 +64,7 @@ class UpdateCheckerTest extends AbstractTestCase
      * @test
      * @throws JsonValidationException
      */
-    public function runThrowsExceptionIfDependenciesCannotBeInstalled(): void
+    public function runThrowsExceptionIfDependenciesCannotBeInstalled()
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_ERRONEOUS);
 
@@ -80,7 +80,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
+    public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired()
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
@@ -91,7 +91,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
+    public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped()
     {
         $expected = new UpdateCheckResult([]);
         static::assertEquals($expected, $this->subject->run(['composer/*'], false));
@@ -100,7 +100,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsUpdateCheckResultWithoutDevRequirements(): void
+    public function runReturnsUpdateCheckResultWithoutDevRequirements()
     {
         $outdatedPackages = $this->subject->run([], false)->getOutdatedPackages();
         /** @var OutdatedPackage $outdatedPackage */
@@ -115,7 +115,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsUpdateCheckResultWithoutSkippedPackages(): void
+    public function runReturnsUpdateCheckResultWithoutSkippedPackages()
     {
         $outdatedPackages = $this->subject->run(['composer/*'])->getOutdatedPackages();
         /** @var OutdatedPackage $outdatedPackage */
@@ -130,7 +130,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsUpdateCheckResultListOfOutdatedPackages(): void
+    public function runReturnsUpdateCheckResultListOfOutdatedPackages()
     {
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
         /** @var OutdatedPackage $firstOutdatedPackage */
@@ -152,7 +152,7 @@ class UpdateCheckerTest extends AbstractTestCase
     /**
      * @test
      */
-    public function runReturnsUpdateCheckResultListOfOutdatedPackagesAndFlagsInsecurePackages(): void
+    public function runReturnsUpdateCheckResultListOfOutdatedPackagesAndFlagsInsecurePackages()
     {
         $this->subject->setSecurityScan(true);
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
@@ -174,7 +174,7 @@ class UpdateCheckerTest extends AbstractTestCase
         static::assertTrue($secondOutdatedPackage->isInsecure());
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $this->goBackToInitialDirectory();
         parent::tearDown();

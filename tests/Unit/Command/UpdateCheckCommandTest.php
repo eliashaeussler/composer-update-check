@@ -57,7 +57,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @throws JsonValidationException
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->goToTestDirectory();
 
@@ -70,7 +70,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsNoOutdatedPackagesMessageIfNoPackagesAreRequired(): void
+    public function executePrintsNoOutdatedPackagesMessageIfNoPackagesAreRequired()
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
@@ -83,7 +83,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped(): void
+    public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped()
     {
         $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/*'], '--no-dev' => true]);
 
@@ -97,7 +97,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsListOfOutdatedPackagesWithoutDevRequirements(): void
+    public function executePrintsListOfOutdatedPackagesWithoutDevRequirements()
     {
         $this->commandTester->execute(['--json' => true, '--no-dev' => true]);
 
@@ -114,7 +114,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages(): void
+    public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages()
     {
         $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/composer']]);
 
@@ -131,7 +131,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsListOfOutdatedPackages(): void
+    public function executePrintsListOfOutdatedPackages()
     {
         $this->commandTester->execute(['--json' => true]);
 
@@ -153,7 +153,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
     /**
      * @test
      */
-    public function executePrintsListOfOutdatedPackagesAndFlagsInsecurePackages(): void
+    public function executePrintsListOfOutdatedPackagesAndFlagsInsecurePackages()
     {
         $this->commandTester->execute(['--json' => true, '--security-scan' => true]);
 
@@ -174,7 +174,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
         static::assertTrue($actualJson['result'][1]['Insecure']);
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $this->goBackToInitialDirectory();
         parent::tearDown();
