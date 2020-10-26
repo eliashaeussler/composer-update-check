@@ -16,7 +16,7 @@ stages:
     - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
-    - composer self-update
+    - composer self-update --1
     - composer global require hirak/prestissimo --no-progress
   script:
     - >
