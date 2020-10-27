@@ -30,7 +30,9 @@ stages:
     - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   retry:
     max: 2
-    when: script_failure
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
