@@ -21,10 +21,12 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Composer;
+use Composer\Composer as BaseComposer;
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
+use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 
@@ -36,10 +38,11 @@ use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
  */
 class InstallerTest extends AbstractTestCase
 {
+    use ExpectedCommandOutputTrait;
     use TestApplicationTrait;
 
     /**
-     * @var Composer
+     * @var BaseComposer
      */
     protected $composer;
 
@@ -59,11 +62,13 @@ class InstallerTest extends AbstractTestCase
      */
     public function runInstallInstallsComposerDependencies(): void
     {
+        $expected = 'Installing dependencies from lock file (including require-dev)';
+        if (Composer::getMajorVersion() < 2) {
+            $expected = 'Installing dependencies (including require-dev) from lock file';
+        }
+
         static::assertSame(0, Installer::runInstall($this->composer));
-        static::assertStringContainsString(
-            'Installing dependencies (including require-dev) from lock file',
-            Installer::getLastOutput()
-        );
+        static::assertStringContainsString($expected, Installer::getLastOutput());
     }
 
     /**
@@ -90,17 +95,17 @@ class InstallerTest extends AbstractTestCase
         return [
             'no explicit whitelist' => [
                 [],
-                '- Updating',
+                $this->getExpectedCommandOutput(),
             ],
             'composer/composer only' => [
                 ['composer/composer'],
-                '- Updating composer/composer',
-                '- Updating phpunit/phpunit',
+                $this->getExpectedCommandOutput('composer/composer'),
+                $this->getExpectedCommandOutput('phpunit/phpunit'),
             ],
             'phpunit/phpunit only' => [
                 ['phpunit/phpunit'],
-                '- Updating phpunit/phpunit',
-                '- Updating composer/composer',
+                $this->getExpectedCommandOutput('phpunit/phpunit'),
+                $this->getExpectedCommandOutput('composer/composer'),
             ],
         ];
     }

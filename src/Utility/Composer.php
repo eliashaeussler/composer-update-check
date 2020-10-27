@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
@@ -21,41 +21,39 @@ namespace EliasHaeussler\ComposerUpdateCheck;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Composer;
-use Composer\IO\IOInterface;
-use Composer\Plugin\Capability\CommandProvider;
-use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
 
 /**
- * Plugin
+ * Composer
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
- * @codeCoverageIgnore
  */
-class Plugin implements PluginInterface, Capable
+final class Composer
 {
-    public function activate(Composer $composer, IOInterface $io): void
+    public const VERSION_FULL = 0;
+    public const VERSION_MAJOR = 1;
+    public const VERSION_BRANCH = 2;
+
+    public static function getPlatformVersion(int $versionType = self::VERSION_FULL): string
     {
-        // Nothing to do here. Just go ahead :)
+        $platformVersion = PluginInterface::PLUGIN_API_VERSION;
+        $versionComponents = explode('.', $platformVersion);
+
+        switch ($versionType) {
+            case static::VERSION_FULL:
+                return $platformVersion;
+            case static::VERSION_MAJOR:
+                return $versionComponents[0];
+            case static::VERSION_BRANCH:
+                return $versionComponents[0] . '.' . $versionComponents[1];
+            default:
+                throw new \InvalidArgumentException('The given version type is not supported.', 1603794822);
+        }
     }
 
-    public function deactivate(Composer $composer, IOInterface $io)
+    public static function getMajorVersion(): int
     {
-        // Nothing to do here. Just go ahead :)
-    }
-
-    public function uninstall(Composer $composer, IOInterface $io)
-    {
-        // Nothing to do here. Just go ahead :)
-    }
-
-    public function getCapabilities(): array
-    {
-        return [
-            CommandProvider::class => UpdateCheckCommandProvider::class,
-        ];
+        return (int)static::getPlatformVersion(self::VERSION_MAJOR);
     }
 }

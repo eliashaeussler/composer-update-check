@@ -16,9 +16,11 @@ stages:
     - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
-    - composer self-update --1
-    - composer global require hirak/prestissimo --no-progress
+    - composer self-update --${COMPOSER_VERSION-2}
+    - composer --version
+    - php --version
   script:
+    - composer req --dev "composer/composer:^${COMPOSER_VERSION-2}.0" --no-progress
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
         composer require --dev pcov/clobber
@@ -36,30 +38,63 @@ stages:
   only:
     - branches
 
-# Test: PHP 7.1
-test:php7.1:
+# Test: PHP 7.1 & Composer v1
+test:php7.1:v1:
   <<: *test-template
   variables:
     PHP_VERSION: "7.1"
     TEST_COMPATIBILITY: "1"
+    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.2
-test:php7.2:
+# Test: PHP 7.2 & Composer v1
+test:php7.2:v1:
   <<: *test-template
   variables:
     PHP_VERSION: "7.2"
+    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.3
-test:php7.3:
+# Test: PHP 7.3 & Composer v1
+test:php7.3:v1:
   <<: *test-template
   variables:
     PHP_VERSION: "7.3"
+    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.4
-test:php7.4:
+# Test: PHP 7.4 & Composer v1
+test:php7.4:v1:
   <<: *test-template
   variables:
     PHP_VERSION: "7.4"
+    COMPOSER_VERSION: "1"
+
+# Test: PHP 7.1 & Composer v2
+test:php7.1:v2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.1"
+    TEST_COMPATIBILITY: "1"
+    COMPOSER_VERSION: "2"
+
+# Test: PHP 7.2 & Composer v2
+test:php7.2:v2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.2"
+    COMPOSER_VERSION: "2"
+
+# Test: PHP 7.3 & Composer v2
+test:php7.3:v2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.3"
+    COMPOSER_VERSION: "2"
+
+# Test: PHP 7.4 & Composer v2
+test:php7.4:v2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.4"
+    COMPOSER_VERSION: "2"
 
 docs:
   stage: docs

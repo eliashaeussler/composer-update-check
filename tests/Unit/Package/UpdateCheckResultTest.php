@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 
 /**
  * UpdateCheckResultTest
@@ -33,6 +34,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
  */
 class UpdateCheckResultTest extends AbstractTestCase
 {
+    use ExpectedCommandOutputTrait;
+
     /**
      * @test
      */
@@ -110,8 +113,8 @@ class UpdateCheckResultTest extends AbstractTestCase
                     'this is some dummy text',
                     'just ignore it',
                     'but these lines are important:',
-                    '  - Updating foo/baz (1.0.0) to foo/baz (1.0.5)',
-                    '  - Updating dummy/package (dev-master 12345) to dummy/package (dev-master 67890)',
+                    $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+                    $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
                     'bye',
                 ]),
                 [
@@ -134,7 +137,7 @@ class UpdateCheckResultTest extends AbstractTestCase
                 null,
             ],
             'matching package' => [
-                '  - Updating foo/baz (1.0.0) to foo/baz (1.0.5)',
+                $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
                 new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
             ],
         ];

@@ -21,6 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
+
 /**
  * UpdateCheckResult
  *
@@ -30,6 +32,15 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
 class UpdateCheckResult
 {
     protected const COMMAND_OUTPUT_PATTERN =
+        '#^' .
+            '\\s*- Upgrading ' .
+            '(?P<name>[^\\s]+) \\(' .
+                '(?P<outdated>.+)' .
+                ' => ' .
+                '(?P<new>[^)]+)' .
+            '\\)' .
+        '$#';
+    protected const LEGACY_COMMAND_OUTPUT_PATTERN =
         '#^' .
             '\\s*- Updating ' .
             '(?P<name>[^\\s]+) \\(' .
@@ -61,13 +72,16 @@ class UpdateCheckResult
     public static function fromCommandOutput(string $output): self
     {
         $outputParts = explode(PHP_EOL, $output);
-        $packages = array_filter(array_map([static::class, 'parseCommandOutput'], $outputParts));
+        $packages = array_unique(array_filter(array_map([static::class, 'parseCommandOutput'], $outputParts)), SORT_REGULAR);
         return new static($packages);
     }
 
     public static function parseCommandOutput(string $output): ?OutdatedPackage
     {
-        if (!preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches)) {
+        if (
+            !preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches) &&
+            !preg_match(static::LEGACY_COMMAND_OUTPUT_PATTERN, $output, $matches)
+        ) {
             return null;
         }
         $packageName = $matches['name'];
