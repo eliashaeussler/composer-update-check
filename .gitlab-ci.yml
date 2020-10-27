@@ -4,23 +4,22 @@ variables:
   COMPOSER_NO_INTERACTION: "1"
 
 stages:
-  - test
+  - test-v1
+  - test-v2
   - docs
   - deploy
 
-# Test template
+# General test template
 .test: &test-template
-  stage: test
   image: webdevops/php:${PHP_VERSION}
-  before_script:
+  script:
     - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
-    - composer self-update --${COMPOSER_VERSION-2}
+    - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-  script:
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION-2}.0" --no-progress
+    - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
         composer require --dev pcov/clobber
@@ -40,63 +39,72 @@ stages:
   only:
     - branches
 
-# Test: PHP 7.1 & Composer v1
-test:php7.1:v1:
+# Test v1 template
+.test-v1: &test-v1-template
   <<: *test-template
+  stage: test-v1
+  before_script:
+    - export COMPOSER_VERSION=1
+
+# Test v2 template
+.test-v2: &test-v2-template
+  <<: *test-template
+  stage: test-v2
+  before_script:
+    - export COMPOSER_VERSION=2
+  # Add delay between test stages to avoid HTTP 429 errors
+  when: delayed
+  start_in: 5 minutes
+
+# Test v1: PHP 7.1
+test-v1:php7.1:
+  <<: *test-v1-template
   variables:
     PHP_VERSION: "7.1"
     TEST_COMPATIBILITY: "1"
-    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.2 & Composer v1
-test:php7.2:v1:
-  <<: *test-template
+# Test v1: PHP 7.2
+test-v1:php7.2:
+  <<: *test-v1-template
   variables:
     PHP_VERSION: "7.2"
-    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.3 & Composer v1
-test:php7.3:v1:
-  <<: *test-template
+# Test v1: PHP 7.3
+test-v1:php7.3:
+  <<: *test-v1-template
   variables:
     PHP_VERSION: "7.3"
-    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.4 & Composer v1
-test:php7.4:v1:
-  <<: *test-template
+# Test v1: PHP 7.4
+test-v1:php7.4:
+  <<: *test-v1-template
   variables:
     PHP_VERSION: "7.4"
-    COMPOSER_VERSION: "1"
 
-# Test: PHP 7.1 & Composer v2
-test:php7.1:v2:
-  <<: *test-template
+# Test v2: PHP 7.1
+test-v2:php7.1:
+  <<: *test-v2-template
   variables:
     PHP_VERSION: "7.1"
     TEST_COMPATIBILITY: "1"
-    COMPOSER_VERSION: "2"
 
-# Test: PHP 7.2 & Composer v2
-test:php7.2:v2:
-  <<: *test-template
+# Test v2: PHP 7.2
+test-v2:php7.2:
+  <<: *test-v2-template
   variables:
     PHP_VERSION: "7.2"
-    COMPOSER_VERSION: "2"
 
-# Test: PHP 7.3 & Composer v2
-test:php7.3:v2:
-  <<: *test-template
+# Test v2: PHP 7.3
+test-v2:php7.3:
+  <<: *test-v2-template
   variables:
     PHP_VERSION: "7.3"
-    COMPOSER_VERSION: "2"
 
-# Test: PHP 7.4 & Composer v2
-test:php7.4:v2:
-  <<: *test-template
+# Test v2: PHP 7.4
+test-v2:php7.4:
+  <<: *test-v2-template
   variables:
     PHP_VERSION: "7.4"
-    COMPOSER_VERSION: "2"
 
 docs:
   stage: docs
