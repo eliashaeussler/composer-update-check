@@ -21,8 +21,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
-
 /**
  * UpdateCheckResult
  *
