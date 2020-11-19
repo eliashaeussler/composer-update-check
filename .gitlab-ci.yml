@@ -140,3 +140,43 @@ deploy:docs:
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
       when: on_success
+
+# Deploy docker image
+.deploy:docker: &deploy-docker-template
+  stage: deploy
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+
+deploy:docker:v2:
+  <<: *deploy-docker-template
+  script:
+    - >
+      docker build --pull \
+        --build-arg COMPOSER_VERSION=2 \
+        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG-v2 \
+        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG \
+        --tag $CI_REGISTRY_IMAGE:v2 \
+        --tag $CI_REGISTRY_IMAGE:latest \
+        .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG-v2
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker push $CI_REGISTRY_IMAGE:v2
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+deploy:docker:v1:
+  <<: *deploy-docker-template
+  script:
+    - >
+      docker build --pull \
+        --build-arg COMPOSER_VERSION=1 \
+        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG-v1 \
+        --tag $CI_REGISTRY_IMAGE:v1 \
+        .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG-v1
+    - docker push $CI_REGISTRY_IMAGE:v1

@@ -105,7 +105,7 @@ other tools or programs.
     If you want to use the update check result for additional reports,
     you might be interested in the
     [`PostUpdateCheckEvent`](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/blob/master/src/Event/PostUpdateCheckEvent.php)
-    which is being dispatched after each successfull update check.
+    which is being dispatched after each successful update check.
 
 ### Command
 

@@ -1,6 +1,7 @@
 [![Pipeline](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/pipeline.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
 [![Coverage](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/coverage.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
 [![Packagist](https://badgen.net/packagist/v/eliashaeussler/composer-update-check)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![Docker](https://img.shields.io/docker/v/eliashaeussler/composer-update-check?label=docker&sort=semver)](https://hub.docker.com/r/eliashaeussler/composer-update-check)
 [![License](https://badgen.net/packagist/license/eliashaeussler/composer-update-check)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/blob/master/LICENSE)
 [![Documentation](https://badgen.net/badge/read/the%20docs/cyan)](https://docs.elias-haeussler.de/composer-update-check/)
 

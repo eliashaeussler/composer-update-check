@@ -17,6 +17,7 @@ nav:
   - Installation: install.md
   - Features: features.md
   - Usage: usage.md
+  - 'Docker image': docker.md
   - 'Source code': https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
 
 # Theme configuration

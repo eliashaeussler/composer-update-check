@@ -1,6 +1,7 @@
 [![Pipeline](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/pipeline.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
 [![Coverage](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/badges/master/coverage.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/pipelines)
 [![Packagist](https://badgen.net/packagist/v/eliashaeussler/composer-update-check)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![Docker](https://img.shields.io/docker/v/eliashaeussler/composer-update-check?label=docker&sort=semver)](https://hub.docker.com/r/eliashaeussler/composer-update-check)
 [![License](https://badgen.net/packagist/license/eliashaeussler/composer-update-check)](LICENSE)
 [![Documentation](https://badgen.net/badge/read/the%20docs/cyan)](https://docs.elias-haeussler.de/composer-update-check/)
 
@@ -28,6 +29,19 @@ composer update-check -i "my-vendor/*" -i "roave/security-advisories"
 
 # Exclude dev-requirements and custom packages
 composer update-check -i "my-vendor/*" --no-dev
+```
+
+### Usage with Docker
+
+```bash
+# Use latest version (Composer v2)
+docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check
+
+# Use specific version (Composer v2)
+docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check:0.6.0
+
+# Use specific version (Composer v1)
+docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check:0.6.0-v1
 ```
 
 ### Additional security scan
