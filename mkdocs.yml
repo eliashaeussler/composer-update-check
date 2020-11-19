@@ -45,6 +45,9 @@ plugins:
   - search
   - localsearch
   - git-revision-date
+  - exclude:
+      glob:
+        - build/*
 markdown_extensions:
   - attr_list
   - markdown.extensions.admonition
