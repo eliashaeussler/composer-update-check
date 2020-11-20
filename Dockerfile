@@ -7,4 +7,4 @@ RUN composer global config repositories.update-check path /update-check
 RUN composer global require --dev "eliashaeussler/composer-update-check:*@dev"
 
 WORKDIR /app
-ENTRYPOINT ["composer", "update-check"]
+ENTRYPOINT ["/update-check/docker/docker-entrypoint.sh"]

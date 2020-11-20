@@ -50,3 +50,71 @@ Usage:
 ```bash
 docker-compose run --rm update-check [options]
 ```
+
+## Handling SSH key authentication
+
+!!! attention
+    In case you need to authenticate yourself for specific packages
+    within your project, you have to add your SSH key(s) to the
+    container.
+
+Make sure to add all relevant SSH keys to the Docker container,
+either by mounting the whole `.ssh` directory or by adding each
+key on its own.
+
+The target directory inside the container is `/root/.ssh`.
+
+### Mount the whole `.ssh` directory
+
+#### General usage
+
+```bash
+docker run --rm -it \
+  -v $(pwd):/app \
+  -v ~/.ssh:/root/.ssh \
+  eliashaeussler/composer-update-check
+```
+
+#### Usage with docker-compose
+
+```yaml
+version: '3.6'
+
+services:
+  update-check:
+    image: eliashaeussler/composer-update-check
+    volumes:
+      - ./:/app
+      - ~/.ssh:/root/.ssh
+```
+
+### Mount only relevant SSH keys
+
+!!! tip
+    In case you need multiple SSH keys for authentication, you're
+    free to mount each of them separately into the Container. This
+    can be achieved by declaring multiple volumes.
+
+#### General usage
+
+```bash
+docker run --rm -it \
+  -v $(pwd):/app \
+  -v ~/.ssh/id_rsa:/root/.ssh/id_rsa \
+  -v ~/.ssh/another_key:/root/.ssh/another_key \
+  eliashaeussler/composer-update-check
+```
+
+#### Usage with docker-compose
+
+```yaml
+version: '3.6'
+
+services:
+  update-check:
+    image: eliashaeussler/composer-update-check
+    volumes:
+      - ./:/app
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+      - ~/.ssh/another_key:/root/.ssh/another_key
+```

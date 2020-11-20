@@ -37,12 +37,18 @@ composer update-check -i "my-vendor/*" --no-dev
 # Use latest version (Composer v2)
 docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check
 
+# Use latest version (Composer v1)
+docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check:v1
+
 # Use specific version (Composer v2)
 docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check:0.6.0
 
 # Use specific version (Composer v1)
 docker run --rm -it -v $(pwd):/app eliashaeussler/composer-update-check:0.6.0-v1
 ```
+
+Read more about usage with Docker in the
+[documentation](https://docs.elias-haeussler.de/composer-update-check/docker.html).
 
 ### Additional security scan
 
