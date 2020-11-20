@@ -118,3 +118,35 @@ services:
       - ~/.ssh/id_rsa:/root/.ssh/id_rsa
       - ~/.ssh/another_key:/root/.ssh/another_key
 ```
+
+### Provide `known_hosts` file
+
+Especially when running the Docker image in CI pipelines, it might
+be helpful to additionally mount a `known_hosts` file into the
+container. This ensures all target hosts don't need to be rescanned.
+
+The target file inside the container is `/root/.ssh/known_hosts`.
+
+#### General usage
+
+```bash
+docker run --rm -it \
+  -v $(pwd):/app \
+  -v ~/.ssh/id_rsa:/root/.ssh/id_rsa \
+  -v ~/.ssh/known_hosts:/root/.ssh/known_hosts \
+  eliashaeussler/composer-update-check
+```
+
+#### Usage with docker-compose
+
+```yaml
+version: '3.6'
+
+services:
+  update-check:
+    image: eliashaeussler/composer-update-check
+    volumes:
+      - ./:/app
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+      - ~/.ssh/known_hosts:/root/.ssh/known_hosts
+```
