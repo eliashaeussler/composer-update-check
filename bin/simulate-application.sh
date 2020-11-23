@@ -12,13 +12,13 @@ if [ ! -w "${TEMP_DIR}" ]; then
 fi
 TEMP_PATH="${TEMP_DIR}/update-check-test"
 
-# Define cleanup function for INT signals
+# Define cleanup function for several signals
 function cleanup() {
-  trap SIGINT
+  exitCode=$?
   rm -rf "${TEMP_PATH}"
-  exit
+  exit $exitCode
 }
-trap "cleanup" INT
+trap cleanup INT ERR EXIT
 
 # Prepare temporary application
 cp -r "${APP_PATH}" "${TEMP_PATH}"
@@ -28,9 +28,3 @@ composer require --working-dir "${TEMP_PATH}" --quiet --dev "eliashaeussler/comp
 
 # Run update check
 composer update-check --working-dir "${TEMP_PATH}" --ansi "$@"
-
-# Clear temporary application
-rm -rf "${TEMP_PATH}"
-
-# Restore INT signal handling
-trap SIGINT
