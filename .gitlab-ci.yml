@@ -8,6 +8,7 @@ stages:
   - test-v2
   - docs
   - deploy
+  - test-docker
 
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
@@ -169,5 +170,9 @@ deploy:docker:test:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2
   rules:
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
     - if: '$BUILD_DOCKER_TEST_IMAGE'
       when: on_success
