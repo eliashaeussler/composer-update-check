@@ -53,6 +53,11 @@ class SecurityScanner
      */
     public function scan(array $packages): ScanResult
     {
+        // Early return if no packages are requested to be scanned
+        if ($packages === []) {
+            return new ScanResult([]);
+        }
+
         // Parse package names
         $packagesToScan = [];
         foreach ($packages as $package) {
