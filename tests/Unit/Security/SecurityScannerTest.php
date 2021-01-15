@@ -88,16 +88,24 @@ class SecurityScannerTest extends AbstractTestCase
     /**
      * @test
      */
+    public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
+    {
+        static::assertSame([], $this->subject->scan([])->getInsecurePackages());
+    }
+
+    /**
+     * @test
+     */
     public function scanThrowsExceptionIfRequestFails(): void
     {
         $this->clientProphecy->request('GET', '', [
             RequestOptions::HEADERS => ['Accept' => 'application/json'],
-            RequestOptions::QUERY => ['packages' => []],
+            RequestOptions::QUERY => ['packages' => ['foo']],
         ])->willThrow(RequestException::class)->shouldBeCalledOnce();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1610706128);
 
-        $this->subject->scan([]);
+        $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);
     }
 }

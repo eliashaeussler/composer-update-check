@@ -97,7 +97,7 @@ class UpdateChecker
         $result = $this->runUpdateCheck($packages);
 
         // Overlay security scan
-        if ($this->securityScan) {
+        if ($this->securityScan && $result->getOutdatedPackages() !== []) {
             $this->io->write(Emoji::policeCarLight() . ' Checking for insecure packages...', true, IOInterface::VERBOSE);
             $result = Security::scanAndOverlayResult($result);
         }
