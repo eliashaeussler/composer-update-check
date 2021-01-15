@@ -8,7 +8,6 @@ stages:
   - docs
   - deploy
 
-# General test template
 test:
   image: webdevops/php:${PHP_VERSION}
   stage: test
@@ -68,9 +67,9 @@ test:
 
 docs:
   stage: docs
-  image: docker
+  image: docker:19.03.12
   services:
-    - docker:dind
+    - docker:19.03.12-dind
   before_script:
     - apk add --no-cache docker-compose
   script:
@@ -112,9 +111,9 @@ deploy:docs:
 # Deploy docker image
 .deploy:docker: &deploy-docker-template
   stage: deploy
-  image: docker
+  image: docker:19.03.12
   services:
-    - docker:dind
+    - docker:19.03.12-dind
   before_script:
     - docker login -u "$EXTERNAL_REGISTRY_USER" -p "$EXTERNAL_REGISTRY_PASSWORD" $EXTERNAL_REGISTRY
   rules:
@@ -155,9 +154,9 @@ deploy:docker:v1:
 
 deploy:docker:test:
   stage: deploy
-  image: docker
+  image: docker:19.03.12
   services:
-    - docker:dind
+    - docker:19.03.12-dind
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
