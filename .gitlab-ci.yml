@@ -160,8 +160,10 @@ deploy:docker:test:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-   - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker build --build-arg COMPOSER_VERSION=1 --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1 .
+    - docker build --build-arg COMPOSER_VERSION=2 --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2 .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2
   rules:
     - if: '$BUILD_DOCKER_TEST_IMAGE'
       when: on_success
