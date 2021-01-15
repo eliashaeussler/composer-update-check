@@ -4,13 +4,13 @@ variables:
   COMPOSER_NO_INTERACTION: "1"
 
 stages:
-  - test
+  - test-v1
+  - test-v2
   - docs
   - deploy
 
-test:
+.test: &test-template
   image: webdevops/php:${PHP_VERSION}
-  stage: test
   script:
     - pecl channel-update pecl.php.net
     - pecl install pcov
@@ -26,28 +26,6 @@ test:
       fi
     - composer install --no-progress
     - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
-  parallel:
-    matrix:
-      # Composer 1.x
-      - PHP_VERSION: "7.1"
-        COMPOSER_VERSION: "1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-        COMPOSER_VERSION: "1"
-      - PHP_VERSION: "7.3"
-        COMPOSER_VERSION: "1"
-      - PHP_VERSION: "7.4"
-        COMPOSER_VERSION: "1"
-      # Composer 2.x
-      - PHP_VERSION: "7.1"
-        COMPOSER_VERSION: "2"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-        COMPOSER_VERSION: "2"
-      - PHP_VERSION: "7.3"
-        COMPOSER_VERSION: "2"
-      - PHP_VERSION: "7.4"
-        COMPOSER_VERSION: "2"
   retry:
     max: 2
     when:
@@ -64,6 +42,32 @@ test:
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
+
+test-v1:
+  <<: *test-template
+  stage: test-v1
+  variables:
+    COMPOSER_VERSION: "1"
+  parallel:
+    matrix:
+      - PHP_VERSION: "7.1"
+        TEST_COMPATIBILITY: "1"
+      - PHP_VERSION: "7.2"
+      - PHP_VERSION: "7.3"
+      - PHP_VERSION: "7.4"
+
+test-v2:
+  <<: *test-template
+  stage: test-v2
+  variables:
+    COMPOSER_VERSION: "2"
+  parallel:
+    matrix:
+      - PHP_VERSION: "7.1"
+        TEST_COMPATIBILITY: "1"
+      - PHP_VERSION: "7.2"
+      - PHP_VERSION: "7.3"
+      - PHP_VERSION: "7.4"
 
 docs:
   stage: docs
