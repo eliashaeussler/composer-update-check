@@ -21,9 +21,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Factory;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use SensioLabs\Security\SecurityChecker;
+use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
+use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 /**
  * Security
@@ -33,32 +34,25 @@ use SensioLabs\Security\SecurityChecker;
  */
 class Security
 {
-    public static function scan(): array
+    /**
+     * @param OutdatedPackage[] $outdatedPackages
+     * @return ScanResult
+     */
+    public static function scan(array $outdatedPackages): ScanResult
     {
-        $lockFile = static::getLockFile();
-        $securityChecker = new SecurityChecker();
-        $result = $securityChecker->check($lockFile);
-        return json_decode((string) $result, true) ?: [];
+        $securityChecker = new SecurityScanner();
+        return $securityChecker->scan($outdatedPackages);
     }
 
     public static function scanAndOverlayResult(UpdateCheckResult $result): UpdateCheckResult
     {
-        $scan = static::scan();
         $outdatedPackages = $result->getOutdatedPackages();
+        $scanResult = static::scan($outdatedPackages);
         foreach ($outdatedPackages as $outdatedPackage) {
-            if (array_key_exists($outdatedPackage->getName(), $scan)) {
+            if ($scanResult->isInsecure($outdatedPackage)) {
                 $outdatedPackage->setInsecure(true);
             }
         }
         return $result;
-    }
-
-    private static function getLockFile(): string
-    {
-        $composerFile = Factory::getComposerFile();
-        $lockFile = "json" === pathinfo($composerFile, PATHINFO_EXTENSION)
-            ? substr($composerFile, 0, -4).'lock'
-            : $composerFile . '.lock';
-        return $lockFile;
     }
 }
