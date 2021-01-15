@@ -26,7 +26,6 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use SensioLabs\Security\Exception\RuntimeException;
 
 /**
  * SecurityTest
@@ -38,27 +37,9 @@ class SecurityTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
-    /**
-     * @var string|false
-     */
-    protected $backedUpComposerEnvVariable;
-
     protected function setUp(): void
     {
         $this->goToTestDirectory();
-        $this->backedUpComposerEnvVariable = getenv('COMPOSER');
-    }
-
-    /**
-     * @test
-     */
-    public function scanThrowsExceptionIfComposerLockFileIsNotAvailable(): void
-    {
-        putenv('COMPOSER=/foo');
-
-        $this->expectException(RuntimeException::class);
-
-        Security::scan();
     }
 
     /**
@@ -66,9 +47,13 @@ class SecurityTest extends AbstractTestCase
      */
     public function scanReturnsSecurityVulnerabilities(): void
     {
-        $scan = Security::scan();
-        static::assertArrayHasKey('phpunit/phpunit', $scan);
-        static::assertSame('5.0.10', $scan['phpunit/phpunit']['version']);
+        $securePackage = new OutdatedPackage('composer/composer', '1.0.0', '1.3.3');
+        $insecurePackage = new OutdatedPackage('phpunit/phpunit', '5.0.10', '5.3.0');
+
+        $scan = Security::scan([$securePackage, $insecurePackage]);
+
+        static::assertFalse($scan->isInsecure($securePackage));
+        static::assertTrue($scan->isInsecure($insecurePackage));
     }
 
     /**
@@ -89,13 +74,6 @@ class SecurityTest extends AbstractTestCase
     protected function tearDown(): void
     {
         $this->goBackToInitialDirectory();
-
-        if ($this->backedUpComposerEnvVariable === false) {
-            putenv('COMPOSER');
-        } else {
-            putenv('COMPOSER=' . $this->backedUpComposerEnvVariable);
-        }
-
         parent::tearDown();
     }
 }

@@ -78,10 +78,8 @@ performed to check whether currently required package versions are
 insecure. This can especially be useful if frameworks are used which
 are regularly updated.
 
-The security scan is being performed using the Composer package
-[sensiolabs/security-checker](https://packagist.org/packages/sensiolabs/security-checker).
-For this, the `composer.lock` file is passed to the external Symfony
-scan service.
+The security scan is being performed by the help of the
+[Packagist Security Advisories API endpoint](https://packagist.org/apidoc#list-security-advisories).
 
 ### Command
 

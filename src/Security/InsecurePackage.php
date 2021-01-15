@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,39 +21,49 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Util\Filesystem;
-
 /**
- * TestApplicationTrait
+ * InsecurePackage
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-trait TestApplicationTrait
+class InsecurePackage
 {
     /**
-     * @var string|null
+     * @var string
      */
-    protected $initialDirectory;
+    private $name;
 
-    protected function goToTestDirectory(string $applicationPath = AbstractTestCase::TEST_APPLICATION_NORMAL): void
+    /**
+     * @var array
+     */
+    private $affectedVersions;
+
+    public function __construct(string $name, array $affectedVersions)
     {
-        $this->goBackToInitialDirectory();
-        $this->initialDirectory = getcwd();
-        chdir($applicationPath);
-        $this->cleanUpComposerEnvironment($applicationPath);
+        $this->name = $name;
+        $this->affectedVersions = $affectedVersions;
     }
 
-    protected function goBackToInitialDirectory(): void
+    public function getName(): string
     {
-        if (is_string($this->initialDirectory)) {
-            chdir($this->initialDirectory);
-        }
+        return $this->name;
     }
 
-    protected function cleanUpComposerEnvironment(string $applicationPath): void
+    public function setName(string $name): self
     {
-        $filesystem = new Filesystem();
-        $filesystem->removeDirectory($applicationPath . '/vendor');
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getAffectedVersions(): array
+    {
+        return $this->affectedVersions;
+    }
+
+    public function setAffectedVersions(array $affectedVersions): self
+    {
+        $this->affectedVersions = $affectedVersions;
+        return $this;
     }
 }

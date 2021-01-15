@@ -57,10 +57,8 @@ for security vulnerabilities. Using the `--security-scan` (shorthand: `-s`)
 parameter one can easily check if any of the outdated packages are
 insecure.
 
-The security scan is being performed by the Composer package
-[sensiolabs/security-checker](https://packagist.org/packages/sensiolabs/security-checker).
-For this, the `composer.lock` file is passed to the external Symfony
-scan service.
+The security scan is being performed by the help of the
+[Packagist Security Advisories API endpoint](https://packagist.org/apidoc#list-security-advisories).
 
 ### Format output as JSON
 
