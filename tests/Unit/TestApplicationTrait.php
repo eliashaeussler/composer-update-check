@@ -21,6 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Composer\Util\Filesystem;
+
 /**
  * TestApplicationTrait
  *
@@ -39,6 +41,7 @@ trait TestApplicationTrait
         $this->goBackToInitialDirectory();
         $this->initialDirectory = getcwd();
         chdir($applicationPath);
+        $this->cleanUpComposerEnvironment($applicationPath);
     }
 
     protected function goBackToInitialDirectory(): void
@@ -46,5 +49,11 @@ trait TestApplicationTrait
         if (is_string($this->initialDirectory)) {
             chdir($this->initialDirectory);
         }
+    }
+
+    protected function cleanUpComposerEnvironment(string $applicationPath): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->removeDirectory($applicationPath . '/vendor');
     }
 }
