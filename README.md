@@ -95,6 +95,20 @@ composer test
 composer test -- --coverage-text
 ```
 
+### Run Docker tests
+
+All test applications can also be executed with the generated Docker
+images. The Docker image to be used for testing needs to be specified
+along with optional parameters for the `update-check` command.
+
+```bash
+# Run tests for the latest Docker image
+./bin/run-docker-tests.sh eliashaeussler/composer-update-check:latest
+
+# Run tests with optional parameters
+./bin/run-docker-tests.sh eliashaeussler/composer-update-check:latest --security-scan --no-dev
+```
+
 ### Simulate application
 
 A Composer script `simulate` exists which lets you run the Composer
