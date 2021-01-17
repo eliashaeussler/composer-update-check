@@ -8,6 +8,7 @@ stages:
   - lint
   - test-v1
   - test-v2
+  - test-dependents
   - docs
   - deploy
   - test-docker
@@ -86,6 +87,22 @@ test-v2:
       - PHP_VERSION: "7.2"
       - PHP_VERSION: "7.3"
       - PHP_VERSION: "7.4"
+
+test-dependents:reporter:
+  stage: test-dependents
+  variables:
+    UPDATE_CHECK_URL: $CI_REPOSITORY_URL
+    UPDATE_CHECK_REF: $CI_BUILD_REF
+    # Workaround since CI variables are missing in child pipelines
+    # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+    GIT_CLONE_PATH: /builds/$CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME/test-reporter
+  trigger:
+    project: eliashaeussler/composer-update-reporter
+    strategy: depend
+    branch: develop
+  # Allow failure as long as the build URLs are not correct on downstream
+  # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+  allow_failure: true
 
 docs:
   stage: docs
