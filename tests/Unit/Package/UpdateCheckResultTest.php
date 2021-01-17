@@ -69,8 +69,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
         array $expected
-    ): void
-    {
+    ): void {
         $subject = UpdateCheckResult::fromCommandOutput($commandOutput);
         $outdatedPackages = $subject->getOutdatedPackages();
 

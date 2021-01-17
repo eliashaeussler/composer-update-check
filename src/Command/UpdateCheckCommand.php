@@ -144,7 +144,7 @@ class UpdateCheckCommand extends BaseCommand
             if ($flagInsecurePackages) {
                 if (!$this->json && $outdatedPackage->isInsecure()) {
                     $report[1] .= ' <fg=red;options=bold>insecure</>';
-                } else if ($this->json) {
+                } elseif ($this->json) {
                     $report[] = $outdatedPackage->isInsecure();
                 }
             }
