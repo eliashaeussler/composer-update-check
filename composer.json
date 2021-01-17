@@ -10,6 +10,12 @@
     "homepage": "https://haeussler.dev",
     "role": "Maintainer"
   }],
+  "support": {
+    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
+    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
+    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
+    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
+  },
   "config": {
     "sort-packages": true
   },
