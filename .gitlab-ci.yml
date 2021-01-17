@@ -5,11 +5,27 @@ variables:
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
 
 stages:
+  - lint
   - test-v1
   - test-v2
   - docs
   - deploy
   - test-docker
+
+lint:php:
+  image: webdevops/php:7.4
+  stage: lint
+  before_script:
+    - composer install --no-progress
+  script:
+    - composer lint -- --dry-run
+  rules:
+    - if: '$BUILD_DOCKER_TEST_IMAGE'
+      when: never
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
 
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
