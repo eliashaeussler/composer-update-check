@@ -27,37 +27,19 @@ lint:php:
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-test:
+.test: &test-template
   image: webdevops/php:${PHP_VERSION}
   stage: test
   script:
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
-    - >
-      if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
-      fi
-    - composer install --no-progress
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
-  parallel:
-    matrix:
-      - PHP_VERSION: "7.1"
-        COMPOSER_VERSION: ["1", "2"]
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: ["7.2", "7.3", "7.4"]
-        COMPOSER_VERSION: ["1", "2"]
+    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
   retry:
     max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
@@ -68,6 +50,30 @@ test:
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
+
+test:
+  <<: *test-template
+  after_script:
+    - composer test -- --testdox
+  parallel:
+    matrix:
+      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+        COMPOSER_VERSION: ["1", "2"]
+      - PHP_VERSION: "7.4"
+        COMPOSER_VERSION: "1"
+
+test:coverage:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.4"
+    COMPOSER_VERSION: "2"
+  before_script:
+    - pecl channel-update pecl.php.net
+    - pecl install pcov
+    - docker-php-ext-enable pcov
+  after_script:
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
 
 test-dependents:reporter:
   stage: test-dependents
