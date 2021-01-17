@@ -6,8 +6,7 @@ variables:
 
 stages:
   - lint
-  - test-v1
-  - test-v2
+  - test
   - test-dependents
   - docs
   - deploy
@@ -28,8 +27,9 @@ lint:php:
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-.test: &test-template
+test:
   image: webdevops/php:${PHP_VERSION}
+  stage: test
   script:
     - pecl channel-update pecl.php.net
     - pecl install pcov
@@ -45,6 +45,13 @@ lint:php:
       fi
     - composer install --no-progress
     - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+  parallel:
+    matrix:
+      - PHP_VERSION: "7.1"
+        COMPOSER_VERSION: ["1", "2"]
+        TEST_COMPATIBILITY: "1"
+      - PHP_VERSION: ["7.2", "7.3", "7.4"]
+        COMPOSER_VERSION: ["1", "2"]
   retry:
     max: 2
     when:
@@ -61,32 +68,6 @@ lint:php:
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
-
-test-v1:
-  <<: *test-template
-  stage: test-v1
-  variables:
-    COMPOSER_VERSION: "1"
-  parallel:
-    matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
-      - PHP_VERSION: "7.4"
-
-test-v2:
-  <<: *test-template
-  stage: test-v2
-  variables:
-    COMPOSER_VERSION: "2"
-  parallel:
-    matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
-      - PHP_VERSION: "7.4"
 
 test-dependents:reporter:
   stage: test-dependents
