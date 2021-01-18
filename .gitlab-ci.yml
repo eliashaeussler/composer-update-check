@@ -5,35 +5,41 @@ variables:
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
 
 stages:
-  - test-v1
-  - test-v2
+  - lint
+  - test
+  - test-dependents
   - docs
   - deploy
   - test-docker
 
+lint:php:
+  image: webdevops/php:7.4
+  stage: lint
+  before_script:
+    - composer install --no-progress
+  script:
+    - composer lint -- --dry-run
+  rules:
+    - if: '$BUILD_DOCKER_TEST_IMAGE'
+      when: never
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
+
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
+  stage: test
   script:
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
-    - >
-      if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
-      fi
-    - composer install --no-progress
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
   retry:
     max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
@@ -45,31 +51,45 @@ stages:
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-test-v1:
+test:
   <<: *test-template
-  stage: test-v1
-  variables:
-    COMPOSER_VERSION: "1"
+  after_script:
+    - composer test -- --testdox
   parallel:
     matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
+      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+        COMPOSER_VERSION: ["1", "2"]
       - PHP_VERSION: "7.4"
+        COMPOSER_VERSION: "1"
 
-test-v2:
+test:coverage:
   <<: *test-template
-  stage: test-v2
   variables:
+    PHP_VERSION: "7.4"
     COMPOSER_VERSION: "2"
-  parallel:
-    matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
-      - PHP_VERSION: "7.4"
+  before_script:
+    - pecl channel-update pecl.php.net
+    - pecl install pcov
+    - docker-php-ext-enable pcov
+  after_script:
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+
+test-dependents:reporter:
+  stage: test-dependents
+  variables:
+    UPDATE_CHECK_URL: $CI_REPOSITORY_URL
+    UPDATE_CHECK_REF: $CI_BUILD_REF
+    # Workaround since CI variables are missing in child pipelines
+    # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+    GIT_CLONE_PATH: /builds/$CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME/test-reporter
+  trigger:
+    project: eliashaeussler/composer-update-reporter
+    strategy: depend
+    branch: develop
+  # Allow failure as long as the build URLs are not correct on downstream
+  # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+  allow_failure: true
 
 docs:
   stage: docs
