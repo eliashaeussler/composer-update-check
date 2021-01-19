@@ -86,7 +86,7 @@ test-dependents:reporter:
   trigger:
     project: eliashaeussler/composer-update-reporter
     strategy: depend
-    branch: develop
+    branch: master
   # Allow failure as long as the build URLs are not correct on downstream
   # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
   allow_failure: true
