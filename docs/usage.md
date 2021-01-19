@@ -61,7 +61,7 @@ composer update-check --security-scan
     In case you're using a previous version, the API cannot be accessed directly.
 
 ```php
-$updateChecker = new \EliasHaeussler\ComposerUpdateCheck\UpdateChecker($composer, $io);
+$updateChecker = new \EliasHaeussler\ComposerUpdateCheck\UpdateChecker($composer, $input, $output);
 $updateCheckResult = $updateChecker->run($packageBlacklist, $includeDevPackages);
 ```
 
