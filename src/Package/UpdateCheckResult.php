@@ -57,6 +57,7 @@ class UpdateCheckResult
     {
         $this->outdatedPackages = $outdatedPackages;
         $this->validateOutdatedPackages();
+        $this->sortPackages($this->outdatedPackages);
     }
 
     /**
@@ -86,6 +87,16 @@ class UpdateCheckResult
         $outdatedVersion = $matches['outdated'];
         $newVersion = $matches['new'];
         return new OutdatedPackage($packageName, $outdatedVersion, $newVersion);
+    }
+
+    /**
+     * @param OutdatedPackage[] $outdatedPackages
+     */
+    private function sortPackages(array &$outdatedPackages): void
+    {
+        usort($outdatedPackages, function (OutdatedPackage $a, OutdatedPackage $b) {
+            return strcmp($a->getName(), $b->getName());
+        });
     }
 
     private function validateOutdatedPackages(): void
