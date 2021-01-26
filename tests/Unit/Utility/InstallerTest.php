@@ -97,15 +97,15 @@ class InstallerTest extends AbstractTestCase
                 [],
                 $this->getExpectedCommandOutput(),
             ],
-            'composer/composer only' => [
-                ['composer/composer'],
-                $this->getExpectedCommandOutput('composer/composer'),
+            'symfony/console only' => [
+                ['symfony/console'],
+                $this->getExpectedCommandOutput('symfony/console'),
                 $this->getExpectedCommandOutput('phpunit/phpunit'),
             ],
             'phpunit/phpunit only' => [
                 ['phpunit/phpunit'],
                 $this->getExpectedCommandOutput('phpunit/phpunit'),
-                $this->getExpectedCommandOutput('composer/composer'),
+                $this->getExpectedCommandOutput('symfony/console'),
             ],
         ];
     }

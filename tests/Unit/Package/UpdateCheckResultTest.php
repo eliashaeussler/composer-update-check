@@ -57,7 +57,7 @@ class UpdateCheckResultTest extends AbstractTestCase
         $subject = new UpdateCheckResult([$outdatedPackage1, $outdatedPackage2]);
 
         static::assertCount(2, $subject->getOutdatedPackages());
-        static::assertSame([$outdatedPackage1, $outdatedPackage2], $subject->getOutdatedPackages());
+        static::assertSame([$outdatedPackage2, $outdatedPackage1], $subject->getOutdatedPackages());
     }
 
     /**
@@ -112,13 +112,13 @@ class UpdateCheckResultTest extends AbstractTestCase
                     'this is some dummy text',
                     'just ignore it',
                     'but these lines are important:',
-                    $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
                     $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                    $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
                     'bye',
                 ]),
                 [
-                    new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
                     new OutdatedPackage('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                    new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
                 ],
             ],
         ];
