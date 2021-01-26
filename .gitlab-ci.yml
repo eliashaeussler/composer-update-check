@@ -30,6 +30,8 @@ lint:php:
 test:
   image: webdevops/php:${PHP_VERSION}
   stage: test
+  variables:
+    PHP_MEMORY_LIMIT: "-1"
   before_script:
     - >
       if [ "$COVERAGE" == "1" ]; then
