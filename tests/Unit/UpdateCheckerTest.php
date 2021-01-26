@@ -94,7 +94,7 @@ class UpdateCheckerTest extends AbstractTestCase
     public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
     {
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $this->subject->run(['composer/*'], false));
+        static::assertEquals($expected, $this->subject->run(['symfony/*'], false));
     }
 
     /**
@@ -107,9 +107,9 @@ class UpdateCheckerTest extends AbstractTestCase
         $outdatedPackage = reset($outdatedPackages);
 
         static::assertCount(1, $outdatedPackages);
-        static::assertSame('composer/composer', $outdatedPackage->getName());
-        static::assertSame('1.0.0', $outdatedPackage->getOutdatedVersion());
-        static::assertNotSame('1.0.0', $outdatedPackage->getNewVersion());
+        static::assertSame('symfony/console', $outdatedPackage->getName());
+        static::assertSame('v4.4.0', $outdatedPackage->getOutdatedVersion());
+        static::assertNotSame('v4.4.0', $outdatedPackage->getNewVersion());
     }
 
     /**
@@ -117,7 +117,7 @@ class UpdateCheckerTest extends AbstractTestCase
      */
     public function runReturnsUpdateCheckResultWithoutSkippedPackages(): void
     {
-        $outdatedPackages = $this->subject->run(['composer/*'])->getOutdatedPackages();
+        $outdatedPackages = $this->subject->run(['symfony/*'])->getOutdatedPackages();
         /** @var OutdatedPackage $outdatedPackage */
         $outdatedPackage = reset($outdatedPackages);
 
@@ -140,13 +140,13 @@ class UpdateCheckerTest extends AbstractTestCase
 
         static::assertCount(2, $outdatedPackages);
 
-        static::assertSame('composer/composer', $firstOutdatedPackage->getName());
-        static::assertSame('1.0.0', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('1.0.0', $firstOutdatedPackage->getNewVersion());
+        static::assertSame('phpunit/phpunit', $firstOutdatedPackage->getName());
+        static::assertSame('5.0.10', $firstOutdatedPackage->getOutdatedVersion());
+        static::assertNotSame('5.0.10', $firstOutdatedPackage->getNewVersion());
 
-        static::assertSame('phpunit/phpunit', $secondOutdatedPackage->getName());
-        static::assertSame('5.0.10', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('5.0.10', $secondOutdatedPackage->getNewVersion());
+        static::assertSame('symfony/console', $secondOutdatedPackage->getName());
+        static::assertSame('v4.4.0', $secondOutdatedPackage->getOutdatedVersion());
+        static::assertNotSame('v4.4.0', $secondOutdatedPackage->getNewVersion());
     }
 
     /**
@@ -163,15 +163,15 @@ class UpdateCheckerTest extends AbstractTestCase
 
         static::assertCount(2, $outdatedPackages);
 
-        static::assertSame('composer/composer', $firstOutdatedPackage->getName());
-        static::assertSame('1.0.0', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('1.0.0', $firstOutdatedPackage->getNewVersion());
-        static::assertFalse($firstOutdatedPackage->isInsecure());
+        static::assertSame('phpunit/phpunit', $firstOutdatedPackage->getName());
+        static::assertSame('5.0.10', $firstOutdatedPackage->getOutdatedVersion());
+        static::assertNotSame('5.0.10', $firstOutdatedPackage->getNewVersion());
+        static::assertTrue($firstOutdatedPackage->isInsecure());
 
-        static::assertSame('phpunit/phpunit', $secondOutdatedPackage->getName());
-        static::assertSame('5.0.10', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('5.0.10', $secondOutdatedPackage->getNewVersion());
-        static::assertTrue($secondOutdatedPackage->isInsecure());
+        static::assertSame('symfony/console', $secondOutdatedPackage->getName());
+        static::assertSame('v4.4.0', $secondOutdatedPackage->getOutdatedVersion());
+        static::assertNotSame('v4.4.0', $secondOutdatedPackage->getNewVersion());
+        static::assertFalse($secondOutdatedPackage->isInsecure());
     }
 
     protected function tearDown(): void

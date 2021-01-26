@@ -85,11 +85,11 @@ class UpdateCheckCommandTest extends AbstractTestCase
      */
     public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped(): void
     {
-        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/*'], '--no-dev' => true]);
+        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/*'], '--no-dev' => true]);
 
         $expected = json_encode([
             'status' => 'All packages are up to date (skipped 2 packages).',
-            'skipped' => ['phpunit/phpunit', 'composer/composer'],
+            'skipped' => ['phpunit/phpunit', 'symfony/console'],
         ]);
         static::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
     }
@@ -106,9 +106,9 @@ class UpdateCheckCommandTest extends AbstractTestCase
 
         static::assertSame($expectedStatus, $actualJson['status']);
         static::assertCount(1, $actualJson['result']);
-        static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
-        static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
-        static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
+        static::assertSame('symfony/console', $actualJson['result'][0]['Package']);
+        static::assertSame('v4.4.0', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('v4.4.0', $actualJson['result'][0]['New version']);
     }
 
     /**
@@ -116,7 +116,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
      */
     public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages(): void
     {
-        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['composer/composer']]);
+        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/console']]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
         $expectedStatus = '1 package is outdated.';
@@ -141,13 +141,13 @@ class UpdateCheckCommandTest extends AbstractTestCase
         static::assertSame($expectedStatus, $actualJson['status']);
         static::assertCount(2, $actualJson['result']);
 
-        static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
-        static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
-        static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
+        static::assertSame('phpunit/phpunit', $actualJson['result'][0]['Package']);
+        static::assertSame('5.0.10', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('5.0.10', $actualJson['result'][0]['New version']);
 
-        static::assertSame('phpunit/phpunit', $actualJson['result'][1]['Package']);
-        static::assertSame('5.0.10', $actualJson['result'][1]['Outdated version']);
-        static::assertNotSame('5.0.10', $actualJson['result'][1]['New version']);
+        static::assertSame('symfony/console', $actualJson['result'][1]['Package']);
+        static::assertSame('v4.4.0', $actualJson['result'][1]['Outdated version']);
+        static::assertNotSame('v4.4.0', $actualJson['result'][1]['New version']);
     }
 
     /**
@@ -163,15 +163,15 @@ class UpdateCheckCommandTest extends AbstractTestCase
         static::assertSame($expectedStatus, $actualJson['status']);
         static::assertCount(2, $actualJson['result']);
 
-        static::assertSame('composer/composer', $actualJson['result'][0]['Package']);
-        static::assertSame('1.0.0', $actualJson['result'][0]['Outdated version']);
-        static::assertNotSame('1.0.0', $actualJson['result'][0]['New version']);
-        static::assertFalse($actualJson['result'][0]['Insecure']);
+        static::assertSame('phpunit/phpunit', $actualJson['result'][0]['Package']);
+        static::assertSame('5.0.10', $actualJson['result'][0]['Outdated version']);
+        static::assertNotSame('5.0.10', $actualJson['result'][0]['New version']);
+        static::assertTrue($actualJson['result'][0]['Insecure']);
 
-        static::assertSame('phpunit/phpunit', $actualJson['result'][1]['Package']);
-        static::assertSame('5.0.10', $actualJson['result'][1]['Outdated version']);
-        static::assertNotSame('5.0.10', $actualJson['result'][1]['New version']);
-        static::assertTrue($actualJson['result'][1]['Insecure']);
+        static::assertSame('symfony/console', $actualJson['result'][1]['Package']);
+        static::assertSame('v4.4.0', $actualJson['result'][1]['Outdated version']);
+        static::assertNotSame('v4.4.0', $actualJson['result'][1]['New version']);
+        static::assertFalse($actualJson['result'][1]['Insecure']);
     }
 
     protected function tearDown(): void
