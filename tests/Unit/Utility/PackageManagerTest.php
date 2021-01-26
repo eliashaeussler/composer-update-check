@@ -22,6 +22,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
  */
 
 use Composer\Console\Application;
+use Composer\Factory;
 use Composer\IO\BufferIO;
 use Composer\Package\PackageInterface;
 use Composer\Semver\Constraint\Constraint;
@@ -29,6 +30,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 use EliasHaeussler\ComposerUpdateCheck\Utility\PackageManager;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * PackageManagerTest
@@ -55,7 +58,8 @@ class PackageManagerTest extends AbstractTestCase
         $this->goToTestDirectory();
 
         $composer = (new Application())->getComposer();
-        $this->io = new BufferIO();
+        $formatter = new OutputFormatter(false, Factory::createAdditionalStyles());
+        $this->io = new BufferIO('', StreamOutput::VERBOSITY_NORMAL, $formatter);
         $this->subject = new PackageManager($composer, $this->io);
         Installer::runInstall($composer);
     }
@@ -87,7 +91,7 @@ class PackageManagerTest extends AbstractTestCase
     {
         $this->subject->suggestRequirement('phpunit/phpunit', '^9.4');
         self::assertSame(
-            '"phpunit/phpunit" (installed as 5.0.10) might be an incompatible requirement. Suggested requirement: ^9.4',
+            'Package phpunit/phpunit (installed as 5.0.10) might be an incompatible requirement. Suggested requirement: ^9.4',
             trim($this->io->getOutput())
         );
     }

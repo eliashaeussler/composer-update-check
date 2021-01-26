@@ -71,7 +71,7 @@ final class PackageManager
             return;
         }
         $this->io->writeError(sprintf(
-            '<comment>"%s" (installed as %s) might be an incompatible requirement. Suggested requirement: %s</comment>',
+            '<warning>Package %s (installed as %s) might be an incompatible requirement. Suggested requirement: %s</warning>',
             $packageName,
             $this->getPackage($packageName)->getPrettyVersion(),
             $suggestion
