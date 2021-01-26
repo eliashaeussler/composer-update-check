@@ -3,6 +3,7 @@
 /.php_cs.cache
 /.phpunit.result.cache
 /.build
+/docs/__pycache__
 /tests/Build/test-application/vendor
 /tests/Build/test-application-empty/composer.lock
 /tests/Build/test-application-empty/vendor

@@ -9,7 +9,7 @@ repo_url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
 edit_uri: ""
 
 # Copyright
-copyright: Copyright &copy; <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
+copyright: Copyright &copy; %current_year% <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
 
 # Navigation
 nav:
@@ -49,6 +49,11 @@ plugins:
   - exclude:
       glob:
         - build/*
+        - __pycache__/*
+        - hooks.py
+  - mkdocs-simple-hooks:
+      hooks:
+        on_config: 'docs.hooks:apply_copyright_year'
 markdown_extensions:
   - attr_list
   - markdown.extensions.admonition

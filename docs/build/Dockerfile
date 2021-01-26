@@ -5,4 +5,5 @@ RUN pip install \
         Pygments \
         mkdocs-git-revision-date-plugin \
         mkdocs-localsearch \
-        mkdocs-exclude
+        mkdocs-exclude \
+        mkdocs-simple-hooks

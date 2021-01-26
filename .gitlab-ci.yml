@@ -91,6 +91,13 @@ test-dependents:reporter:
   # Allow failure as long as the build URLs are not correct on downstream
   # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
   allow_failure: true
+  rules:
+    - if: '$BUILD_DOCKER_TEST_IMAGE'
+      when: never
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
 
 docs:
   stage: docs
