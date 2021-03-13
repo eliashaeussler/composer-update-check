@@ -23,7 +23,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
-use GuzzleHttp\Psr7\Uri;
+use Nyholm\Psr7\Uri;
 
 /**
  * OutdatedPackageTest

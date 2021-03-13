@@ -22,10 +22,12 @@ namespace EliasHaeussler\ComposerUpdateCheck\Security;
  */
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Symfony\Component\HttpClient\Psr18Client;
 
 /**
  * SecurityScanner
@@ -38,13 +40,19 @@ class SecurityScanner
     public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
 
     /**
+     * @var RequestFactoryInterface
+     */
+    private $requestFactory;
+
+    /**
      * @var ClientInterface
      */
     private $client;
 
     public function __construct(ClientInterface $client = null)
     {
-        $this->client = $client ?? new Client(['base_uri' => static::API_ENDPOINT]);
+        $this->requestFactory = new Psr17Factory();
+        $this->client = $client ?? new Psr18Client();
     }
 
     /**
@@ -64,15 +72,18 @@ class SecurityScanner
             $packagesToScan[] = $package->getName();
         }
 
+        // Build API request
+        $query = http_build_query(['packages' => $packagesToScan]);
+        $requestUri = new Uri(self::API_ENDPOINT);
+        $requestUri = $requestUri->withQuery($query);
+        $request = $this->requestFactory->createRequest('GET', $requestUri)->withHeader('Accept', 'application/json');
+
         // Send API request and evaluate response
         try {
-            $response = $this->client->request('GET', '', [
-                RequestOptions::HEADERS => ['Accept' => 'application/json'],
-                RequestOptions::QUERY => ['packages' => $packagesToScan],
-            ]);
-            $apiResult = $response->getBody()->getContents();
+            $response = $this->client->sendRequest($request);
+            $apiResult = $response->getBody()->__toString();
             return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
-        } catch (GuzzleException $e) {
+        } catch (ClientExceptionInterface $e) {
             throw new \RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
         }
     }

@@ -21,7 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use GuzzleHttp\Psr7\Uri;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Message\UriInterface;
 
 /**
  * OutdatedPackage
@@ -54,7 +55,7 @@ class OutdatedPackage
     private $insecure;
 
     /**
-     * @var Uri
+     * @var UriInterface
      */
     private $providerLink;
 
@@ -111,7 +112,7 @@ class OutdatedPackage
         return $this;
     }
 
-    public function getProviderLink(): Uri
+    public function getProviderLink(): UriInterface
     {
         return $this->providerLink;
     }
@@ -122,7 +123,7 @@ class OutdatedPackage
         return $this;
     }
 
-    private function generateProviderLink(): Uri
+    private function generateProviderLink(): UriInterface
     {
         $versionHash = explode(' ', $this->newVersion, 2)[0];
         $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
