@@ -107,7 +107,8 @@ docs:
   before_script:
     - apk add --no-cache docker-compose
   script:
-    - docker-compose -f docs/build/docker-compose.yaml run docs build
+    - docker-compose -f docs/build/docker-compose.yaml build --pull
+    - docker-compose -f docs/build/docker-compose.yaml run --rm docs build
   artifacts:
     paths:
       - site/
