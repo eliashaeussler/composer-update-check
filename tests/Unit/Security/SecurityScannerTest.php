@@ -25,11 +25,11 @@ use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Prophecy\ObjectProphecy;
+use Http\Client\Exception\TransferException;
+use Http\Message\RequestMatcher\CallbackRequestMatcher;
+use Http\Mock\Client;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * SecurityScannerTest
@@ -45,14 +45,14 @@ class SecurityScannerTest extends AbstractTestCase
     protected $subject;
 
     /**
-     * @var ClientInterface|ObjectProphecy
+     * @var Client
      */
-    protected $clientProphecy;
+    protected $client;
 
     protected function setUp(): void
     {
-        $this->clientProphecy = $this->prophesize(ClientInterface::class);
-        $this->subject = new SecurityScanner($this->clientProphecy->reveal());
+        $this->client = new Client();
+        $this->subject = new SecurityScanner($this->client);
     }
 
     /**
@@ -73,10 +73,15 @@ class SecurityScannerTest extends AbstractTestCase
         ];
 
         $response = new Response(200, [], json_encode($apiResult));
-        $this->clientProphecy->request('GET', '', [
-            RequestOptions::HEADERS => ['Accept' => 'application/json'],
-            RequestOptions::QUERY => ['packages' => ['foo', 'baz']],
-        ])->willReturn($response)->shouldBeCalledOnce();
+        $response->getBody()->rewind();
+        $matcher = function (RequestInterface $request) {
+            self::assertSame('GET', $request->getMethod());
+            self::assertSame(['application/json'], $request->getHeaders()['Accept']);
+            self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
+            return true;
+        };
+        $this->client->on(new CallbackRequestMatcher($matcher), $response);
+
         $scanResult = $this->subject->scan($packages);
 
         static::assertInstanceOf(ScanResult::class, $scanResult);
@@ -98,10 +103,7 @@ class SecurityScannerTest extends AbstractTestCase
      */
     public function scanThrowsExceptionIfRequestFails(): void
     {
-        $this->clientProphecy->request('GET', '', [
-            RequestOptions::HEADERS => ['Accept' => 'application/json'],
-            RequestOptions::QUERY => ['packages' => ['foo']],
-        ])->willThrow(RequestException::class)->shouldBeCalledOnce();
+        $this->client->addException(new TransferException());
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1610706128);

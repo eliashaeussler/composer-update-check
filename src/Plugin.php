@@ -43,7 +43,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     public function activate(Composer $composer, IOInterface $io): void
     {
-        $this->loadDependencies($composer);
+        // Nothing to do here. Just go ahead :)
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -90,26 +90,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             && Utility\Composer::getMajorVersion() < 2
         ) {
             $packageManager->suggestRequirement('composer/semver', '^1.0');
-        }
-    }
-
-    /**
-     * Load required Composer dependencies.
-     *
-     * Loads all required Composer dependencies to make sure following code can be safely executed.
-     * This is required as the main autoloader has not yed loaded required functions, but only
-     * classes. As those functions are required, they have to be loaded manually.
-     *
-     * @param Composer $composer
-     * @see https://github.com/composer/composer/issues/5998#issuecomment-269447326
-     */
-    private function loadDependencies(Composer $composer): void
-    {
-        $vendorDir = $composer->getConfig()->get('vendor-dir');
-        $autoloadFile = $vendorDir . '/autoload.php';
-        if (file_exists($autoloadFile)) {
-            /** @noinspection PhpIncludeInspection */
-            require $vendorDir . '/autoload.php';
         }
     }
 }
