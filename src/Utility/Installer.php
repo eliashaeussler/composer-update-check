@@ -22,6 +22,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
  */
 
 use Composer\Composer;
+use Composer\DependencyResolver\Request;
 use Composer\Installer as ComposerInstaller;
 use Composer\IO\BufferIO;
 
@@ -67,8 +68,16 @@ final class Installer
         if (method_exists($installer, 'setUpdateAllowList')) {
             $installer->setUpdateAllowList($packages);
         } else {
-            /** @noinspection PhpDeprecationInspection */
+            /** @noinspection PhpUndefinedMethodInspection */
             $installer->setUpdateWhitelist($packages);
+        }
+        if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
+            $installer->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS);
+        } elseif (method_exists($installer, 'setAllowListAllDependencies')) {
+            $installer->setAllowListAllDependencies(true);
+        } else {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $installer->setWhitelistDependencies(true);
         }
         return $installer->run();
     }

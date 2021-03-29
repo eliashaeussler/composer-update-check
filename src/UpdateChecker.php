@@ -131,7 +131,7 @@ class UpdateChecker
             );
         }
 
-        return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput());
+        return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput(), $packages);
     }
 
     private function installDependencies(): void

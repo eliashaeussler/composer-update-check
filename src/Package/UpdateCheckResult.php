@@ -68,10 +68,21 @@ class UpdateCheckResult
         return $this->outdatedPackages;
     }
 
-    public static function fromCommandOutput(string $output): self
+    public static function fromCommandOutput(string $output, array $allowedPackages): self
     {
         $outputParts = explode(PHP_EOL, $output);
-        $packages = array_unique(array_filter(array_map([static::class, 'parseCommandOutput'], $outputParts)), SORT_REGULAR);
+        $packages = array_unique(
+            array_filter(
+                array_map([static::class, 'parseCommandOutput'], $outputParts),
+                function (?OutdatedPackage $outdatedPackage) use ($allowedPackages) {
+                    if ($outdatedPackage === null) {
+                        return false;
+                    }
+                    return in_array($outdatedPackage->getName(), $allowedPackages, true);
+                }
+            ),
+            SORT_REGULAR
+        );
         return new static($packages);
     }
 
