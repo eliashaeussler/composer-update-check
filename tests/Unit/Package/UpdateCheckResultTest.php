@@ -70,7 +70,7 @@ class UpdateCheckResultTest extends AbstractTestCase
         string $commandOutput,
         array $expected
     ): void {
-        $subject = UpdateCheckResult::fromCommandOutput($commandOutput);
+        $subject = UpdateCheckResult::fromCommandOutput($commandOutput, ['dummy/package', 'foo/baz']);
         $outdatedPackages = $subject->getOutdatedPackages();
 
         static::assertCount(count($expected), $outdatedPackages);
@@ -83,6 +83,28 @@ class UpdateCheckResultTest extends AbstractTestCase
             static::assertSame($expectedOutdatedPackage->getNewVersion(), current($outdatedPackages)->getNewVersion());
             next($outdatedPackages);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function fromCommandOutputExcludesNonAllowedPackagesFromResult(): void
+    {
+        $output = implode(PHP_EOL, [
+            $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+        ]);
+        $allowedPackages = [
+            'foo/baz',
+        ];
+
+        $subject = UpdateCheckResult::fromCommandOutput($output, $allowedPackages);
+        $outdatedPackages = $subject->getOutdatedPackages();
+
+        static::assertCount(1, $outdatedPackages);
+        static::assertSame('foo/baz', reset($outdatedPackages)->getName());
+        static::assertSame('1.0.0', reset($outdatedPackages)->getOutdatedVersion());
+        static::assertSame('1.0.5', reset($outdatedPackages)->getNewVersion());
     }
 
     /**

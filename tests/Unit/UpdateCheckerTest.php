@@ -63,22 +63,6 @@ class UpdateCheckerTest extends AbstractTestCase
      * @test
      * @throws JsonValidationException
      */
-    public function runThrowsExceptionIfDependenciesCannotBeInstalled(): void
-    {
-        $this->goToTestDirectory(self::TEST_APPLICATION_ERRONEOUS);
-
-        $subject = new UpdateChecker($this->getComposer());
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600278536);
-
-        $subject->run();
-    }
-
-    /**
-     * @test
-     * @throws JsonValidationException
-     */
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
