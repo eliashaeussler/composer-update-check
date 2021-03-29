@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 use Composer\Util\Filesystem;
 
 /**
- * TestApplicationTrait
+ * TestApplicationTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -41,7 +43,7 @@ trait TestApplicationTrait
         $this->goBackToInitialDirectory();
         $this->initialDirectory = getcwd();
         chdir($applicationPath);
-        $this->cleanUpComposerEnvironment($applicationPath);
+        $this->cleanUpComposerEnvironment();
     }
 
     protected function goBackToInitialDirectory(): void
@@ -51,9 +53,9 @@ trait TestApplicationTrait
         }
     }
 
-    protected function cleanUpComposerEnvironment(string $applicationPath): void
+    protected function cleanUpComposerEnvironment(): void
     {
         $filesystem = new Filesystem();
-        $filesystem->removeDirectory($applicationPath . '/vendor');
+        $filesystem->removeDirectory(getcwd().'/vendor');
     }
 }

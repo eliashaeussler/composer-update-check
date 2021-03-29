@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 /*
@@ -30,7 +32,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
- * SecurityScanner
+ * SecurityScanner.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -57,12 +59,11 @@ class SecurityScanner
 
     /**
      * @param OutdatedPackage[] $packages
-     * @return ScanResult
      */
     public function scan(array $packages): ScanResult
     {
         // Early return if no packages are requested to be scanned
-        if ($packages === []) {
+        if ([] === $packages) {
             return new ScanResult([]);
         }
 
@@ -82,6 +83,7 @@ class SecurityScanner
         try {
             $response = $this->client->sendRequest($request);
             $apiResult = $response->getBody()->__toString();
+
             return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
         } catch (ClientExceptionInterface $e) {
             throw new \RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);

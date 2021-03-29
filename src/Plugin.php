@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck;
 
 /*
@@ -33,7 +35,7 @@ use Composer\Semver\Constraint\Constraint;
 use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
 
 /**
- * Plugin
+ * Plugin.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -46,12 +48,12 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         // Nothing to do here. Just go ahead :)
     }
 
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
 
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
@@ -63,6 +65,9 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -78,8 +83,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      * Tests whether some specific packages are currently installed and if the installed versions
      * might be incompatible with the current environment. For example, this can be the case for
      * the package "composer/semver" in combination with Composer 1.x.
-     *
-     * @param Event $event
      */
     public function checkPossibleIncompatibilities(Event $event): void
     {

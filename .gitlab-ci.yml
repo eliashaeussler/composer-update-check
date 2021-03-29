@@ -6,6 +6,7 @@ variables:
 
 stages:
   - lint
+  - sca
   - test
   - test-dependents
   - docs
@@ -19,6 +20,25 @@ lint:php:
     - composer install --no-progress
   script:
     - composer lint -- --dry-run
+  rules:
+    - if: '$BUILD_DOCKER_TEST_IMAGE'
+      when: never
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
+
+sca:php:
+  image: webdevops/php:7.4
+  stage: sca
+  before_script:
+    - composer install --no-progress
+    - mkdir -p .build
+  script:
+    - composer sca -- --error-format gitlab > .build/phpstan.json
+  artifacts:
+    reports:
+      codequality: .build/phpstan.json
   rules:
     - if: '$BUILD_DOCKER_TEST_IMAGE'
       when: never

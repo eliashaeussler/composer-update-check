@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Event;
 
 /*
@@ -23,9 +25,11 @@ namespace EliasHaeussler\ComposerUpdateCheck\Event;
 
 use Composer\Plugin\CommandEvent;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * PostUpdateCheckEvent
+ * PostUpdateCheckEvent.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -38,6 +42,14 @@ class PostUpdateCheckEvent extends CommandEvent
      */
     private $updateCheckResult;
 
+    /**
+     * @param string          $name
+     * @param string          $commandName
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @param string[]        $args
+     * @param string[]        $flags
+     */
     public function __construct(
         $name,
         $commandName,

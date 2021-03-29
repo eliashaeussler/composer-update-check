@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 /*
@@ -27,7 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 
 /**
- * ScanResultTest
+ * ScanResultTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -42,13 +44,16 @@ class ScanResultTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1610707087);
 
+        /* @noinspection PhpParamsInspection */
+        /* @phpstan-ignore-next-line */
         new ScanResult(['foo' => 'baz']);
     }
 
     /**
      * @test
      * @dataProvider fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider
-     * @param array $apiResult
+     *
+     * @param array<string, mixed> $apiResult
      */
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(array $apiResult): void
     {
@@ -106,8 +111,6 @@ class ScanResultTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider isInsecureReturnsSecurityStateOfGivenPackageDataProvider
-     * @param OutdatedPackage $outdatedPackage
-     * @param bool $expected
      */
     public function isInsecureReturnsSecurityStateOfGivenPackage(OutdatedPackage $outdatedPackage, bool $expected): void
     {
@@ -120,6 +123,9 @@ class ScanResultTest extends AbstractTestCase
         static::assertSame($expected, $subject->isInsecure($outdatedPackage));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): array
     {
         return [
@@ -135,6 +141,9 @@ class ScanResultTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): array
     {
         return [

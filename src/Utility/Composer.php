@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 use Composer\Plugin\PluginInterface;
 
 /**
- * Composer
+ * Composer.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -46,7 +48,7 @@ final class Composer
             case static::VERSION_MAJOR:
                 return $versionComponents[0];
             case static::VERSION_BRANCH:
-                return $versionComponents[0] . '.' . $versionComponents[1];
+                return $versionComponents[0].'.'.$versionComponents[1];
             default:
                 throw new \InvalidArgumentException('The given version type is not supported.', 1603794822);
         }
@@ -54,6 +56,6 @@ final class Composer
 
     public static function getMajorVersion(): int
     {
-        return (int)static::getPlatformVersion(self::VERSION_MAJOR);
+        return (int) static::getPlatformVersion(self::VERSION_MAJOR);
     }
 }

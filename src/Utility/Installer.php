@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
@@ -22,14 +24,16 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
  */
 
 use Composer\Composer;
+use Composer\DependencyResolver\Request;
 use Composer\Installer as ComposerInstaller;
 use Composer\IO\BufferIO;
 
 /**
- * Installer
+ * Installer.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
  * @internal
  */
 final class Installer
@@ -41,43 +45,58 @@ final class Installer
 
     public static function runInstall(Composer $composer): int
     {
-        static::$io = new BufferIO();
+        self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $result = ComposerInstaller::create(static::$io, $composer)
-            ->setPreferSource($preferredInstall === 'source')
-            ->setPreferDist($preferredInstall === 'dist')
+
+        return ComposerInstaller::create(static::$io, $composer)
+            ->setPreferSource('source' === $preferredInstall)
+            ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
             ->setRunScripts(false)
             ->setIgnorePlatformRequirements(true)
             ->run();
-        return $result;
     }
 
+    /**
+     * @param string[] $packages
+     */
     public static function runUpdate(array $packages, Composer $composer): int
     {
-        static::$io = new BufferIO();
+        self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
         $installer = ComposerInstaller::create(static::$io, $composer)
             ->setDryRun(true)
-            ->setPreferSource($preferredInstall === 'source')
-            ->setPreferDist($preferredInstall === 'dist')
+            ->setPreferSource('source' === $preferredInstall)
+            ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
             ->setUpdate(true)
             ->setIgnorePlatformRequirements(true);
         if (method_exists($installer, 'setUpdateAllowList')) {
             $installer->setUpdateAllowList($packages);
         } else {
-            /** @noinspection PhpDeprecationInspection */
+            /* @noinspection PhpUndefinedMethodInspection */
+            /* @phpstan-ignore-next-line */
             $installer->setUpdateWhitelist($packages);
         }
+        if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
+            $installer->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS);
+        } elseif (method_exists($installer, 'setAllowListAllDependencies')) {
+            $installer->setAllowListAllDependencies(true);
+        } else {
+            /* @noinspection PhpUndefinedMethodInspection */
+            /* @phpstan-ignore-next-line */
+            $installer->setWhitelistDependencies(true);
+        }
+
         return $installer->run();
     }
 
     public static function getLastOutput(): ?string
     {
-        if (static::$io instanceof BufferIO) {
-            return static::$io->getOutput();
+        if (self::$io instanceof BufferIO) {
+            return self::$io->getOutput();
         }
+
         return null;
     }
 }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
@@ -27,10 +29,11 @@ use Composer\Package\PackageInterface;
 use Composer\Semver\Constraint\Constraint;
 
 /**
- * PackageManager
+ * PackageManager.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
  * @internal
  */
 final class PackageManager
@@ -55,10 +58,10 @@ final class PackageManager
     {
         $package = $this->getPackage($packagedName);
 
-        if ($package === null) {
+        if (null === $package) {
             return false;
         }
-        if ($constraint === null) {
+        if (null === $constraint) {
             return true;
         }
 

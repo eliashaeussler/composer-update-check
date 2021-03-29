@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 
 /*
@@ -27,7 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 
 /**
- * UpdateCheckResultTest
+ * UpdateCheckResultTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -44,6 +46,8 @@ class UpdateCheckResultTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
 
+        /* @noinspection PhpParamsInspection */
+        /* @phpstan-ignore-next-line */
         new UpdateCheckResult(['foo']);
     }
 
@@ -63,14 +67,14 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
-     * @param string $commandOutput
-     * @param array $expected
+     *
+     * @param OutdatedPackage[] $expected
      */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
         array $expected
     ): void {
-        $subject = UpdateCheckResult::fromCommandOutput($commandOutput);
+        $subject = UpdateCheckResult::fromCommandOutput($commandOutput, ['dummy/package', 'foo/baz']);
         $outdatedPackages = $subject->getOutdatedPackages();
 
         static::assertCount(count($expected), $outdatedPackages);
@@ -87,15 +91,38 @@ class UpdateCheckResultTest extends AbstractTestCase
 
     /**
      * @test
+     */
+    public function fromCommandOutputExcludesNonAllowedPackagesFromResult(): void
+    {
+        $output = implode(PHP_EOL, [
+            $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+        ]);
+        $allowedPackages = [
+            'foo/baz',
+        ];
+
+        $subject = UpdateCheckResult::fromCommandOutput($output, $allowedPackages);
+        $outdatedPackages = $subject->getOutdatedPackages();
+
+        static::assertCount(1, $outdatedPackages);
+        static::assertSame('foo/baz', reset($outdatedPackages)->getName());
+        static::assertSame('1.0.0', reset($outdatedPackages)->getOutdatedVersion());
+        static::assertSame('1.0.5', reset($outdatedPackages)->getNewVersion());
+    }
+
+    /**
+     * @test
      * @dataProvider parseCommandOutputParsesCommandOutputCorrectlyDataProvider
-     * @param string $commandOutput
-     * @param OutdatedPackage|null $expected
      */
     public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, ?OutdatedPackage $expected): void
     {
         static::assertEquals($expected, UpdateCheckResult::parseCommandOutput($commandOutput));
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): array
     {
         return [
@@ -104,7 +131,7 @@ class UpdateCheckResultTest extends AbstractTestCase
                 [],
             ],
             'no outdated packages' => [
-                'this is some dummy text' . PHP_EOL . 'Just ignore it.',
+                'this is some dummy text'.PHP_EOL.'Just ignore it.',
                 [],
             ],
             'outdated packages' => [
@@ -124,6 +151,9 @@ class UpdateCheckResultTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): array
     {
         return [

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Package;
 
 /*
@@ -22,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  */
 
 /**
- * UpdateCheckResult
+ * UpdateCheckResult.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -30,22 +32,22 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
 class UpdateCheckResult
 {
     protected const COMMAND_OUTPUT_PATTERN =
-        '#^' .
-            '\\s*- Upgrading ' .
-            '(?P<name>[^\\s]+) \\(' .
-                '(?P<outdated>.+)' .
-                ' => ' .
-                '(?P<new>[^)]+)' .
-            '\\)' .
+        '#^'.
+            '\\s*- Upgrading '.
+            '(?P<name>[^\\s]+) \\('.
+                '(?P<outdated>.+)'.
+                ' => '.
+                '(?P<new>[^)]+)'.
+            '\\)'.
         '$#';
     protected const LEGACY_COMMAND_OUTPUT_PATTERN =
-        '#^' .
-            '\\s*- Updating ' .
-            '(?P<name>[^\\s]+) \\(' .
-                '(?P<outdated>[^)]+)' .
-            '\\) to [^\\s]+ \\(' .
-                '(?P<new>[^)]+)' .
-            '\\)' .
+        '#^'.
+            '\\s*- Updating '.
+            '(?P<name>[^\\s]+) \\('.
+                '(?P<outdated>[^)]+)'.
+            '\\) to [^\\s]+ \\('.
+                '(?P<new>[^)]+)'.
+            '\\)'.
         '$#';
 
     /**
@@ -53,6 +55,9 @@ class UpdateCheckResult
      */
     private $outdatedPackages;
 
+    /**
+     * @param OutdatedPackage[] $outdatedPackages
+     */
     public function __construct(array $outdatedPackages)
     {
         $this->outdatedPackages = $outdatedPackages;
@@ -68,11 +73,27 @@ class UpdateCheckResult
         return $this->outdatedPackages;
     }
 
-    public static function fromCommandOutput(string $output): self
+    /**
+     * @param string[] $allowedPackages
+     */
+    public static function fromCommandOutput(string $output, array $allowedPackages): self
     {
         $outputParts = explode(PHP_EOL, $output);
-        $packages = array_unique(array_filter(array_map([static::class, 'parseCommandOutput'], $outputParts)), SORT_REGULAR);
-        return new static($packages);
+        $packages = array_unique(
+            array_filter(
+                array_map([static::class, 'parseCommandOutput'], $outputParts),
+                function (?OutdatedPackage $outdatedPackage) use ($allowedPackages) {
+                    if (null === $outdatedPackage) {
+                        return false;
+                    }
+
+                    return in_array($outdatedPackage->getName(), $allowedPackages, true);
+                }
+            ),
+            SORT_REGULAR
+        );
+
+        return new self($packages);
     }
 
     public static function parseCommandOutput(string $output): ?OutdatedPackage
@@ -86,6 +107,7 @@ class UpdateCheckResult
         $packageName = $matches['name'];
         $outdatedVersion = $matches['outdated'];
         $newVersion = $matches['new'];
+
         return new OutdatedPackage($packageName, $outdatedVersion, $newVersion);
     }
 
@@ -103,10 +125,7 @@ class UpdateCheckResult
     {
         foreach ($this->outdatedPackages as $key => $outdatedPackage) {
             if (!($outdatedPackage instanceof OutdatedPackage)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class),
-                    1600276584
-                );
+                throw new \InvalidArgumentException(sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class), 1600276584);
             }
         }
     }

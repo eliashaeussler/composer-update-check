@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 /*
@@ -25,7 +27,7 @@ use EliasHaeussler\ComposerUpdateCheck\Security\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 
 /**
- * InsecurePackageTest
+ * InsecurePackageTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later

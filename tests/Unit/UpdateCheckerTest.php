@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
@@ -29,7 +31,7 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 
 /**
- * UpdateCheckerTest
+ * UpdateCheckerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -55,37 +57,23 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goToTestDirectory();
 
-        $application = new Application();
-        $this->composer = $application->getComposer();
+        $this->composer = $this->getComposer();
         $this->subject = new UpdateChecker($this->composer);
     }
 
     /**
      * @test
+     *
      * @throws JsonValidationException
-     */
-    public function runThrowsExceptionIfDependenciesCannotBeInstalled(): void
-    {
-        $this->goToTestDirectory(self::TEST_APPLICATION_ERRONEOUS);
-
-        $composer = (new Application())->getComposer();
-        $subject = new UpdateChecker($composer);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600278536);
-
-        $subject->run();
-    }
-
-    /**
-     * @test
      */
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
+        $subject = new UpdateChecker($this->getComposer());
+
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $this->subject->run());
+        static::assertEquals($expected, $subject->run());
     }
 
     /**
@@ -178,5 +166,15 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goBackToInitialDirectory();
         parent::tearDown();
+    }
+
+    /**
+     * @throws JsonValidationException
+     */
+    private function getComposer(): Composer
+    {
+        $application = new Application();
+
+        return $application->getComposer();
     }
 }

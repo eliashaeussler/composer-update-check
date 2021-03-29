@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Command;
 
 /*
@@ -30,7 +32,7 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * UpdateCheckCommandTest
+ * UpdateCheckCommandTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
