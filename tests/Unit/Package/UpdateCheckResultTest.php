@@ -44,6 +44,8 @@ class UpdateCheckResultTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
 
+        /** @noinspection PhpParamsInspection */
+        /** @phpstan-ignore-next-line */
         new UpdateCheckResult(['foo']);
     }
 
@@ -64,7 +66,7 @@ class UpdateCheckResultTest extends AbstractTestCase
      * @test
      * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
      * @param string $commandOutput
-     * @param array $expected
+     * @param OutdatedPackage[] $expected
      */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
@@ -118,6 +120,9 @@ class UpdateCheckResultTest extends AbstractTestCase
         static::assertEquals($expected, UpdateCheckResult::parseCommandOutput($commandOutput));
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): array
     {
         return [
@@ -146,6 +151,9 @@ class UpdateCheckResultTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): array
     {
         return [

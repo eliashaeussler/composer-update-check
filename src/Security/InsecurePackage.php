@@ -35,10 +35,14 @@ class InsecurePackage
     private $name;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $affectedVersions;
 
+    /**
+     * @param string $name
+     * @param string[] $affectedVersions
+     */
     public function __construct(string $name, array $affectedVersions)
     {
         $this->name = $name;
@@ -56,11 +60,18 @@ class InsecurePackage
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getAffectedVersions(): array
     {
         return $this->affectedVersions;
     }
 
+    /**
+     * @param string[] $affectedVersions
+     * @return self
+     */
     public function setAffectedVersions(array $affectedVersions): self
     {
         $this->affectedVersions = $affectedVersions;

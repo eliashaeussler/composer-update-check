@@ -74,7 +74,7 @@ class InstallerTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider runUpdateExecutesDryRunUpdateDataProvider
-     * @param array $packages
+     * @param string[] $packages
      * @param string $expected
      * @param string|null $notExpected
      */
@@ -90,6 +90,9 @@ class InstallerTest extends AbstractTestCase
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function runUpdateExecutesDryRunUpdateDataProvider(): array
     {
         return [

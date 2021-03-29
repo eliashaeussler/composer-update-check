@@ -42,13 +42,15 @@ class ScanResultTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1610707087);
 
+        /** @noinspection PhpParamsInspection */
+        /** @phpstan-ignore-next-line */
         new ScanResult(['foo' => 'baz']);
     }
 
     /**
      * @test
      * @dataProvider fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider
-     * @param array $apiResult
+     * @param array<string, mixed> $apiResult
      */
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(array $apiResult): void
     {
@@ -120,6 +122,9 @@ class ScanResultTest extends AbstractTestCase
         static::assertSame($expected, $subject->isInsecure($outdatedPackage));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): array
     {
         return [
@@ -135,6 +140,9 @@ class ScanResultTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): array
     {
         return [

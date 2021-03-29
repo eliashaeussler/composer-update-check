@@ -53,6 +53,9 @@ class UpdateCheckResult
      */
     private $outdatedPackages;
 
+    /**
+     * @param OutdatedPackage[] $outdatedPackages
+     */
     public function __construct(array $outdatedPackages)
     {
         $this->outdatedPackages = $outdatedPackages;
@@ -68,6 +71,11 @@ class UpdateCheckResult
         return $this->outdatedPackages;
     }
 
+    /**
+     * @param string $output
+     * @param string[] $allowedPackages
+     * @return self
+     */
     public static function fromCommandOutput(string $output, array $allowedPackages): self
     {
         $outputParts = explode(PHP_EOL, $output);
@@ -83,7 +91,7 @@ class UpdateCheckResult
             ),
             SORT_REGULAR
         );
-        return new static($packages);
+        return new self($packages);
     }
 
     public static function parseCommandOutput(string $output): ?OutdatedPackage

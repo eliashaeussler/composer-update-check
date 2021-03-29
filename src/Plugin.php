@@ -46,12 +46,12 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         // Nothing to do here. Just go ahead :)
     }
 
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
 
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
@@ -63,6 +63,9 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getSubscribedEvents(): array
     {
         return [

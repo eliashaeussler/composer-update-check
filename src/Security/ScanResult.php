@@ -37,12 +37,19 @@ class ScanResult
      */
     private $insecurePackages;
 
+    /**
+     * @param InsecurePackage[] $insecurePackages
+     */
     public function __construct(array $insecurePackages)
     {
         $this->insecurePackages = $insecurePackages;
         $this->validateInsecurePackages();
     }
 
+    /**
+     * @param array<string, mixed> $apiResult
+     * @return self
+     */
     public static function fromApiResult(array $apiResult): self
     {
         // Early return if no advisories were provided

@@ -33,6 +33,7 @@
     "composer/composer": "^1.0 || ^2.0",
     "friendsofphp/php-cs-fixer": "^2.14",
     "php-http/mock-client": "^1.0",
+    "phpstan/phpstan": "^0.12.80",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
   },
   "extra": {
@@ -50,6 +51,7 @@
   },
   "scripts": {
     "lint": "php-cs-fixer fix",
+    "sca": "phpstan analyse -c phpstan.neon",
     "test": "phpunit -c phpunit.xml",
     "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml",
     "simulate": "bin/simulate-application.sh",

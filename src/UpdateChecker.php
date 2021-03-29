@@ -87,6 +87,11 @@ class UpdateChecker
         }
     }
 
+    /**
+     * @param string[] $packageBlacklist
+     * @param bool $includeDevPackages
+     * @return UpdateCheckResult
+     */
     public function run(array $packageBlacklist = [], bool $includeDevPackages = true): UpdateCheckResult
     {
         // Resolve packages to be checked
@@ -108,6 +113,10 @@ class UpdateChecker
         return $result;
     }
 
+    /**
+     * @param string[] $packages
+     * @return UpdateCheckResult
+     */
     private function runUpdateCheck(array $packages): UpdateCheckResult
     {
         // Early return if no packages are listed for update check
@@ -149,6 +158,11 @@ class UpdateChecker
         }
     }
 
+    /**
+     * @param string[] $ignoredPackages
+     * @param bool $includeDevPackages
+     * @return string[]
+     */
     private function resolvePackagesForUpdateCheck(array $ignoredPackages, bool $includeDevPackages): array
     {
         $rootPackage = $this->composer->getPackage();
@@ -171,6 +185,11 @@ class UpdateChecker
         return $requiredPackages;
     }
 
+    /**
+     * @param string $pattern
+     * @param string[] $packages
+     * @return string[]
+     */
     private function removeByIgnorePattern(string $pattern, array $packages): array
     {
         return array_filter($packages, function (string $package) use ($pattern) {
@@ -197,6 +216,9 @@ class UpdateChecker
         $this->composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
     }
 
+    /**
+     * @return string[]
+     */
     public function getPackageBlacklist(): array
     {
         return $this->packageBlacklist;

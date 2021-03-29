@@ -106,6 +106,11 @@ class UpdateCheckCommand extends BaseCommand
         return 0;
     }
 
+    /**
+     * @param UpdateCheckResult $result
+     * @param string[] $ignoredPackages
+     * @param bool $flagInsecurePackages
+     */
     private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
@@ -167,6 +172,10 @@ class UpdateCheckCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param array{status: string, result?: array} $report
+     * @param string[] $ignoredPackages
+     */
     private function buildJsonReport(array $report, array $ignoredPackages = []): void
     {
         if ($ignoredPackages !== []) {

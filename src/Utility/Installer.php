@@ -42,21 +42,25 @@ final class Installer
 
     public static function runInstall(Composer $composer): int
     {
-        static::$io = new BufferIO();
+        self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $result = ComposerInstaller::create(static::$io, $composer)
+        return ComposerInstaller::create(static::$io, $composer)
             ->setPreferSource($preferredInstall === 'source')
             ->setPreferDist($preferredInstall === 'dist')
             ->setDevMode(true)
             ->setRunScripts(false)
             ->setIgnorePlatformRequirements(true)
             ->run();
-        return $result;
     }
 
+    /**
+     * @param string[] $packages
+     * @param Composer $composer
+     * @return int
+     */
     public static function runUpdate(array $packages, Composer $composer): int
     {
-        static::$io = new BufferIO();
+        self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
         $installer = ComposerInstaller::create(static::$io, $composer)
             ->setDryRun(true)
@@ -69,6 +73,7 @@ final class Installer
             $installer->setUpdateAllowList($packages);
         } else {
             /** @noinspection PhpUndefinedMethodInspection */
+            /** @phpstan-ignore-next-line */
             $installer->setUpdateWhitelist($packages);
         }
         if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
@@ -77,6 +82,7 @@ final class Installer
             $installer->setAllowListAllDependencies(true);
         } else {
             /** @noinspection PhpUndefinedMethodInspection */
+            /** @phpstan-ignore-next-line */
             $installer->setWhitelistDependencies(true);
         }
         return $installer->run();
@@ -84,8 +90,8 @@ final class Installer
 
     public static function getLastOutput(): ?string
     {
-        if (static::$io instanceof BufferIO) {
-            return static::$io->getOutput();
+        if (self::$io instanceof BufferIO) {
+            return self::$io->getOutput();
         }
         return null;
     }
