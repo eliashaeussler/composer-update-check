@@ -55,8 +55,7 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goToTestDirectory();
 
-        $application = new Application();
-        $this->composer = $application->getComposer();
+        $this->composer = $this->getComposer();
         $this->subject = new UpdateChecker($this->composer);
     }
 
@@ -68,8 +67,7 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_ERRONEOUS);
 
-        $composer = (new Application())->getComposer();
-        $subject = new UpdateChecker($composer);
+        $subject = new UpdateChecker($this->getComposer());
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1600278536);
@@ -79,13 +77,16 @@ class UpdateCheckerTest extends AbstractTestCase
 
     /**
      * @test
+     * @throws JsonValidationException
      */
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
+        $subject = new UpdateChecker($this->getComposer());
+
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $this->subject->run());
+        static::assertEquals($expected, $subject->run());
     }
 
     /**
@@ -178,5 +179,15 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goBackToInitialDirectory();
         parent::tearDown();
+    }
+
+    /**
+     * @return Composer
+     * @throws JsonValidationException
+     */
+    private function getComposer(): Composer
+    {
+        $application = new Application();
+        return $application->getComposer();
     }
 }
