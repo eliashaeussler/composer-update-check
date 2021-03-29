@@ -11,7 +11,7 @@ command by the path to your `composer.phar` in the following examples.
 
 ### Requirements
 
-* PHP 7.1 - 7.4
+* PHP 7.1+
 * Composer v1 or v2
 
 ## Installation

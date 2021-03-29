@@ -71,7 +71,7 @@ class PackageManagerTest extends AbstractTestCase
      */
     public function isPackageInstalledReturnsPackageInstallState(): void
     {
-        self::assertTrue($this->subject->isPackageInstalled('phpunit/phpunit'));
+        self::assertTrue($this->subject->isPackageInstalled('symfony/http-kernel'));
         self::assertFalse($this->subject->isPackageInstalled('foo/baz'));
     }
 
@@ -81,9 +81,9 @@ class PackageManagerTest extends AbstractTestCase
     public function isPackageInstalledRespectsConstraint(): void
     {
         $constraint = new Constraint('<', '6.0.0');
-        self::assertTrue($this->subject->isPackageInstalled('phpunit/phpunit', $constraint));
+        self::assertTrue($this->subject->isPackageInstalled('symfony/http-kernel', $constraint));
         $constraint = new Constraint('>=', '6.0.0');
-        self::assertFalse($this->subject->isPackageInstalled('phpunit/phpunit', $constraint));
+        self::assertFalse($this->subject->isPackageInstalled('symfony/http-kernel', $constraint));
     }
 
     /**
@@ -91,9 +91,9 @@ class PackageManagerTest extends AbstractTestCase
      */
     public function suggestRequirementPrintsInstallSuggestion(): void
     {
-        $this->subject->suggestRequirement('phpunit/phpunit', '^9.4');
+        $this->subject->suggestRequirement('symfony/http-kernel', '^5.2');
         self::assertSame(
-            'Package phpunit/phpunit (installed as 5.0.10) might be an incompatible requirement. Suggested requirement: ^9.4',
+            'Package symfony/http-kernel (installed as v4.4.9) might be an incompatible requirement. Suggested requirement: ^5.2',
             trim($this->io->getOutput())
         );
     }
@@ -112,9 +112,9 @@ class PackageManagerTest extends AbstractTestCase
      */
     public function getPackageReturnsPackageObjectIfPackageIsInstalled(): void
     {
-        $package = $this->subject->getPackage('phpunit/phpunit');
+        $package = $this->subject->getPackage('symfony/http-kernel');
         self::assertInstanceOf(PackageInterface::class, $package);
-        self::assertSame('phpunit/phpunit', $package->getName());
+        self::assertSame('symfony/http-kernel', $package->getName());
     }
 
     /**

@@ -104,11 +104,11 @@ class InstallerTest extends AbstractTestCase
             'symfony/console only' => [
                 ['symfony/console'],
                 $this->getExpectedCommandOutput('symfony/console'),
-                $this->getExpectedCommandOutput('phpunit/phpunit'),
+                $this->getExpectedCommandOutput('symfony/http-kernel'),
             ],
-            'phpunit/phpunit only' => [
-                ['phpunit/phpunit'],
-                $this->getExpectedCommandOutput('phpunit/phpunit'),
+            'symfony/http-kernel only' => [
+                ['symfony/http-kernel'],
+                $this->getExpectedCommandOutput('symfony/http-kernel'),
                 $this->getExpectedCommandOutput('symfony/console'),
             ],
         ];

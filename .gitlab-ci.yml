@@ -14,7 +14,7 @@ stages:
   - test-docker
 
 lint:php:
-  image: webdevops/php:7.4
+  image: webdevops/php:8.0
   stage: lint
   before_script:
     - composer install --no-progress
@@ -29,7 +29,7 @@ lint:php:
       when: on_success
 
 sca:php:
-  image: webdevops/php:7.4
+  image: webdevops/php:8.0
   stage: sca
   before_script:
     - composer install --no-progress
@@ -72,11 +72,11 @@ test:
       fi
   parallel:
     matrix:
-      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+      - PHP_VERSION: ["7.1", "7.2", "7.3", "7.4"]
         COMPOSER_VERSION: ["1", "2"]
-      - PHP_VERSION: "7.4"
+      - PHP_VERSION: "8.0"
         COMPOSER_VERSION: "1"
-      - PHP_VERSION: "7.4"
+      - PHP_VERSION: "8.0"
         COMPOSER_VERSION: "2"
         COVERAGE: "1"
   retry:
