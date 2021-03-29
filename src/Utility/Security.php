@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
@@ -27,7 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 /**
- * Security
+ * Security.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -36,11 +38,11 @@ class Security
 {
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return ScanResult
      */
     public static function scan(array $outdatedPackages): ScanResult
     {
         $securityChecker = new SecurityScanner();
+
         return $securityChecker->scan($outdatedPackages);
     }
 
@@ -53,6 +55,7 @@ class Security
                 $outdatedPackage->setInsecure(true);
             }
         }
+
         return $result;
     }
 }

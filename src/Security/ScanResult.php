@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 /*
@@ -25,7 +27,7 @@ use Composer\Semver\Semver;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 
 /**
- * ScanResult
+ * ScanResult.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -48,7 +50,6 @@ class ScanResult
 
     /**
      * @param array<string, mixed> $apiResult
-     * @return self
      */
     public static function fromApiResult(array $apiResult): self
     {
@@ -56,7 +57,7 @@ class ScanResult
         if (
             !array_key_exists('advisories', $apiResult) ||
             !is_array($apiResult['advisories']) ||
-            $apiResult['advisories'] === []
+            [] === $apiResult['advisories']
         ) {
             return new self([]);
         }
@@ -88,9 +89,11 @@ class ScanResult
         foreach ($this->insecurePackages as $insecurePackage) {
             if ($insecurePackage->getName() === $outdatedPackage->getName()) {
                 $insecureVersions = implode('|', $insecurePackage->getAffectedVersions());
+
                 return Semver::satisfies($outdatedPackage->getOutdatedVersion(), $insecureVersions);
             }
         }
+
         return false;
     }
 
@@ -98,10 +101,7 @@ class ScanResult
     {
         foreach ($this->insecurePackages as $key => $insecurePackage) {
             if (!($insecurePackage instanceof InsecurePackage)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Insecure package #%s must be an instance of "%s".', $key, InsecurePackage::class),
-                    1610707087
-                );
+                throw new \InvalidArgumentException(sprintf('Insecure package #%s must be an instance of "%s".', $key, InsecurePackage::class), 1610707087);
             }
         }
     }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 /*
@@ -22,13 +24,13 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
  */
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 
 /**
- * SecurityTest
+ * SecurityTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -63,7 +65,7 @@ class SecurityTest extends AbstractTestCase
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
         $insecurePackage = new OutdatedPackage('phpunit/phpunit', '5.0.10', '5.3.0');
-        $result = new UpdateCheckResult([$securePackage, $insecurePackage,]);
+        $result = new UpdateCheckResult([$securePackage, $insecurePackage]);
 
         Security::scanAndOverlayResult($result);
 

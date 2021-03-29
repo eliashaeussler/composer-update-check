@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 
 /**
- * ExpectedCommandOutputTrait
+ * ExpectedCommandOutputTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -37,14 +39,14 @@ trait ExpectedCommandOutputTrait
         $output = $isLegacyPlatform ? ' - Updating' : ' - Upgrading';
 
         // Early return if no package is specified
-        if ($package === null) {
+        if (null === $package) {
             return $output;
         }
 
-        $output .= ' ' . $package;
+        $output .= ' '.$package;
 
         // Early return if package versions are not completely specified
-        if ($outdated === null || $new === null || trim($outdated) === '' || trim($new) === '') {
+        if (null === $outdated || null === $new || '' === trim($outdated) || '' === trim($new)) {
             return $output;
         }
 
@@ -52,6 +54,7 @@ trait ExpectedCommandOutputTrait
         if ($isLegacyPlatform) {
             return sprintf('%s (%s) to %s (%s)', $output, $outdated, $package, $new);
         }
+
         return sprintf('%s (%s => %s)', $output, $outdated, $new);
     }
 }

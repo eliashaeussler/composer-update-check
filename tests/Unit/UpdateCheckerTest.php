@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
@@ -29,7 +31,7 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 
 /**
- * UpdateCheckerTest
+ * UpdateCheckerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -61,6 +63,7 @@ class UpdateCheckerTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @throws JsonValidationException
      */
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
@@ -166,12 +169,12 @@ class UpdateCheckerTest extends AbstractTestCase
     }
 
     /**
-     * @return Composer
      * @throws JsonValidationException
      */
     private function getComposer(): Composer
     {
         $application = new Application();
+
         return $application->getComposer();
     }
 }

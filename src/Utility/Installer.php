@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 /*
@@ -27,10 +29,11 @@ use Composer\Installer as ComposerInstaller;
 use Composer\IO\BufferIO;
 
 /**
- * Installer
+ * Installer.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
  * @internal
  */
 final class Installer
@@ -44,9 +47,10 @@ final class Installer
     {
         self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
+
         return ComposerInstaller::create(static::$io, $composer)
-            ->setPreferSource($preferredInstall === 'source')
-            ->setPreferDist($preferredInstall === 'dist')
+            ->setPreferSource('source' === $preferredInstall)
+            ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
             ->setRunScripts(false)
             ->setIgnorePlatformRequirements(true)
@@ -55,8 +59,6 @@ final class Installer
 
     /**
      * @param string[] $packages
-     * @param Composer $composer
-     * @return int
      */
     public static function runUpdate(array $packages, Composer $composer): int
     {
@@ -64,16 +66,16 @@ final class Installer
         $preferredInstall = $composer->getConfig()->get('preferred-install');
         $installer = ComposerInstaller::create(static::$io, $composer)
             ->setDryRun(true)
-            ->setPreferSource($preferredInstall === 'source')
-            ->setPreferDist($preferredInstall === 'dist')
+            ->setPreferSource('source' === $preferredInstall)
+            ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
             ->setUpdate(true)
             ->setIgnorePlatformRequirements(true);
         if (method_exists($installer, 'setUpdateAllowList')) {
             $installer->setUpdateAllowList($packages);
         } else {
-            /** @noinspection PhpUndefinedMethodInspection */
-            /** @phpstan-ignore-next-line */
+            /* @noinspection PhpUndefinedMethodInspection */
+            /* @phpstan-ignore-next-line */
             $installer->setUpdateWhitelist($packages);
         }
         if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
@@ -81,10 +83,11 @@ final class Installer
         } elseif (method_exists($installer, 'setAllowListAllDependencies')) {
             $installer->setAllowListAllDependencies(true);
         } else {
-            /** @noinspection PhpUndefinedMethodInspection */
-            /** @phpstan-ignore-next-line */
+            /* @noinspection PhpUndefinedMethodInspection */
+            /* @phpstan-ignore-next-line */
             $installer->setWhitelistDependencies(true);
         }
+
         return $installer->run();
     }
 
@@ -93,6 +96,7 @@ final class Installer
         if (self::$io instanceof BufferIO) {
             return self::$io->getOutput();
         }
+
         return null;
     }
 }

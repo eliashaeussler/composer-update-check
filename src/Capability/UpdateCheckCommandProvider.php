@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Capability;
 
 /*
@@ -25,7 +27,7 @@ use Composer\Plugin\Capability\CommandProvider;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
 
 /**
- * UpdateCheckCommandProvider
+ * UpdateCheckCommandProvider.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later

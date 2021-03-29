@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 /*
@@ -26,7 +28,7 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 
 /**
- * ComposerTest
+ * ComposerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -57,7 +59,7 @@ class ComposerTest extends AbstractTestCase
     public function getPlatformVersionReturnsPlatformBranch(): void
     {
         [$major, $minor] = explode('.', PluginInterface::PLUGIN_API_VERSION);
-        $expected = $major . '.' . $minor;
+        $expected = $major.'.'.$minor;
         static::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_BRANCH));
     }
 
@@ -77,6 +79,6 @@ class ComposerTest extends AbstractTestCase
     public function getMajorVersionReturnsMajorPlatformVersion(): void
     {
         [$expected] = explode('.', PluginInterface::PLUGIN_API_VERSION);
-        static::assertSame((int)$expected, Composer::getMajorVersion());
+        static::assertSame((int) $expected, Composer::getMajorVersion());
     }
 }

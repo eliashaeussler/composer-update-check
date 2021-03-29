@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 use Composer\Util\Filesystem;
 
 /**
- * TestApplicationTrait
+ * TestApplicationTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -54,6 +56,6 @@ trait TestApplicationTrait
     protected function cleanUpComposerEnvironment(): void
     {
         $filesystem = new Filesystem();
-        $filesystem->removeDirectory(getcwd() . '/vendor');
+        $filesystem->removeDirectory(getcwd().'/vendor');
     }
 }

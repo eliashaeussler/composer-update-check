@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 /*
@@ -24,15 +26,15 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
 use Composer\Command\BaseCommand;
 use Composer\Factory;
 use Composer\IO\BufferIO;
-use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * UpdateCheckCommand
+ * UpdateCheckCommand.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -107,31 +109,30 @@ class UpdateCheckCommand extends BaseCommand
     }
 
     /**
-     * @param UpdateCheckResult $result
      * @param string[] $ignoredPackages
-     * @param bool $flagInsecurePackages
      */
     private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
 
         // Print message if no packages are outdated
-        if ($outdatedPackages === []) {
+        if ([] === $outdatedPackages) {
             $countSkipped = count($ignoredPackages);
             $message = sprintf(
                 'All packages are up to date%s.',
-                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, $countSkipped !== 1 ? 's' : '') : ''
+                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : ''
             );
             if ($this->json) {
                 $this->buildJsonReport(['status' => $message], $ignoredPackages);
             } else {
                 $this->symfonyStyle->success($message);
             }
+
             return;
         }
 
         // Print header
-        $statusLabel = count($outdatedPackages) === 1
+        $statusLabel = 1 === count($outdatedPackages)
             ? '1 package is outdated.'
             : sprintf('%d packages are outdated.', count($outdatedPackages));
         if (!$this->json) {
@@ -174,11 +175,11 @@ class UpdateCheckCommand extends BaseCommand
 
     /**
      * @param array{status: string, result?: array} $report
-     * @param string[] $ignoredPackages
+     * @param string[]                              $ignoredPackages
      */
     private function buildJsonReport(array $report, array $ignoredPackages = []): void
     {
-        if ($ignoredPackages !== []) {
+        if ([] !== $ignoredPackages) {
             $report['skipped'] = $ignoredPackages;
         }
         $this->symfonyStyle->writeln(json_encode($report));

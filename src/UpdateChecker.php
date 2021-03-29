@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck;
 
 /*
@@ -38,7 +40,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * UpdateChecker
+ * UpdateChecker.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -80,7 +82,7 @@ class UpdateChecker
         $this->composer = $composer;
         $this->input = $input ?? new ArrayInput([]);
         $this->output = $output ?? new NullOutput();
-        if ($input !== null && $output !== null) {
+        if (null !== $input && null !== $output) {
             $this->io = new ConsoleIO($input, $output, new HelperSet());
         } else {
             $this->io = new NullIO();
@@ -89,21 +91,19 @@ class UpdateChecker
 
     /**
      * @param string[] $packageBlacklist
-     * @param bool $includeDevPackages
-     * @return UpdateCheckResult
      */
     public function run(array $packageBlacklist = [], bool $includeDevPackages = true): UpdateCheckResult
     {
         // Resolve packages to be checked
-        $this->io->write(Emoji::package() . ' Resolving packages...', true, IOInterface::VERBOSE);
+        $this->io->write(Emoji::package().' Resolving packages...', true, IOInterface::VERBOSE);
         $packages = $this->resolvePackagesForUpdateCheck($packageBlacklist, $includeDevPackages);
 
         // Run update check
         $result = $this->runUpdateCheck($packages);
 
         // Overlay security scan
-        if ($this->securityScan && $result->getOutdatedPackages() !== []) {
-            $this->io->write(Emoji::policeCarLight() . ' Checking for insecure packages...', true, IOInterface::VERBOSE);
+        if ($this->securityScan && [] !== $result->getOutdatedPackages()) {
+            $this->io->write(Emoji::policeCarLight().' Checking for insecure packages...', true, IOInterface::VERBOSE);
             $result = Security::scanAndOverlayResult($result);
         }
 
@@ -115,12 +115,11 @@ class UpdateChecker
 
     /**
      * @param string[] $packages
-     * @return UpdateCheckResult
      */
     private function runUpdateCheck(array $packages): UpdateCheckResult
     {
         // Early return if no packages are listed for update check
-        if ($packages === []) {
+        if ([] === $packages) {
             return new UpdateCheckResult([]);
         }
 
@@ -128,16 +127,13 @@ class UpdateChecker
         $this->installDependencies();
 
         // Run Composer installer
-        $this->io->write(Emoji::hourglassNotDone() . ' Checking for outdated packages...', true, IOInterface::VERBOSE);
+        $this->io->write(Emoji::hourglassNotDone().' Checking for outdated packages...', true, IOInterface::VERBOSE);
         $result = Installer::runUpdate($packages, $this->composer);
 
         // Handle installer failures
         if ($result > 0) {
             $this->io->writeError(Installer::getLastOutput());
-            throw new \RuntimeException(
-                sprintf('Error during update check. Exit code from Composer installer: %d', $result),
-                1600278536
-            );
+            throw new \RuntimeException(sprintf('Error during update check. Exit code from Composer installer: %d', $result), 1600278536);
         }
 
         return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput(), $packages);
@@ -151,16 +147,13 @@ class UpdateChecker
         // Handle installer failures
         if ($result > 0) {
             $this->io->writeError(Installer::getLastOutput());
-            throw new \RuntimeException(
-                sprintf('Error during dependency install. Exit code from Composer installer: %d', $result),
-                1600614218
-            );
+            throw new \RuntimeException(sprintf('Error during dependency install. Exit code from Composer installer: %d', $result), 1600614218);
         }
     }
 
     /**
      * @param string[] $ignoredPackages
-     * @param bool $includeDevPackages
+     *
      * @return string[]
      */
     private function resolvePackagesForUpdateCheck(array $ignoredPackages, bool $includeDevPackages): array
@@ -174,7 +167,7 @@ class UpdateChecker
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
         } else {
             $this->packageBlacklist = array_merge($this->packageBlacklist, $requiredDevPackages);
-            $this->io->write(Emoji::prohibited() . ' Skipped dev-requirements', true, IOInterface::VERBOSE);
+            $this->io->write(Emoji::prohibited().' Skipped dev-requirements', true, IOInterface::VERBOSE);
         }
 
         // Remove blacklisted packages
@@ -186,8 +179,8 @@ class UpdateChecker
     }
 
     /**
-     * @param string $pattern
      * @param string[] $packages
+     *
      * @return string[]
      */
     private function removeByIgnorePattern(string $pattern, array $packages): array
@@ -198,6 +191,7 @@ class UpdateChecker
             }
             $this->io->write(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package), true, IOInterface::VERBOSE);
             $this->packageBlacklist[] = $package;
+
             return false;
         });
     }
@@ -227,6 +221,7 @@ class UpdateChecker
     public function setSecurityScan(bool $securityScan): self
     {
         $this->securityScan = $securityScan;
+
         return $this;
     }
 }

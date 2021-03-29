@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 /*
@@ -32,7 +34,7 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * SecurityScannerTest
+ * SecurityScannerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -78,6 +80,7 @@ class SecurityScannerTest extends AbstractTestCase
             self::assertSame('GET', $request->getMethod());
             self::assertSame(['application/json'], $request->getHeaders()['Accept']);
             self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
+
             return true;
         };
         $this->client->on(new CallbackRequestMatcher($matcher), $response);

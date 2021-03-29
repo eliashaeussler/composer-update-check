@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 
 /*
@@ -27,7 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 
 /**
- * UpdateCheckResultTest
+ * UpdateCheckResultTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -44,8 +46,8 @@ class UpdateCheckResultTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
 
-        /** @noinspection PhpParamsInspection */
-        /** @phpstan-ignore-next-line */
+        /* @noinspection PhpParamsInspection */
+        /* @phpstan-ignore-next-line */
         new UpdateCheckResult(['foo']);
     }
 
@@ -65,7 +67,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
-     * @param string $commandOutput
+     *
      * @param OutdatedPackage[] $expected
      */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
@@ -112,8 +114,6 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider parseCommandOutputParsesCommandOutputCorrectlyDataProvider
-     * @param string $commandOutput
-     * @param OutdatedPackage|null $expected
      */
     public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, ?OutdatedPackage $expected): void
     {
@@ -131,7 +131,7 @@ class UpdateCheckResultTest extends AbstractTestCase
                 [],
             ],
             'no outdated packages' => [
-                'this is some dummy text' . PHP_EOL . 'Just ignore it.',
+                'this is some dummy text'.PHP_EOL.'Just ignore it.',
                 [],
             ],
             'outdated packages' => [

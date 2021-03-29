@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 /*
@@ -22,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Security;
  */
 
 /**
- * InsecurePackage
+ * InsecurePackage.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -40,7 +42,6 @@ class InsecurePackage
     private $affectedVersions;
 
     /**
-     * @param string $name
      * @param string[] $affectedVersions
      */
     public function __construct(string $name, array $affectedVersions)
@@ -57,6 +58,7 @@ class InsecurePackage
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -70,11 +72,11 @@ class InsecurePackage
 
     /**
      * @param string[] $affectedVersions
-     * @return self
      */
     public function setAffectedVersions(array $affectedVersions): self
     {
         $this->affectedVersions = $affectedVersions;
+
         return $this;
     }
 }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Package;
 
 /*
@@ -25,7 +27,7 @@ use Nyholm\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
 /**
- * OutdatedPackage
+ * OutdatedPackage.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -76,6 +78,7 @@ class OutdatedPackage
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -87,6 +90,7 @@ class OutdatedPackage
     public function setOutdatedVersion(string $outdatedVersion): self
     {
         $this->outdatedVersion = $outdatedVersion;
+
         return $this;
     }
 
@@ -98,6 +102,7 @@ class OutdatedPackage
     public function setNewVersion(string $newVersion): self
     {
         $this->newVersion = $newVersion;
+
         return $this;
     }
 
@@ -109,6 +114,7 @@ class OutdatedPackage
     public function setInsecure(bool $insecure): self
     {
         $this->insecure = $insecure;
+
         return $this;
     }
 
@@ -120,6 +126,7 @@ class OutdatedPackage
     public function setProviderLink(Uri $providerLink): self
     {
         $this->providerLink = $providerLink;
+
         return $this;
     }
 
@@ -127,6 +134,7 @@ class OutdatedPackage
     {
         $versionHash = explode(' ', $this->newVersion, 2)[0];
         $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
+
         return new Uri($uri);
     }
 }

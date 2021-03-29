@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 /*
@@ -24,14 +26,14 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 use Composer\Composer as BaseComposer;
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
-use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
+use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 
 /**
- * InstallerTest
+ * InstallerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -74,9 +76,8 @@ class InstallerTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider runUpdateExecutesDryRunUpdateDataProvider
+     *
      * @param string[] $packages
-     * @param string $expected
-     * @param string|null $notExpected
      */
     public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null): void
     {
@@ -85,7 +86,7 @@ class InstallerTest extends AbstractTestCase
 
         static::assertSame(0, Installer::runUpdate($packages, $this->composer));
         static::assertStringContainsString($expected, Installer::getLastOutput());
-        if ($notExpected !== null) {
+        if (null !== $notExpected) {
             static::assertStringNotContainsString($notExpected, Installer::getLastOutput());
         }
     }
@@ -112,7 +113,7 @@ class InstallerTest extends AbstractTestCase
             ],
         ];
     }
-    
+
     protected function tearDown(): void
     {
         $this->goBackToInitialDirectory();
