@@ -41,7 +41,7 @@ trait TestApplicationTrait
         $this->goBackToInitialDirectory();
         $this->initialDirectory = getcwd();
         chdir($applicationPath);
-        $this->cleanUpComposerEnvironment($applicationPath);
+        $this->cleanUpComposerEnvironment();
     }
 
     protected function goBackToInitialDirectory(): void
@@ -51,9 +51,9 @@ trait TestApplicationTrait
         }
     }
 
-    protected function cleanUpComposerEnvironment(string $applicationPath): void
+    protected function cleanUpComposerEnvironment(): void
     {
         $filesystem = new Filesystem();
-        $filesystem->removeDirectory($applicationPath . '/vendor');
+        $filesystem->removeDirectory(getcwd() . '/vendor');
     }
 }
