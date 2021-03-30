@@ -101,16 +101,16 @@ test-dependents:reporter:
   variables:
     UPDATE_CHECK_URL: $CI_REPOSITORY_URL
     UPDATE_CHECK_REF: $CI_BUILD_REF
-    # Workaround since CI variables are missing in child pipelines
-    # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
-    GIT_CLONE_PATH: /builds/$CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME/test-reporter
+  # Only inherit relevant variables to avoid conflicts with GIT_CLONE_PATH
+  # in downstream pipeline, see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+  inherit:
+    variables:
+      - UPDATE_CHECK_URL
+      - UPDATE_CHECK_REF
   trigger:
     project: eliashaeussler/composer-update-reporter
     strategy: depend
     branch: master
-  # Allow failure as long as the build URLs are not correct on downstream
-  # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
-  allow_failure: true
   rules:
     - if: '$BUILD_DOCKER_TEST_IMAGE'
       when: never
