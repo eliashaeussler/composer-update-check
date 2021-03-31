@@ -22,7 +22,6 @@
     "symfony/http-client": "^4.4 || ^5.0"
   },
   "require-dev": {
-    "brianium/paratest": "^4.0 || ^5.0 || ^6.0",
     "composer/composer": "^1.0 || ^2.0",
     "ergebnis/composer-normalize": "^2.8",
     "friendsofphp/php-cs-fixer": "^2.14",
@@ -51,8 +50,8 @@
     "lint": "php-cs-fixer fix",
     "sca": "phpstan analyse -c phpstan.neon",
     "simulate": "bin/simulate-application.sh",
-    "test": "paratest --runner=WrapperRunner -c phpunit.xml",
-    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/paratest --runner=WrapperRunner -c phpunit.ci.xml"
+    "test": "phpunit -c phpunit.xml",
+    "test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 phpunit -c phpunit.coverage.xml"
   },
   "support": {
     "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",

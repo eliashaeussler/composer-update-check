@@ -81,6 +81,7 @@ test:unit:
     PHP_MEMORY_LIMIT: "-1"
     PHP_MAX_EXECUTION_TIME: "600"
   before_script:
+    - composer global require --dev --no-progress --prefer-stable brianium/paratest:"*"
     - >
       if [ "$COVERAGE" == "1" ]; then
         pecl channel-update pecl.php.net
@@ -91,12 +92,12 @@ test:unit:
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
+    - composer require --dev --no-progress "composer/composer:^${COMPOSER_VERSION}.0"
     - >
       if [ "$COVERAGE" == "1" ]; then
-        COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+        COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml
       else
-        composer test -- --testdox
+        /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.xml
       fi
   parallel:
     matrix:
