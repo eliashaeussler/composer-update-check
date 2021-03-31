@@ -1,10 +1,11 @@
 default:
   image: webdevops/php:8.0
 
-cache:
+cache: &cache
   key: "$CI_COMMIT_REF_SLUG"
   paths:
     - vendor/
+  policy: pull
 
 variables:
   COMPOSER_ALLOW_SUPERUSER: "1"
@@ -23,6 +24,9 @@ build:
   stage: build
   script:
     - composer install --no-progress
+  cache:
+    <<: *cache
+    policy: pull-push
   rules:
     - if: '$RENDER_DOCS'
       when: never
@@ -112,9 +116,9 @@ test:unit:
   # Disable cache to force re-install of Composer
   # dependencies for each single PHP version
   cache:
+    <<: *cache
     key: "${CI_COMMIT_REF_SLUG}-${PHP_VERSION}-${COMPOSER_VERSION}"
-    paths:
-      - vendor/
+    policy: pull-push
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
@@ -157,6 +161,7 @@ test:docker:
   parallel:
     matrix:
       - COMPOSER_VERSION: ["1", "2"]
+  cache: {}
   rules:
     - if: '$RENDER_DOCS'
       when: never
@@ -173,6 +178,7 @@ docs:
   script:
     - docker-compose -f docs/build/docker-compose.yaml build --pull
     - docker-compose -f docs/build/docker-compose.yaml run --rm docs build
+  cache: {}
   artifacts:
     paths:
       - site/
@@ -197,6 +203,7 @@ deploy:docs:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
+  cache: {}
   rules:
     - if: '$RENDER_DOCS'
       when: never
@@ -211,6 +218,7 @@ deploy:docs:
     - docker:19.03.12-dind
   before_script:
     - docker login -u "$EXTERNAL_REGISTRY_USER" -p "$EXTERNAL_REGISTRY_PASSWORD" $EXTERNAL_REGISTRY
+  cache: {}
   rules:
     - if: '$RENDER_DOCS'
       when: never
