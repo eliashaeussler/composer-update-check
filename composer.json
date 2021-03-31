@@ -1,24 +1,17 @@
 {
   "name": "eliashaeussler/composer-update-check",
-  "description": "Composer Plugin to check outdated packages, based on their requirements",
   "type": "composer-plugin",
-  "license": "GPL-3.0-or-later",
+  "description": "Composer Plugin to check outdated packages, based on their requirements",
   "homepage": "https://haeussler.dev",
-  "authors": [{
-    "name": "Elias Häußler",
-    "email": "elias@haeussler.dev",
-    "homepage": "https://haeussler.dev",
-    "role": "Maintainer"
-  }],
-  "support": {
-    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
-    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
-    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
-    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
-  },
-  "config": {
-    "sort-packages": true
-  },
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Elias Häußler",
+      "email": "elias@haeussler.dev",
+      "homepage": "https://haeussler.dev",
+      "role": "Maintainer"
+    }
+  ],
   "require": {
     "php": "^7.1 || 8.0.*",
     "ext-json": "*",
@@ -31,10 +24,14 @@
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
+    "ergebnis/composer-normalize": "^2.8",
     "friendsofphp/php-cs-fixer": "^2.14",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^0.12.80",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
+  },
+  "config": {
+    "sort-packages": true
   },
   "extra": {
     "class": "EliasHaeussler\\ComposerUpdateCheck\\Plugin"
@@ -50,11 +47,17 @@
     }
   },
   "scripts": {
+    "docs": "docker-compose -f docs/build/docker-compose.yaml run --rm --service-ports docs",
     "lint": "php-cs-fixer fix",
     "sca": "phpstan analyse -c phpstan.neon",
-    "test": "phpunit -c phpunit.xml",
-    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml",
     "simulate": "bin/simulate-application.sh",
-    "docs": "docker-compose -f docs/build/docker-compose.yaml run --rm --service-ports docs"
+    "test": "phpunit -c phpunit.xml",
+    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml"
+  },
+  "support": {
+    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
+    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
+    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
+    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
   }
 }
