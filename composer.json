@@ -52,7 +52,7 @@
     "sca": "phpstan analyse -c phpstan.neon",
     "simulate": "bin/simulate-application.sh",
     "test": "phpunit -c phpunit.xml",
-    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml"
+    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 -d max_execution_time=600 vendor/bin/phpunit -c phpunit.ci.xml"
   },
   "support": {
     "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
