@@ -24,14 +24,10 @@ namespace EliasHaeussler\ComposerUpdateCheck;
  */
 
 use Composer\Composer;
-use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use Composer\Script\Event;
-use Composer\Script\ScriptEvents;
-use Composer\Semver\Constraint\Constraint;
 use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
 
 /**
@@ -41,7 +37,7 @@ use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
  * @license GPL-3.0-or-later
  * @codeCoverageIgnore
  */
-class Plugin implements PluginInterface, Capable, EventSubscriberInterface
+class Plugin implements PluginInterface, Capable
 {
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -63,36 +59,5 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         return [
             CommandProvider::class => UpdateCheckCommandProvider::class,
         ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ScriptEvents::POST_AUTOLOAD_DUMP => [
-                ['checkPossibleIncompatibilities'],
-            ],
-        ];
-    }
-
-    /**
-     * Check for possible incompatibilities of currently installed packages.
-     *
-     * Tests whether some specific packages are currently installed and if the installed versions
-     * might be incompatible with the current environment. For example, this can be the case for
-     * the package "composer/semver" in combination with Composer 1.x.
-     */
-    public function checkPossibleIncompatibilities(Event $event): void
-    {
-        $packageManager = new Utility\PackageManager($event->getComposer(), $event->getIO());
-        $constraint = new Constraint('>=', '2.0.0');
-        if (
-            $packageManager->isPackageInstalled('composer/semver', $constraint)
-            && Utility\Composer::getMajorVersion() < 2
-        ) {
-            $packageManager->suggestRequirement('composer/semver', '^1.0');
-        }
     }
 }
