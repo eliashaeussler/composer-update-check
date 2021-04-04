@@ -25,8 +25,13 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 use Composer\Composer;
 use Composer\Console\Application;
+use Composer\IO\NullIO;
 use Composer\Json\JsonValidationException;
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\IO\Style;
+use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 
@@ -46,6 +51,16 @@ class UpdateCheckerTest extends AbstractTestCase
     protected $composer;
 
     /**
+     * @var OutputBehavior
+     */
+    protected $behavior;
+
+    /**
+     * @var Options
+     */
+    protected $options;
+
+    /**
      * @var UpdateChecker
      */
     protected $subject;
@@ -58,7 +73,9 @@ class UpdateCheckerTest extends AbstractTestCase
         $this->goToTestDirectory();
 
         $this->composer = $this->getComposer();
-        $this->subject = new UpdateChecker($this->composer);
+        $this->behavior = new OutputBehavior(new Style(), new Verbosity(), new NullIO());
+        $this->options = new Options();
+        $this->subject = new UpdateChecker($this->composer, $this->behavior, $this->options);
     }
 
     /**
@@ -70,7 +87,7 @@ class UpdateCheckerTest extends AbstractTestCase
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
 
-        $subject = new UpdateChecker($this->getComposer());
+        $subject = new UpdateChecker($this->getComposer(), $this->behavior, $this->options);
 
         $expected = new UpdateCheckResult([]);
         static::assertEquals($expected, $subject->run());
@@ -81,8 +98,11 @@ class UpdateCheckerTest extends AbstractTestCase
      */
     public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
     {
+        $this->options->setIgnorePackages(['symfony/*']);
+        $this->options->setIncludeDevPackages(false);
+
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $this->subject->run(['symfony/*'], false));
+        static::assertEquals($expected, $this->subject->run());
     }
 
     /**
@@ -90,10 +110,10 @@ class UpdateCheckerTest extends AbstractTestCase
      */
     public function runReturnsUpdateCheckResultWithoutDevRequirements(): void
     {
-        $outdatedPackages = $this->subject->run([], false)->getOutdatedPackages();
-        /** @var OutdatedPackage $firstOutdatedPackage */
+        $this->options->setIncludeDevPackages(false);
+
+        $outdatedPackages = $this->subject->run()->getOutdatedPackages();
         $firstOutdatedPackage = reset($outdatedPackages);
-        /** @var OutdatedPackage $secondOutdatedPackage */
         $secondOutdatedPackage = next($outdatedPackages);
 
         static::assertCount(2, $outdatedPackages);
@@ -112,10 +132,10 @@ class UpdateCheckerTest extends AbstractTestCase
      */
     public function runReturnsUpdateCheckResultWithoutSkippedPackages(): void
     {
-        $outdatedPackages = $this->subject->run(['symfony/console'])->getOutdatedPackages();
-        /** @var OutdatedPackage $firstOutdatedPackage */
+        $this->options->setIgnorePackages(['symfony/console']);
+
+        $outdatedPackages = $this->subject->run()->getOutdatedPackages();
         $firstOutdatedPackage = reset($outdatedPackages);
-        /** @var OutdatedPackage $secondOutdatedPackage */
         $secondOutdatedPackage = next($outdatedPackages);
 
         static::assertCount(2, $outdatedPackages);
@@ -135,11 +155,8 @@ class UpdateCheckerTest extends AbstractTestCase
     public function runReturnsUpdateCheckResultListOfOutdatedPackages(): void
     {
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
-        /** @var OutdatedPackage $firstOutdatedPackage */
         $firstOutdatedPackage = reset($outdatedPackages);
-        /** @var OutdatedPackage $secondOutdatedPackage */
         $secondOutdatedPackage = next($outdatedPackages);
-        /** @var OutdatedPackage $thirdOutdatedPackage */
         $thirdOutdatedPackage = next($outdatedPackages);
 
         static::assertCount(3, $outdatedPackages);
@@ -162,13 +179,11 @@ class UpdateCheckerTest extends AbstractTestCase
      */
     public function runReturnsUpdateCheckResultListOfOutdatedPackagesAndFlagsInsecurePackages(): void
     {
-        $this->subject->setSecurityScan(true);
+        $this->options->setPerformSecurityScan(true);
+
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
-        /** @var OutdatedPackage $firstOutdatedPackage */
         $firstOutdatedPackage = reset($outdatedPackages);
-        /** @var OutdatedPackage $secondOutdatedPackage */
         $secondOutdatedPackage = next($outdatedPackages);
-        /** @var OutdatedPackage $thirdOutdatedPackage */
         $thirdOutdatedPackage = next($outdatedPackages);
 
         static::assertCount(3, $outdatedPackages);
@@ -187,6 +202,33 @@ class UpdateCheckerTest extends AbstractTestCase
         static::assertSame('v4.4.9', $thirdOutdatedPackage->getOutdatedVersion());
         static::assertNotSame('v4.4.9', $thirdOutdatedPackage->getNewVersion());
         static::assertTrue($thirdOutdatedPackage->isInsecure());
+    }
+
+    /**
+     * @test
+     */
+    public function runDispatchesPostUpdateCheckEvent(): void
+    {
+        $listener = function (PostUpdateCheckEvent $event) {
+            $outdatedPackages = $event->getUpdateCheckResult()->getOutdatedPackages();
+
+            static::assertSame($this->behavior, $event->getBehavior());
+            static::assertSame($this->options, $event->getOptions());
+
+            $outdatedPackage = reset($outdatedPackages);
+
+            static::assertCount(1, $outdatedPackages);
+            static::assertSame('symfony/http-kernel', $outdatedPackage->getName());
+            static::assertSame('v4.4.9', $outdatedPackage->getOutdatedVersion());
+            static::assertNotSame('v4.4.9', $outdatedPackage->getNewVersion());
+        };
+
+        $this->options->setIgnorePackages(['symfony/console']);
+        $this->options->setIncludeDevPackages(false);
+        $this->options->setPerformSecurityScan(true);
+        $this->composer->getEventDispatcher()->addListener(PostUpdateCheckEvent::NAME, $listener);
+
+        $this->subject->run();
     }
 
     protected function tearDown(): void

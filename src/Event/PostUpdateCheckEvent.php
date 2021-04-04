@@ -23,10 +23,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Event;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Plugin\CommandEvent;
+use Composer\EventDispatcher\Event;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * PostUpdateCheckEvent.
@@ -35,36 +35,54 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @license GPL-3.0-or-later
  * @codeCoverageIgnore
  */
-class PostUpdateCheckEvent extends CommandEvent
+class PostUpdateCheckEvent extends Event
 {
+    public const NAME = 'post-update-check';
+
     /**
-     * @var UpdateCheckResult|null
+     * @var UpdateCheckResult
      */
     private $updateCheckResult;
 
     /**
-     * @param string          $name
-     * @param string          $commandName
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param string[]        $args
-     * @param string[]        $flags
+     * @var OutputBehavior
+     */
+    private $behavior;
+
+    /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @param string[] $args
+     * @param string[] $flags
      */
     public function __construct(
-        $name,
-        $commandName,
-        $input,
-        $output,
+        UpdateCheckResult $updateCheckResult,
+        OutputBehavior $behavior,
+        Options $options,
         array $args = [],
-        array $flags = [],
-        UpdateCheckResult $updateCheckResult = null
+        array $flags = []
     ) {
-        parent::__construct($name, $commandName, $input, $output, $args, $flags);
+        parent::__construct(self::NAME, $args, $flags);
         $this->updateCheckResult = $updateCheckResult;
+        $this->behavior = $behavior;
+        $this->options = $options;
     }
 
-    public function getUpdateCheckResult(): ?UpdateCheckResult
+    public function getUpdateCheckResult(): UpdateCheckResult
     {
         return $this->updateCheckResult;
+    }
+
+    public function getBehavior(): OutputBehavior
+    {
+        return $this->behavior;
+    }
+
+    public function getOptions(): Options
+    {
+        return $this->options;
     }
 }

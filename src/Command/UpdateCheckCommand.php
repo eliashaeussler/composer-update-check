@@ -26,6 +26,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
 use Composer\Command\BaseCommand;
 use Composer\Factory;
 use Composer\IO\BufferIO;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\IO\Style;
+use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,9 +51,9 @@ class UpdateCheckCommand extends BaseCommand
     private $symfonyStyle;
 
     /**
-     * @var bool
+     * @var OutputBehavior
      */
-    private $json = false;
+    private $behavior;
 
     protected function configure(): void
     {
@@ -86,21 +90,21 @@ class UpdateCheckCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->symfonyStyle = new SymfonyStyle($input, $output);
-        $this->json = $input->getOption('json');
 
         // Prepare command options
-        $ignoredPackages = $input->getOption('ignore-packages');
-        $noDev = $input->getOption('no-dev');
+        $json = $input->getOption('json');
         $securityScan = $input->getOption('security-scan');
 
         // Initialize IO
-        $output->setVerbosity($this->json ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
+        $style = new Style($json ? Style::JSON : Style::NORMAL);
+        $verbosity = new Verbosity($style->isJson() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
+        $this->behavior = new OutputBehavior($style, $verbosity, $this->getIO());
+        $output->setVerbosity($verbosity->getLevel());
 
         // Run update check
         $composer = Factory::create(new BufferIO());
-        $updateChecker = new UpdateChecker($composer, $input, $output);
-        $updateChecker->setSecurityScan($securityScan);
-        $result = $updateChecker->run($ignoredPackages, !$noDev);
+        $updateChecker = new UpdateChecker($composer, $this->behavior, Options::fromInput($input));
+        $result = $updateChecker->run();
 
         // Decorate update check result
         $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $securityScan);
@@ -122,7 +126,7 @@ class UpdateCheckCommand extends BaseCommand
                 'All packages are up to date%s.',
                 $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : ''
             );
-            if ($this->json) {
+            if ($this->behavior->style->isJson()) {
                 $this->buildJsonReport(['status' => $message], $ignoredPackages);
             } else {
                 $this->symfonyStyle->success($message);
@@ -135,7 +139,7 @@ class UpdateCheckCommand extends BaseCommand
         $statusLabel = 1 === count($outdatedPackages)
             ? '1 package is outdated.'
             : sprintf('%d packages are outdated.', count($outdatedPackages));
-        if (!$this->json) {
+        if (!$this->behavior->style->isJson()) {
             $this->symfonyStyle->warning($statusLabel);
         }
 
@@ -148,9 +152,9 @@ class UpdateCheckCommand extends BaseCommand
                 $outdatedPackage->getNewVersion(),
             ];
             if ($flagInsecurePackages) {
-                if (!$this->json && $outdatedPackage->isInsecure()) {
+                if (!$this->behavior->style->isJson() && $outdatedPackage->isInsecure()) {
                     $report[1] .= ' <fg=red;options=bold>insecure</>';
-                } elseif ($this->json) {
+                } elseif ($this->behavior->style->isJson()) {
                     $report[] = $outdatedPackage->isInsecure();
                 }
             }
@@ -159,7 +163,7 @@ class UpdateCheckCommand extends BaseCommand
 
         // Print table
         $tableHeader = ['Package', 'Outdated version', 'New version'];
-        if (!$this->json) {
+        if (!$this->behavior->style->isJson()) {
             $this->symfonyStyle->table($tableHeader, $tableRows);
         } else {
             $result = [];

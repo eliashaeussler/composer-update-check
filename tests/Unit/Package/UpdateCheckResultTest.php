@@ -80,7 +80,6 @@ class UpdateCheckResultTest extends AbstractTestCase
         static::assertCount(count($expected), $outdatedPackages);
 
         reset($outdatedPackages);
-        /** @var OutdatedPackage $expectedOutdatedPackage */
         foreach ($expected as $expectedOutdatedPackage) {
             static::assertSame($expectedOutdatedPackage->getName(), current($outdatedPackages)->getName());
             static::assertSame($expectedOutdatedPackage->getOutdatedVersion(), current($outdatedPackages)->getOutdatedVersion());
