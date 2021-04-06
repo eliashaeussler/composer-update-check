@@ -82,6 +82,7 @@ test:unit:
     PHP_MEMORY_LIMIT: "-1"
     PHP_MAX_EXECUTION_TIME: "600"
   before_script:
+    - mkdir -p .build/coverage
     - composer global require --dev --no-progress --prefer-stable brianium/paratest:"*"
     - >
       if [ "$COVERAGE" == "1" ]; then
@@ -115,8 +116,6 @@ test:unit:
       - runner_system_failure
       - stuck_or_timeout_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
-  # Disable cache to force re-install of Composer
-  # dependencies for each single PHP version
   cache:
     <<: *cache
     key: "${CI_COMMIT_REF_SLUG}-${PHP_VERSION}-${COMPOSER_VERSION}"
