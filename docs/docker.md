@@ -1,5 +1,9 @@
 # Docker image
 
+!!! attention
+    The Docker image is deprecated and will be dropped with  version 2.0.0.<br>
+    Consider using the [Composer plugin](install.md) instead.
+
 The Composer plugin is also available as Docker image. This allows
 its usage without explicitly requiring it in your project. It also
 ensures the plugin can be safely used regardless of any requirements.

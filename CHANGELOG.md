@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use temporary directories for test applications in Unit tests
 - Parallel execution of Unit tests in CI
 
+### Deprecated
+
+- Usage with Docker images (will be removed in 2.0.0)
+
 ### Fixed
 
 - Remove unneeded package dependency `composer/semver`
