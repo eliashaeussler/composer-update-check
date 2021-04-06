@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Decouple `PostUpdateCheckEvent` from command event
+- Various improvements in documentation
 - Use temporary directories for test applications in Unit tests
 - Parallel execution of Unit tests in CI
 

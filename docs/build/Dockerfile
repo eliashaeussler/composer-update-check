@@ -7,4 +7,5 @@ RUN pip install \
         mkdocs-git-revision-date-plugin \
         mkdocs-localsearch \
         mkdocs-exclude \
-        mkdocs-simple-hooks
+        mkdocs-simple-hooks \
+        mkdocs-macros-plugin
