@@ -189,3 +189,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2020-09-16
 
 Initial release
+
+[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.2...develop
+[0.8.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.1...0.8.2
+[0.8.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.0...0.8.1
+[0.8.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.7.3...0.8.0
+[0.7.3]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.7.2...0.7.3
+[0.7.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.7.1...0.7.2
+[0.7.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.7.0...0.7.1
+[0.7.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.6.1...0.7.0
+[0.6.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.6.0...0.6.1
+[0.6.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.5.0...0.6.0
+[0.5.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.4.4...0.5.0
+[0.4.3]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.4.0...0.4.3
+[0.4.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.3.0...0.4.0
+[0.3.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.2.0...0.3.0
+[0.2.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.1.3...0.2.0
+[0.1.3]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.1.2...0.1.3
+[0.1.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.1.1...0.1.2
+[0.1.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.1.0...0.1.1
+[0.1.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/tags/0.1.0
