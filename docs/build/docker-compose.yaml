@@ -5,6 +5,6 @@ services:
     build: .
     container_name: composer-update-check-docs
     ports:
-      - "8000:8000"
+      - "8000"
     volumes:
       - ../../:/docs
