@@ -97,7 +97,7 @@ test:unit:
     - composer require --dev --no-progress "composer/composer:^${COMPOSER_VERSION}.0"
     - >
       if [ "$COVERAGE" == "1" ]; then
-        COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml
+        COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml --coverage-text
       else
         /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.xml
       fi
