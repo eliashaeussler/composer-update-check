@@ -80,7 +80,6 @@ class UpdateCheckResultTest extends AbstractTestCase
         static::assertCount(count($expected), $outdatedPackages);
 
         reset($outdatedPackages);
-        /** @var OutdatedPackage $expectedOutdatedPackage */
         foreach ($expected as $expectedOutdatedPackage) {
             static::assertSame($expectedOutdatedPackage->getName(), current($outdatedPackages)->getName());
             static::assertSame($expectedOutdatedPackage->getOutdatedVersion(), current($outdatedPackages)->getOutdatedVersion());
@@ -121,54 +120,50 @@ class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): array
+    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
     {
-        return [
-            'no output' => [
-                '',
-                [],
-            ],
-            'no outdated packages' => [
-                'this is some dummy text'.PHP_EOL.'Just ignore it.',
-                [],
-            ],
-            'outdated packages' => [
-                implode(PHP_EOL, [
-                    'this is some dummy text',
-                    'just ignore it',
-                    'but these lines are important:',
-                    $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-                    $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
-                    'bye',
-                ]),
-                [
-                    new OutdatedPackage('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-                    new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
-                ],
+        yield 'no output' => [
+            '',
+            [],
+        ];
+        yield 'no outdated packages' => [
+            'this is some dummy text'.PHP_EOL.'Just ignore it.',
+            [],
+        ];
+        yield 'outdated packages' => [
+            implode(PHP_EOL, [
+                'this is some dummy text',
+                'just ignore it',
+                'but these lines are important:',
+                $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+                'bye',
+            ]),
+            [
+                new OutdatedPackage('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): array
+    public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
     {
-        return [
-            'no output' => [
-                '',
-                null,
-            ],
-            'no matching package' => [
-                'this is just some dummy text',
-                null,
-            ],
-            'matching package' => [
-                $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
-                new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
-            ],
+        yield 'no output' => [
+            '',
+            null,
+        ];
+        yield 'no matching package' => [
+            'this is just some dummy text',
+            null,
+        ];
+        yield 'matching package' => [
+            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+            new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
         ];
     }
 }

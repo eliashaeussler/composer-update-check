@@ -1,6 +1,6 @@
 # Site configuration
 site_name: Composer update check plugin
-site_url: http://docs.elias-haeussler.de/composer-update-check/
+site_url: https://docs.elias-haeussler.de/composer-update-check/
 site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-check"
 site_author: Elias Häußler
 
@@ -9,28 +9,46 @@ repo_url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
 edit_uri: ""
 
 # Copyright
-copyright: Copyright &copy; %current_year% <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
+copyright: Copyright &copy; 2020 - %current_year% <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
 
 # Navigation
 nav:
   - Home: index.md
-  - Installation: install.md
   - Features: features.md
-  - Usage: usage.md
-  - 'Docker image': docker.md
-  - 'Source code': https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
+  - Getting started:
+    - Installation: install.md
+    - Usage: usage.md
+    - API: api.md
+    - 'Docker image': docker.md
+  - Customization:
+    - Events: events.md
+    - Plugins: plugins.md
+  - About:
+    - Contribution: contribute.md
+    - Changelog: changelog.md
+    - License: license.md
 
 # Theme configuration
 theme:
   name: material
   custom_dir: docs/theme
-  favicon: images/favicon.ico
+  favicon: assets/img/favicon.ico
   icon:
     logo: material/alarm
+  palette:
+    primary: red
+    accent: red
   features:
     - navigation.instant
+    - navigation.sections
+    - navigation.top
 use_directory_urls: false
+extra_css:
+  - assets/css/theme.css
 extra:
+  repository:
+    url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check
+    blob: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/tree/master
   social:
     - icon: fontawesome/solid/globe-americas
       link: https://haeussler.dev
@@ -46,6 +64,7 @@ plugins:
   - search
   - localsearch
   - git-revision-date
+  - macros
   - exclude:
       glob:
         - build/*
@@ -59,8 +78,12 @@ markdown_extensions:
   - markdown.extensions.admonition
   - markdown.extensions.toc:
       permalink: true
+      toc_depth: 3
+  - pymdownx.details
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.tabbed
+  - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.highlight:
       extend_pygments_lang:

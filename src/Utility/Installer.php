@@ -48,7 +48,7 @@ final class Installer
         self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
 
-        return ComposerInstaller::create(static::$io, $composer)
+        return ComposerInstaller::create(self::$io, $composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
@@ -64,7 +64,7 @@ final class Installer
     {
         self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $installer = ComposerInstaller::create(static::$io, $composer)
+        $installer = ComposerInstaller::create(self::$io, $composer)
             ->setDryRun(true)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)

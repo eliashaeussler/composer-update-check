@@ -92,25 +92,23 @@ class InstallerTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return \Generator<string, mixed>
      */
-    public function runUpdateExecutesDryRunUpdateDataProvider(): array
+    public function runUpdateExecutesDryRunUpdateDataProvider(): \Generator
     {
-        return [
-            'no explicit whitelist' => [
-                [],
-                $this->getExpectedCommandOutput(),
-            ],
-            'symfony/console only' => [
-                ['symfony/console'],
-                $this->getExpectedCommandOutput('symfony/console'),
-                $this->getExpectedCommandOutput('phpunit/phpunit'),
-            ],
-            'phpunit/phpunit only' => [
-                ['phpunit/phpunit'],
-                $this->getExpectedCommandOutput('phpunit/phpunit'),
-                $this->getExpectedCommandOutput('symfony/console'),
-            ],
+        yield 'no explicit whitelist' => [
+            [],
+            $this->getExpectedCommandOutput(),
+        ];
+        yield 'symfony/console only' => [
+            ['symfony/console'],
+            $this->getExpectedCommandOutput('symfony/console'),
+            $this->getExpectedCommandOutput('symfony/http-kernel'),
+        ];
+        yield 'symfony/http-kernel only' => [
+            ['symfony/http-kernel'],
+            $this->getExpectedCommandOutput('symfony/http-kernel'),
+            $this->getExpectedCommandOutput('symfony/console'),
         ];
     }
 

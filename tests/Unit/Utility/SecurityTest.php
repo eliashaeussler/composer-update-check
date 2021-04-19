@@ -50,7 +50,7 @@ class SecurityTest extends AbstractTestCase
     public function scanReturnsSecurityVulnerabilities(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
-        $insecurePackage = new OutdatedPackage('phpunit/phpunit', '5.0.10', '5.3.0');
+        $insecurePackage = new OutdatedPackage('symfony/http-kernel', 'v4.4.9', 'v4.4.21');
 
         $scan = Security::scan([$securePackage, $insecurePackage]);
 
@@ -64,7 +64,7 @@ class SecurityTest extends AbstractTestCase
     public function scanAndOverlayResultsAppliesInsecureFlagsToInsecureOutdatedPackages(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
-        $insecurePackage = new OutdatedPackage('phpunit/phpunit', '5.0.10', '5.3.0');
+        $insecurePackage = new OutdatedPackage('symfony/http-kernel', 'v4.4.9', 'v4.4.21');
         $result = new UpdateCheckResult([$securePackage, $insecurePackage]);
 
         Security::scanAndOverlayResult($result);

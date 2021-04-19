@@ -38,11 +38,21 @@ trait TestApplicationTrait
      */
     protected $initialDirectory;
 
+    /**
+     * @var string|null
+     */
+    protected $temporaryDirectory;
+
     protected function goToTestDirectory(string $applicationPath = AbstractTestCase::TEST_APPLICATION_NORMAL): void
     {
-        $this->goBackToInitialDirectory();
         $this->initialDirectory = getcwd();
-        chdir($applicationPath);
+        $this->temporaryDirectory = tempnam(sys_get_temp_dir(), str_replace('\\', '', strtolower(static::class)));
+
+        $filesystem = new Filesystem();
+        $filesystem->remove($this->temporaryDirectory);
+        $filesystem->copy(dirname(__DIR__, 2).'/'.$applicationPath, $this->temporaryDirectory);
+
+        chdir($this->temporaryDirectory);
         $this->cleanUpComposerEnvironment();
     }
 
@@ -50,6 +60,16 @@ trait TestApplicationTrait
     {
         if (is_string($this->initialDirectory)) {
             chdir($this->initialDirectory);
+        }
+
+        $this->cleanUpTemporaryDirectory();
+    }
+
+    protected function cleanUpTemporaryDirectory(): void
+    {
+        if (is_string($this->temporaryDirectory)) {
+            $filesystem = new Filesystem();
+            $filesystem->removeDirectory($this->temporaryDirectory);
         }
     }
 

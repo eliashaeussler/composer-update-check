@@ -43,11 +43,11 @@ final class Composer
         $versionComponents = explode('.', $platformVersion);
 
         switch ($versionType) {
-            case static::VERSION_FULL:
+            case self::VERSION_FULL:
                 return $platformVersion;
-            case static::VERSION_MAJOR:
+            case self::VERSION_MAJOR:
                 return $versionComponents[0];
-            case static::VERSION_BRANCH:
+            case self::VERSION_BRANCH:
                 return $versionComponents[0].'.'.$versionComponents[1];
             default:
                 throw new \InvalidArgumentException('The given version type is not supported.', 1603794822);
@@ -56,6 +56,6 @@ final class Composer
 
     public static function getMajorVersion(): int
     {
-        return (int) static::getPlatformVersion(self::VERSION_MAJOR);
+        return (int) self::getPlatformVersion(self::VERSION_MAJOR);
     }
 }

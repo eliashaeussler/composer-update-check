@@ -4,22 +4,46 @@ set -e
 # Resolve variables
 ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
 APP_PATH="${ROOT_PATH}/tests/Build"
-DOCKER_IMAGE="$1"
+COMPOSER_VERSION=""
 
-# Ensure Docker image is specified
-if [ -z "${DOCKER_IMAGE}" ]; then
-  >&2 echo "Please pass the Docker image to be tested as the first parameter to this script." && exit 1
-else
-  shift
-fi
+# Resolve parameters
+POSITIONAL=()
+while [ $# -gt 0 ]; do
+  key="$1"
+  case ${key} in
+    -c|--composer-version)
+      COMPOSER_VERSION="$2"
+      shift
+      shift
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+set -- "${POSITIONAL[@]}"
 
 # Print check mark with text
 _check() {
   echo -e "\xE2\x9C\x94 $1"
 }
 
-# Print selected Docker image
-_check "Selected Docker image: \"${DOCKER_IMAGE}\""
+# Ensure Composer version is specified
+if [ -z "${COMPOSER_VERSION}" ]; then
+  echo >&2 "Please pass a valid Composer version using the \"--composer-version\" argument." && exit 1
+fi
+
+# Build Docker images
+DOCKER_IMAGE="composer-update-check/test-${COMPOSER_VERSION}"
+docker build \
+  --build-arg COMPOSER_VERSION="${COMPOSER_VERSION}" \
+  --tag "${DOCKER_IMAGE}" \
+  --quiet \
+  "${ROOT_PATH}"
+
+# Print build Docker image
+_check "Successfully built Docker image: \"${DOCKER_IMAGE}\""
 
 # Test Docker image in test applications
 for testApplication in "${APP_PATH}/test-application" "${APP_PATH}/test-application-empty"; do

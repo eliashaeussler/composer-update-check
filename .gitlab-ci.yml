@@ -1,38 +1,68 @@
+default:
+  image: webdevops/php:8.0
+
+cache: &cache
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - vendor/
+  policy: pull
+
 variables:
-  COMPOSER_CACHE_DIR: "/cache/composer"
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_NO_INTERACTION: "1"
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
 
 stages:
+  - build
   - lint
   - sca
   - test
-  - test-dependents
   - docs
   - deploy
-  - test-docker
+  - release
+
+build:
+  stage: build
+  script:
+    - composer install --no-progress
+  cache:
+    <<: *cache
+    policy: pull-push
+  rules:
+    - if: '$RENDER_DOCS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
 
 lint:php:
-  image: webdevops/php:7.4
   stage: lint
-  before_script:
-    - composer install --no-progress
+  needs:
+    - build
   script:
     - composer lint -- --dry-run
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
+    - if: '$RENDER_DOCS'
       when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
+
+lint:composer:
+  stage: lint
+  needs:
+    - build
+  script:
+    - composer normalize --dry-run
+  rules:
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
 sca:php:
-  image: webdevops/php:7.4
   stage: sca
+  needs:
+    - build
   before_script:
-    - composer install --no-progress
     - mkdir -p .build
   script:
     - composer sca -- --error-format gitlab > .build/phpstan.json
@@ -40,43 +70,45 @@ sca:php:
     reports:
       codequality: .build/phpstan.json
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-test:
+test:unit:
   image: webdevops/php:${PHP_VERSION}
   stage: test
   variables:
     PHP_MEMORY_LIMIT: "-1"
+    PHP_MAX_EXECUTION_TIME: "600"
   before_script:
+    - mkdir -p .build/coverage
+    - composer global require --dev --no-progress --prefer-stable brianium/paratest:"*"
     - >
       if [ "$COVERAGE" == "1" ]; then
         pecl channel-update pecl.php.net
         pecl install pcov
         docker-php-ext-enable pcov
       fi
-  script:
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
+  script:
+    - mkdir -p .build/coverage
+    - composer require --dev --no-progress "composer/composer:^${COMPOSER_VERSION}.0"
     - >
       if [ "$COVERAGE" == "1" ]; then
-        COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+        COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml --coverage-text
       else
-        composer test -- --testdox
+        /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.xml
       fi
   parallel:
     matrix:
-      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+      - PHP_VERSION: ["7.1", "7.2", "7.3", "7.4"]
         COMPOSER_VERSION: ["1", "2"]
-      - PHP_VERSION: "7.4"
+      - PHP_VERSION: "8.0"
         COMPOSER_VERSION: "1"
-      - PHP_VERSION: "7.4"
+      - PHP_VERSION: "8.0"
         COMPOSER_VERSION: "2"
         COVERAGE: "1"
   retry:
@@ -85,35 +117,54 @@ test:
       - runner_system_failure
       - stuck_or_timeout_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  cache:
+    <<: *cache
+    key: "${CI_COMMIT_REF_SLUG}-${PHP_VERSION}-${COMPOSER_VERSION}"
+    policy: pull-push
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-test-dependents:reporter:
-  stage: test-dependents
+test:update-reporter:
+  stage: test
   variables:
     UPDATE_CHECK_URL: $CI_REPOSITORY_URL
-    UPDATE_CHECK_REF: $CI_BUILD_REF
-    # Workaround since CI variables are missing in child pipelines
-    # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
-    GIT_CLONE_PATH: /builds/$CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME/test-reporter
+    UPDATE_CHECK_REF: "dev-${CI_COMMIT_REF_NAME}#${CI_COMMIT_SHA} as 1.0.0"
+  # Only inherit relevant variables to avoid conflicts with GIT_CLONE_PATH
+  # in downstream pipeline, see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
+  inherit:
+    variables:
+      - UPDATE_CHECK_URL
+      - UPDATE_CHECK_REF
   trigger:
     project: eliashaeussler/composer-update-reporter
     strategy: depend
     branch: master
-  # Allow failure as long as the build URLs are not correct on downstream
-  # see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
-  allow_failure: true
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
+    - if: '$RENDER_DOCS'
       when: never
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
+
+test:docker:
+  stage: test
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  before_script:
+    - apk add --no-cache bash git
+  script:
+    - ./bin/run-docker-tests.sh --composer-version "${COMPOSER_VERSION}"
+  parallel:
+    matrix:
+      - COMPOSER_VERSION: ["1", "2"]
+  cache: {}
+  rules:
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
@@ -129,12 +180,11 @@ docs:
   script:
     - docker-compose -f docs/build/docker-compose.yaml build --pull
     - docker-compose -f docs/build/docker-compose.yaml run --rm docs build
+  cache: {}
   artifacts:
     paths:
       - site/
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: never
     - if: '$RENDER_DOCS'
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -155,9 +205,8 @@ deploy:docs:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
+  cache: {}
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -171,9 +220,8 @@ deploy:docs:
     - docker:19.03.12-dind
   before_script:
     - docker login -u "$EXTERNAL_REGISTRY_USER" -p "$EXTERNAL_REGISTRY_PASSWORD" $EXTERNAL_REGISTRY
+  cache: {}
   rules:
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_TAG'
@@ -207,41 +255,18 @@ deploy:docker:v1:
     - docker push $EXTERNAL_REGISTRY_IMAGE:$CI_COMMIT_TAG-v1
     - docker push $EXTERNAL_REGISTRY_IMAGE:v1
 
-deploy:docker:test:
-  stage: deploy
-  image: docker:19.03.12
-  services:
-    - docker:19.03.12-dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - docker build --build-arg COMPOSER_VERSION=1 --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1 .
-    - docker build --build-arg COMPOSER_VERSION=2 --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2 .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2
+    - echo "Creating release for ${CI_COMMIT_TAG}"
+  release:
+    name: '${CI_COMMIT_TAG}'
+    description: 'Release notes are available in the [Changelog](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/blob/${CI_COMMIT_TAG}/CHANGELOG.md) file.'
+    tag_name: '${CI_COMMIT_TAG}'
+    ref: '${CI_COMMIT_TAG}'
   rules:
     - if: '$RENDER_DOCS'
       when: never
-    - if: '$CI_COMMIT_BRANCH'
-      when: on_success
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
-      when: on_success
-
-test-docker:
-  stage: test-docker
-  image: docker:19.03.12
-  services:
-    - docker:19.03.12-dind
-  before_script:
-    - apk add --no-cache bash git
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - ./bin/run-docker-tests.sh "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v1"
-    - ./bin/run-docker-tests.sh "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-v2"
-  rules:
-    - if: '$RENDER_DOCS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      when: on_success
-    - if: '$BUILD_DOCKER_TEST_IMAGE'
+    - if: '$CI_COMMIT_TAG'
       when: on_success

@@ -124,45 +124,35 @@ class ScanResultTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return \Generator<string, mixed>
      */
-    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): array
+    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): \Generator
     {
-        return [
-            'empty array' => [
-                [],
-            ],
-            'array without advisories' => [
-                ['foo' => 'baz'],
-            ],
-            'array with empty advisories' => [
-                ['advisories' => []],
-            ],
-        ];
+        yield 'empty array' => [[]];
+        yield 'array without advisories' => [['foo' => 'baz']];
+        yield 'array with empty advisories' => [['advisories' => []]];
     }
 
     /**
-     * @return array<string, mixed>
+     * @return \Generator<string, mixed>
      */
-    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): array
+    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): \Generator
     {
-        return [
-            'secure package without any insecure versions' => [
-                new OutdatedPackage('secure/package', '1.0.0', '1.0.1'),
-                false,
-            ],
-            'secure package with insecure versions' => [
-                new OutdatedPackage('baz', '1.0.0', '1.0.1'),
-                false,
-            ],
-            'insecure package' => [
-                new OutdatedPackage('foo', '1.3.0', '1.5.0'),
-                true,
-            ],
-            'insecure package with special version' => [
-                new OutdatedPackage('baz', '1.0.0-alpha-1', '1.0.0'),
-                true,
-            ],
+        yield 'secure package without any insecure versions' => [
+            new OutdatedPackage('secure/package', '1.0.0', '1.0.1'),
+            false,
+        ];
+        yield 'secure package with insecure versions' => [
+            new OutdatedPackage('baz', '1.0.0', '1.0.1'),
+            false,
+        ];
+        yield 'insecure package' => [
+            new OutdatedPackage('foo', '1.3.0', '1.5.0'),
+            true,
+        ];
+        yield 'insecure package with special version' => [
+            new OutdatedPackage('baz', '1.0.0-alpha-1', '1.0.0'),
+            true,
         ];
     }
 }
