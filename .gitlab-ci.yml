@@ -133,7 +133,7 @@ test:reporter:
   stage: test
   variables:
     UPDATE_CHECK_URL: $CI_REPOSITORY_URL
-    UPDATE_CHECK_REF: $CI_BUILD_REF
+    UPDATE_CHECK_REF: "dev-${CI_COMMIT_REF_NAME}#${CI_COMMIT_SHA} as 1.0.0"
   # Only inherit relevant variables to avoid conflicts with GIT_CLONE_PATH
   # in downstream pipeline, see https://gitlab.com/gitlab-org/gitlab/-/issues/220047
   inherit:
