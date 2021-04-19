@@ -90,10 +90,11 @@ test:unit:
         pecl install pcov
         docker-php-ext-enable pcov
       fi
-  script:
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
+  script:
+    - mkdir -p .build/coverage
     - composer require --dev --no-progress "composer/composer:^${COMPOSER_VERSION}.0"
     - >
       if [ "$COVERAGE" == "1" ]; then
@@ -129,7 +130,7 @@ test:unit:
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
-test:reporter:
+test:update-reporter:
   stage: test
   variables:
     UPDATE_CHECK_URL: $CI_REPOSITORY_URL
