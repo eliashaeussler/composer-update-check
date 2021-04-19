@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-04-19
+
 ### Added
 
 - Transfer objects for output style and verbosity
@@ -194,7 +196,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.2...develop
+[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/1.0.0...develop
+[1.0.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.2...1.0.0
 [0.8.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.1...0.8.2
 [0.8.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.0...0.8.1
 [0.8.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.7.3...0.8.0
