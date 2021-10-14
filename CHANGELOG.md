@@ -202,7 +202,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/1.0.0...develop
+[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/1.0.1...develop
+[1.0.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/1.0.0...1.0.1
 [1.0.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.2...1.0.0
 [0.8.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.1...0.8.2
 [0.8.1]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/compare/0.8.0...0.8.1
