@@ -201,10 +201,10 @@ deploy:docs:
     - echo "$PRIVATE_KEY_FOR_DEPLOYMENT" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan cp140.sp-server.net >> ~/.ssh/known_hosts
+    - ssh-keyscan cp232.sp-server.net >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
+    - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp232.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/'
   cache: {}
   rules:
     - if: '$RENDER_DOCS'
