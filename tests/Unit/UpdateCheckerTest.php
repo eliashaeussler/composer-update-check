@@ -191,7 +191,7 @@ class UpdateCheckerTest extends AbstractTestCase
         static::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
         static::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
         static::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
-        static::assertFalse($firstOutdatedPackage->isInsecure());
+        static::assertTrue($firstOutdatedPackage->isInsecure());
 
         static::assertSame('symfony/console', $secondOutdatedPackage->getName());
         static::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
