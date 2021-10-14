@@ -182,7 +182,7 @@ class UpdateCheckCommandTest extends AbstractTestCase
         static::assertSame('codeception/codeception', $actualJson['result'][0]['Package']);
         static::assertSame('4.1.9', $actualJson['result'][0]['Outdated version']);
         static::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
-        static::assertFalse($actualJson['result'][0]['Insecure']);
+        static::assertTrue($actualJson['result'][0]['Insecure']);
 
         static::assertSame('symfony/console', $actualJson['result'][1]['Package']);
         static::assertSame('v4.4.9', $actualJson['result'][1]['Outdated version']);

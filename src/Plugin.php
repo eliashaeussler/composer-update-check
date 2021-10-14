@@ -41,7 +41,7 @@ class Plugin implements PluginInterface, Capable
 {
     public function activate(Composer $composer, IOInterface $io): void
     {
-        // Nothing to do here. Just go ahead :)
+        $this->autoloadFunctions($composer);
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
@@ -59,5 +59,25 @@ class Plugin implements PluginInterface, Capable
         return [
             CommandProvider::class => UpdateCheckCommandProvider::class,
         ];
+    }
+
+    /**
+     * Workaround to ensure required functions from dependencies are auto-loaded.
+     *
+     * @see https://github.com/composer/composer/issues/4764#issuecomment-379619265
+     */
+    protected function autoloadFunctions(Composer $composer): void
+    {
+        $vendor = $composer->getConfig()->get('vendor-dir');
+
+        $this->loadFailsafe($vendor.'/symfony/polyfill-php73/bootstrap.php');
+        $this->loadFailsafe($vendor.'/symfony/polyfill-php80/bootstrap.php');
+    }
+
+    protected function loadFailsafe(string $vendorFile): void
+    {
+        if (file_exists($vendorFile)) {
+            require_once $vendorFile;
+        }
     }
 }
