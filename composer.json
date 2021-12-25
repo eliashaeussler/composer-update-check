@@ -29,7 +29,7 @@
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
-    "ergebnis/composer-normalize": "^2.17",
+    "ergebnis/composer-normalize": "^2.8",
     "friendsofphp/php-cs-fixer": "^3.0",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^1.2",
