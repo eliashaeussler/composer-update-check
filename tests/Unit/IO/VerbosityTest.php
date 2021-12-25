@@ -130,7 +130,7 @@ class VerbosityTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{int}>
      */
     public function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): \Generator
     {

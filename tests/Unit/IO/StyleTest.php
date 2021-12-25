@@ -101,7 +101,7 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{string}>
      */
     public function isReturnsTrueIfGivenStyleEqualsStyleDataProvider(): \Generator
     {
