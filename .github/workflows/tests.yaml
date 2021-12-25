@@ -61,10 +61,14 @@ jobs:
         run: composer require --dev --no-progress "composer/composer:^${{ matrix.composer-version }}"
 
       # Run tests
-      - name: Run tests
-        run: |
-          mkdir -p .build/coverage
-          composer test:coverage
+      - name: Build coverage directory
+        run: mkdir -p .build/coverage
+      - name: Run tests with coverage
+        run: composer test:coverage
+        if: ${{ matrix.coverage }}
+      - name: Run tests without coverage
+        run: composer test
+        if: ${{ !matrix.coverage }}
 
       # Report coverage
       - name: Fix coverage path
