@@ -1,9 +1,8 @@
 {
   "name": "eliashaeussler/composer-update-check",
-  "type": "composer-plugin",
   "description": "Composer Plugin to check outdated packages, based on their requirements",
-  "homepage": "https://haeussler.dev",
   "license": "GPL-3.0-or-later",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Elias Häußler",
@@ -12,6 +11,13 @@
       "role": "Maintainer"
     }
   ],
+  "homepage": "https://haeussler.dev",
+  "support": {
+    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
+    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
+    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
+    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
+  },
   "require": {
     "php": "^7.1 || 8.0.*",
     "ext-json": "*",
@@ -23,17 +29,11 @@
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
-    "ergebnis/composer-normalize": "^2.8",
+    "ergebnis/composer-normalize": "^2.17",
     "friendsofphp/php-cs-fixer": "^3.0",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^0.12.80",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "class": "EliasHaeussler\\ComposerUpdateCheck\\Plugin"
   },
   "autoload": {
     "psr-4": {
@@ -44,6 +44,12 @@
     "psr-4": {
       "EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests"
     }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "class": "EliasHaeussler\\ComposerUpdateCheck\\Plugin"
   },
   "scripts": {
     "docs": [
@@ -62,11 +68,5 @@
     "simulate": "bin/simulate-application.sh",
     "test": "phpunit -c phpunit.xml",
     "test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.coverage.xml"
-  },
-  "support": {
-    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
-    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
-    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
-    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
   }
 }
