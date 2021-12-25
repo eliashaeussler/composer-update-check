@@ -2,6 +2,7 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
+  # Job: Run unit tests
   tests:
     name: PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}
     runs-on: ubuntu-20.04
@@ -82,6 +83,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{ matrix.coverage }}
 
+  # Job: Run unit tests with lowest installed dependency versions
   tests-lowest:
     name: '[test-lowest] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
     runs-on: ubuntu-20.04
@@ -126,6 +128,7 @@ jobs:
           mkdir -p .build/coverage
           composer test
 
+  # Job: Run Docker tests
   tests-docker:
     name: '[test-docker] Composer ${{ matrix.composer-version }}'
     runs-on: ubuntu-20.04
