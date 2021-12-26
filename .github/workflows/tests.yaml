@@ -123,10 +123,10 @@ jobs:
         run: composer require --dev --no-progress --prefer-lowest "composer/composer:^${{ matrix.composer-version }}"
 
       # Run tests
+      - name: Build coverage directory
+        run: mkdir -p .build/coverage
       - name: Run tests
-        run: |
-          mkdir -p .build/coverage
-          composer test
+        run: composer test
 
   # Job: Run Docker tests
   tests-docker:
