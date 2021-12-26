@@ -33,7 +33,7 @@
     "friendsofphp/php-cs-fixer": ">= 2.17 < 4.0",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^1.2",
-    "phpunit/phpunit": ">= 7.0 < 10.0",
+    "phpunit/phpunit": ">= 7.5 < 10.0",
     "symfony/filesystem": ">= 4.4 < 6.0"
   },
   "autoload": {
