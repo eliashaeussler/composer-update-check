@@ -20,7 +20,7 @@
 
 A Composer plugin that detects outdated dependencies in your `composer.lock`, based on the
 version constraints in your `composer.json`. This distinguishes it from other plugins in the
-wild, most of which do not respect version restrictions. With an optional security scan and
+wild, most of which do not respect version constraints. With an optional security scan and
 an interface for other plugins, it provides an elegant way to highlight the successes of
 your project. Especially in interaction with the
 [reporter plugin](https://github.com/eliashaeussler/composer-update-reporter), it enables
