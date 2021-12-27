@@ -178,8 +178,8 @@ class UpdateCheckCommand extends BaseCommand
     }
 
     /**
-     * @param array{status: string, result?: array} $report
-     * @param string[]                              $ignoredPackages
+     * @param array{status: string, result?: array<int, array<string, mixed>>} $report
+     * @param string[]                                                         $ignoredPackages
      */
     private function buildJsonReport(array $report, array $ignoredPackages = []): void
     {

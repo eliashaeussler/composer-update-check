@@ -13,4 +13,4 @@ using environment variables. This makes it easy to automate checks for
 outdated packages.
 
 [:octicons-link-external-16: View on Packagist](https://packagist.org/packages/eliashaeussler/composer-update-reporter){: target=_blank }<br>
-[:octicons-git-merge-16: Source code](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter){: target=_blank }
+[:octicons-git-merge-16: Source code](https://github.com/eliashaeussler/composer-update-reporter){: target=_blank }

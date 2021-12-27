@@ -23,7 +23,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Util\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * TestApplicationTrait.
@@ -50,7 +50,7 @@ trait TestApplicationTrait
 
         $filesystem = new Filesystem();
         $filesystem->remove($this->temporaryDirectory);
-        $filesystem->copy(dirname(__DIR__, 2).'/'.$applicationPath, $this->temporaryDirectory);
+        $filesystem->mirror(dirname(__DIR__, 2).'/'.$applicationPath, $this->temporaryDirectory);
 
         chdir($this->temporaryDirectory);
         $this->cleanUpComposerEnvironment();
@@ -69,13 +69,13 @@ trait TestApplicationTrait
     {
         if (is_string($this->temporaryDirectory)) {
             $filesystem = new Filesystem();
-            $filesystem->removeDirectory($this->temporaryDirectory);
+            $filesystem->remove($this->temporaryDirectory);
         }
     }
 
     protected function cleanUpComposerEnvironment(): void
     {
         $filesystem = new Filesystem();
-        $filesystem->removeDirectory(getcwd().'/vendor');
+        $filesystem->remove(getcwd().'/vendor');
     }
 }
