@@ -8,7 +8,7 @@ hide:
 [![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
 [![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](LICENSE.md)
+[![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)
 
 # Composer update check plugin
 
