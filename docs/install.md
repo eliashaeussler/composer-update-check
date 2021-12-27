@@ -16,6 +16,6 @@ composer require --dev eliashaeussler/composer-update-check
 ### From source
 
 ```bash
-composer config repositories.update-check vcs "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.git"
+composer config repositories.update-check vcs "https://github.com/eliashaeussler/composer-update-check.git"
 composer require --dev eliashaeussler/composer-update-check
 ```

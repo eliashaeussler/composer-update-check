@@ -13,10 +13,10 @@
   ],
   "homepage": "https://haeussler.dev",
   "support": {
-    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check/-/issues",
-    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
+    "issues": "https://github.com/eliashaeussler/composer-update-check/issues",
+    "source": "https://github.com/eliashaeussler/composer-update-check",
     "docs": "https://docs.elias-haeussler.de/composer-update-check/",
-    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom"
+    "rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
   },
   "require": {
     "php": ">= 7.1 < 8.1",
