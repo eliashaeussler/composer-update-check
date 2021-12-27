@@ -120,7 +120,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{string, array<OutdatedPackage>}>
      */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
     {
@@ -149,7 +149,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{string, OutdatedPackage|null}>
      */
     public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
     {

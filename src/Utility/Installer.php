@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
+use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\Installer as ComposerInstaller;
 use Composer\IO\BufferIO;
 
@@ -47,14 +48,30 @@ final class Installer
     {
         self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
+        $eventDispatcher = $composer->getEventDispatcher();
 
-        return ComposerInstaller::create(self::$io, $composer)
+        $installer = ComposerInstaller::create(self::$io, $composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
-            ->setDevMode(true)
-            ->setRunScripts(false)
-            ->setIgnorePlatformRequirements(true)
-            ->run();
+            ->setDevMode(true);
+
+        if (method_exists($eventDispatcher, 'setRunScripts')) {
+            // Composer >= 2.1.2
+            $eventDispatcher->setRunScripts(false);
+        } else {
+            // Composer < 2.1.2
+            $installer->setRunScripts(false);
+        }
+
+        if (method_exists($installer, 'setPlatformRequirementFilter')) {
+            // Composer >= 2.2
+            $installer->setPlatformRequirementFilter(PlatformRequirementFilterFactory::ignoreAll());
+        } else {
+            // Composer < 2.2
+            $installer->setIgnorePlatformRequirements(true);
+        }
+
+        return $installer->run();
     }
 
     /**
@@ -64,25 +81,40 @@ final class Installer
     {
         self::$io = new BufferIO();
         $preferredInstall = $composer->getConfig()->get('preferred-install');
+
         $installer = ComposerInstaller::create(self::$io, $composer)
             ->setDryRun(true)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
-            ->setUpdate(true)
-            ->setIgnorePlatformRequirements(true);
+            ->setUpdate(true);
+
+        if (method_exists($installer, 'setPlatformRequirementFilter')) {
+            // Composer >= 2.2
+            $installer->setPlatformRequirementFilter(PlatformRequirementFilterFactory::ignoreAll());
+        } else {
+            // Composer < 2.2
+            $installer->setIgnorePlatformRequirements(true);
+        }
+
         if (method_exists($installer, 'setUpdateAllowList')) {
+            // Composer >= 2.0
             $installer->setUpdateAllowList($packages);
         } else {
+            // Composer < 2.0
             /* @noinspection PhpUndefinedMethodInspection */
             /* @phpstan-ignore-next-line */
             $installer->setUpdateWhitelist($packages);
         }
+
         if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
+            // Composer >= 2.0
             $installer->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS);
         } elseif (method_exists($installer, 'setAllowListAllDependencies')) {
+            // Composer >= 1.10.8
             $installer->setAllowListAllDependencies(true);
         } else {
+            // Composer < 1.10.8
             /* @noinspection PhpUndefinedMethodInspection */
             /* @phpstan-ignore-next-line */
             $installer->setWhitelistDependencies(true);
