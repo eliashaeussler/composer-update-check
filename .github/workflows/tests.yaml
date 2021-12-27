@@ -152,3 +152,18 @@ jobs:
       # Run tests
       - name: Run tests
         run: ./bin/run-docker-tests.sh --composer-version "${{ matrix.composer-version }}"
+
+  # Job: Run unit tests of composer-update-reporter
+  tests-reporter:
+    name: 'Trigger test workflow of eliashaeussler/composer-update-reporter'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Trigger workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: 'Tests for composer-update-check'
+          token: ${{ secrets.PAT_REPORTER_TRIGGER }}
+          repo: eliashaeussler/composer-update-reporter
+          # @todo change to master
+          ref: 'feature/migrate-to-github'
+          inputs: '{ "update-check-branch": "${{ github.ref_name }}", "update-check-sha": "${{ github.sha }}" }'
