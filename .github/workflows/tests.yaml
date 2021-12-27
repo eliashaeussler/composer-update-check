@@ -164,6 +164,5 @@ jobs:
           workflow: 'Tests for composer-update-check'
           token: ${{ secrets.PAT_REPORTER_TRIGGER }}
           repo: eliashaeussler/composer-update-reporter
-          # @todo change to master
-          ref: 'feature/migrate-to-github'
+          ref: 'master'
           inputs: '{ "update-check-branch": "${{ github.ref_name }}", "update-check-sha": "${{ github.sha }}" }'
