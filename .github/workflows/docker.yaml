@@ -35,7 +35,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          image: eliashaeussler/composer-update-check
+          images: eliashaeussler/composer-update-check
           flavor: |
             latest=${{ matrix.latest }}
           tags: ${{ matrix.tags }}
