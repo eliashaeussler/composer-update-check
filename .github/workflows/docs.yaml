@@ -1,4 +1,4 @@
-name: CGL
+name: Documentation
 on:
   push:
     branches:
@@ -28,7 +28,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-20.04
-    needs: build
+    needs: render
     steps:
       - uses: actions/checkout@v2
         with:
