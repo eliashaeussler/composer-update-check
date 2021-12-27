@@ -41,7 +41,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v${{ matrix.composer-version }}
+          tools: composer:v2
           coverage: pcov
 
       # Define Composer cache
@@ -59,7 +59,11 @@ jobs:
 
       # Install dependencies
       - name: Install Composer and dependencies
-        run: composer require --dev --no-progress "composer/composer:^${{ matrix.composer-version }}"
+        run: |
+          composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
+          composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
+          composer update --no-progress --with "composer/composer:^${{ matrix.composer-version }}"
+          composer selfupdate --${{ matrix.composer-version }}
 
       # Run tests
       - name: Build coverage directory
@@ -102,7 +106,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v${{ matrix.composer-version }}
+          tools: composer:v2
           coverage: none
 
       # Define Composer cache
@@ -120,7 +124,11 @@ jobs:
 
       # Install dependencies
       - name: Install Composer and dependencies
-        run: composer require --dev --no-progress --prefer-lowest "composer/composer:^${{ matrix.composer-version }}"
+        run: |
+          composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
+          composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
+          composer update --no-progress --prefer-lowest --with "composer/composer:^${{ matrix.composer-version }}"
+          composer selfupdate --${{ matrix.composer-version }}
 
       # Run tests
       - name: Build coverage directory
