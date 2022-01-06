@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2022-01-06
+
+### Added
+
+- Support for Symfony 6 components
+
 ## [1.1.2] - 2021-12-27
 
 ### Fixed
@@ -244,7 +250,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.1.2...develop
+[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.1.3...develop
+[1.1.3]: https://github.com/eliashaeussler/composer-update-check/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/eliashaeussler/composer-update-check/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/eliashaeussler/composer-update-check/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.0.2...1.1.0

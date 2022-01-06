@@ -164,6 +164,10 @@ jobs:
     name: 'Trigger test workflow of eliashaeussler/composer-update-reporter'
     runs-on: ubuntu-20.04
     steps:
+      - id: set-branch
+        run: echo "::set-output name=branch::${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
+      - id: set-sha
+        run: echo "::set-output name=sha::${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}"
       - name: Trigger workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
@@ -171,4 +175,4 @@ jobs:
           token: ${{ secrets.PAT_REPORTER_TRIGGER }}
           repo: eliashaeussler/composer-update-reporter
           ref: 'master'
-          inputs: '{ "update-check-branch": "${{ github.ref_name }}", "update-check-sha": "${{ github.sha }}" }'
+          inputs: '{ "update-check-branch": "${{ steps.set-branch.outputs.branch }}", "update-check-sha": "${{ steps.set-sha.outputs.sha }}" }'
