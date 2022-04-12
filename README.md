@@ -11,7 +11,7 @@
 [![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](LICENSE.md)
 
-**:orange_book:&nbsp;[Documentation](https://docs.elias-haeussler.de/composer-update-check/)** |
+**:orange_book:&nbsp;[Documentation](https://composer-update-check.elias-haeussler.de/)** |
 :package:&nbsp;[Packagist](https://packagist.org/packages/eliashaeussler/composer-update-check) |
 :floppy_disk:&nbsp;[Repository](https://github.com/eliashaeussler/composer-update-check) |
 :bug:&nbsp;[Issue tracker](https://github.com/eliashaeussler/composer-update-check/issues)

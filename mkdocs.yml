@@ -1,6 +1,6 @@
 # Site configuration
 site_name: Composer update check plugin
-site_url: https://docs.elias-haeussler.de/composer-update-check/
+site_url: https://composer-update-check.elias-haeussler.de/
 site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-check"
 site_author: Elias Häußler
 

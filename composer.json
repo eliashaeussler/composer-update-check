@@ -15,7 +15,7 @@
   "support": {
     "issues": "https://github.com/eliashaeussler/composer-update-check/issues",
     "source": "https://github.com/eliashaeussler/composer-update-check",
-    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
+    "docs": "https://composer-update-check.elias-haeussler.de/",
     "rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
   },
   "require": {
