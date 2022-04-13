@@ -645,14 +645,14 @@ composer install
 </code></pre></div>
 <h2 id="check-code-quality"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3a2 2 0 0 1 2-2h9.982a2 2 0 0 1 1.414.586l4.018 4.018A2 2 0 0 1 21 7.018V21a2 2 0 0 1-2 2H4.75a.75.75 0 0 1 0-1.5H19a.5.5 0 0 0 .5-.5V8.5h-4a2 2 0 0 1-2-2v-4H5a.5.5 0 0 0-.5.5v6.25a.75.75 0 0 1-1.5 0V3zm12-.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0-.146-.336l-4.018-4.018A.5.5 0 0 0 15 2.5z"/><path d="M4.53 12.24a.75.75 0 0 1-.039 1.06l-2.639 2.45 2.64 2.45a.75.75 0 1 1-1.022 1.1l-3.23-3a.75.75 0 0 1 0-1.1l3.23-3a.75.75 0 0 1 1.06.04zm3.979 1.06a.75.75 0 1 1 1.02-1.1l3.231 3a.75.75 0 0 1 0 1.1l-3.23 3a.75.75 0 1 1-1.021-1.1l2.639-2.45-2.64-2.45z"/></svg></span> Check code quality<a class="headerlink" href="#check-code-quality" title="Permanent link">&para;</a></h2>
 <p>Code quality can be checked by running the following commands:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run PHP linting</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run linters</span>
 composer lint
+composer lint:composer
+composer lint:php
 
-<span class="c1"># Run PHP static code analysis</span>
+<span class="c1"># Run static code analysis</span>
 composer sca
-
-<span class="c1"># Run Composer normalization</span>
-composer normalize
+composer sca:php
 </code></pre></div>
 <h2 id="run-tests"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M7.72.22a.75.75 0 0 1 1.06 0l1.204 1.203A4.983 4.983 0 0 1 12 1c.717 0 1.4.151 2.016.423L15.22.22a.75.75 0 0 1 1.06 1.06l-.971.972A4.988 4.988 0 0 1 17 6v1.104a2.755 2.755 0 0 1 1.917 1.974l1.998-.999a.75.75 0 0 1 .67 1.342L19 10.714V13.5l3.25.003a.75.75 0 1 1 0 1.5L19 15.001V16a7.02 7.02 0 0 1-.204 1.686.833.833 0 0 1 .04.018l2.75 1.375a.75.75 0 1 1-.671 1.342l-2.638-1.319A7 7 0 0 1 12 23a7 7 0 0 1-6.197-3.742l-2.758 1.181a.75.75 0 1 1-.59-1.378l2.795-1.199A7.007 7.007 0 0 1 5 16v-.996H1.75a.75.75 0 0 1 0-1.5H5v-2.79L2.415 9.42a.75.75 0 0 1 .67-1.342l1.998.999A2.755 2.755 0 0 1 7 7.104V6a4.99 4.99 0 0 1 1.69-3.748l-.97-.972a.75.75 0 0 1 0-1.06zM8.5 7h7V6a3.5 3.5 0 1 0-7 0v1zm-2 3.266V9.75c0-.69.56-1.25 1.25-1.25h8.5c.69 0 1.25.56 1.25 1.25V16a5.5 5.5 0 0 1-11 0v-5.734z"/></svg></span> Run tests<a class="headerlink" href="#run-tests" title="Permanent link">&para;</a></h2>
 <p>Unit tests can be executed using the provided Composer script <code>test</code>.
@@ -699,7 +699,7 @@ composer docs:build
   <small>
     
       Last update:
-      2021-12-27
+      2022-04-13
     
   </small>
 </div>
