@@ -1,6 +1,6 @@
 # Site configuration
 site_name: Composer update check plugin
-site_url: https://docs.elias-haeussler.de/composer-update-check/
+site_url: https://composer-update-check.elias-haeussler.de/
 site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-check"
 site_author: Elias Häußler
 
@@ -50,7 +50,7 @@ extra:
     url: https://github.com/eliashaeussler/composer-update-check
     blob: https://github.com/eliashaeussler/composer-update-check/tree/master
   social:
-    - icon: fontawesome/solid/globe-americas
+    - icon: fontawesome/solid/earth-americas
       link: https://haeussler.dev
     - icon: fontawesome/brands/twitter
       link: https://haeussler.dev/twitter
@@ -82,7 +82,8 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.tabbed
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.highlight:
