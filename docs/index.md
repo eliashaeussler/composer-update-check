@@ -6,9 +6,9 @@ hide:
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eliashaeussler_composer-update-check&metric=coverage)](https://sonarcloud.io/dashboard?id=eliashaeussler_composer-update-check)
 [![Tests](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
-[![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)
+[![Latest Stable Version](https://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![Total Downloads](https://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![License](https://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)
 
 # Composer update check plugin
 
