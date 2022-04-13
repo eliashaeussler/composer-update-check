@@ -22,14 +22,14 @@ composer install
 Code quality can be checked by running the following commands:
 
 ```bash
-# Run PHP linting
+# Run linters
 composer lint
+composer lint:composer
+composer lint:php
 
-# Run PHP static code analysis
+# Run static code analysis
 composer sca
-
-# Run Composer normalization
-composer normalize
+composer sca:php
 ```
 
 ## :octicons-bug-24: Run tests
