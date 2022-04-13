@@ -50,7 +50,7 @@ extra:
     url: https://github.com/eliashaeussler/composer-update-check
     blob: https://github.com/eliashaeussler/composer-update-check/tree/master
   social:
-    - icon: fontawesome/solid/globe-americas
+    - icon: fontawesome/solid/earth-americas
       link: https://haeussler.dev
     - icon: fontawesome/brands/twitter
       link: https://haeussler.dev/twitter
