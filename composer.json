@@ -15,7 +15,7 @@
   "support": {
     "issues": "https://github.com/eliashaeussler/composer-update-check/issues",
     "source": "https://github.com/eliashaeussler/composer-update-check",
-    "docs": "https://docs.elias-haeussler.de/composer-update-check/",
+    "docs": "https://composer-update-check.elias-haeussler.de/",
     "rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
   },
   "require": {
@@ -24,7 +24,9 @@
     "composer-plugin-api": "^1.0 || ^2.0",
     "nyholm/psr7": "^1.0",
     "psr/http-client": "^1.0",
+    "psr/http-message": "^1.0",
     "spatie/emoji": "^2.0",
+    "symfony/console": "^4.4.11 || ^5.0.11 || ^6.0",
     "symfony/http-client": "^4.4.11 || ^5.0.11 || ^6.0"
   },
   "require-dev": {
@@ -69,8 +71,16 @@
     "docs:open": "open http://$(docker-compose -f docs/build/docker-compose.yaml port docs 8000)",
     "docs:start": "@docs:exec up -d",
     "docs:stop": "@docs:exec down",
-    "lint": "php-cs-fixer fix",
-    "sca": "phpstan analyse -c phpstan.neon",
+    "lint": [
+      "@lint:composer",
+      "@lint:php"
+    ],
+    "lint:composer": "@composer normalize --no-check-lock --no-update-lock",
+    "lint:php": "php-cs-fixer fix",
+    "sca": [
+      "@sca:php"
+    ],
+    "sca:php": "phpstan analyse -c phpstan.neon",
     "simulate": "bin/simulate-application.sh",
     "test": "phpunit -c phpunit.xml",
     "test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.coverage.xml"

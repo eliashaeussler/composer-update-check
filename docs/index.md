@@ -3,12 +3,14 @@ hide:
 - toc
 ---
 
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eliashaeussler_composer-update-check&metric=coverage)](https://sonarcloud.io/dashboard?id=eliashaeussler_composer-update-check)
+[![Coverage](https://codecov.io/gh/eliashaeussler/composer-update-check/branch/develop/graph/badge.svg?token=9AEQ0LRYU0)](https://codecov.io/gh/eliashaeussler/composer-update-check)
+[![Maintainability](https://api.codeclimate.com/v1/badges/882ab3bb81b87d2b4a6d/maintainability)](https://codeclimate.com/github/eliashaeussler/composer-update-check/maintainability)
 [![Tests](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
-[![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)
+[![Release](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml)
+[![Latest Stable Version](https://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![Total Downloads](https://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![License](https://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)
 
 # Composer update check plugin
 

@@ -4,14 +4,16 @@
 
 # Composer update check plugin
 
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eliashaeussler_composer-update-check&metric=coverage)](https://sonarcloud.io/dashboard?id=eliashaeussler_composer-update-check)
+[![Coverage](https://codecov.io/gh/eliashaeussler/composer-update-check/branch/develop/graph/badge.svg?token=9AEQ0LRYU0)](https://codecov.io/gh/eliashaeussler/composer-update-check)
+[![Maintainability](https://api.codeclimate.com/v1/badges/882ab3bb81b87d2b4a6d/maintainability)](https://codeclimate.com/github/eliashaeussler/composer-update-check/maintainability)
 [![Tests](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
-[![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
-[![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](LICENSE.md)
+[![Release](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml)
+[![Latest Stable Version](https://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![Total Downloads](https://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
+[![License](https://poser.pugx.org/eliashaeussler/composer-update-check/license)](LICENSE.md)
 
-**:orange_book:&nbsp;[Documentation](https://docs.elias-haeussler.de/composer-update-check/)** |
+**:orange_book:&nbsp;[Documentation](https://composer-update-check.elias-haeussler.de/)** |
 :package:&nbsp;[Packagist](https://packagist.org/packages/eliashaeussler/composer-update-check) |
 :floppy_disk:&nbsp;[Repository](https://github.com/eliashaeussler/composer-update-check) |
 :bug:&nbsp;[Issue tracker](https://github.com/eliashaeussler/composer-update-check/issues)
@@ -53,3 +55,5 @@ View all notable release notes in the [Changelog](CHANGELOG.md).
 ## :star: License
 
 This project is licensed under [GNU General Public License 3.0 (or later)](LICENSE.md).
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check?ref=badge_large)
