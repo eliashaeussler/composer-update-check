@@ -10,6 +10,7 @@
 [![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![License](http://poser.pugx.org/eliashaeussler/composer-update-check/license)](LICENSE.md)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check?ref=badge_shield)
 
 **:orange_book:&nbsp;[Documentation](https://docs.elias-haeussler.de/composer-update-check/)** |
 :package:&nbsp;[Packagist](https://packagist.org/packages/eliashaeussler/composer-update-check) |
@@ -53,3 +54,6 @@ View all notable release notes in the [Changelog](CHANGELOG.md).
 ## :star: License
 
 This project is licensed under [GNU General Public License 3.0 (or later)](LICENSE.md).
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Feliashaeussler%2Fcomposer-update-check?ref=badge_large)
