@@ -48,7 +48,7 @@ extra_css:
 extra:
   repository:
     url: https://github.com/eliashaeussler/composer-update-check
-    blob: https://github.com/eliashaeussler/composer-update-check/tree/master
+    blob: https://github.com/eliashaeussler/composer-update-check/tree/main
   social:
     - icon: fontawesome/solid/earth-americas
       link: https://haeussler.dev
