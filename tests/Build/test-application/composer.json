@@ -1,9 +1,0 @@
-{
-  "require": {
-    "symfony/console": "^4.4",
-    "symfony/http-kernel": "^4.4"
-  },
-  "require-dev": {
-    "codeception/codeception": "^4.1"
-  }
-}
