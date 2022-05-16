@@ -183,5 +183,5 @@ jobs:
           workflow: 'Tests for composer-update-check'
           token: ${{ secrets.PAT_REPORTER_TRIGGER }}
           repo: eliashaeussler/composer-update-reporter
-          ref: 'master'
+          ref: 'main'
           inputs: '{ "update-check-branch": "${{ steps.set-branch.outputs.branch }}", "update-check-sha": "${{ steps.set-sha.outputs.sha }}" }'
