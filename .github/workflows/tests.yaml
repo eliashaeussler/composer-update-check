@@ -173,6 +173,7 @@ jobs:
   tests-reporter:
     name: 'Trigger test workflow of eliashaeussler/composer-update-reporter'
     runs-on: ubuntu-20.04
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - id: set-branch
         run: echo "::set-output name=branch::${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
