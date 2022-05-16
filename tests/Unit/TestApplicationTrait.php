@@ -48,12 +48,28 @@ trait TestApplicationTrait
         $this->initialDirectory = getcwd();
         $this->temporaryDirectory = tempnam(sys_get_temp_dir(), str_replace('\\', '', strtolower(static::class)));
 
+        $applicationVariant = $this->getApplicationVariant($applicationPath);
+        if (null !== $applicationVariant) {
+            $applicationVariant = '/'.$applicationVariant;
+        }
+
         $filesystem = new Filesystem();
         $filesystem->remove($this->temporaryDirectory);
-        $filesystem->mirror(dirname(__DIR__, 2).'/'.$applicationPath, $this->temporaryDirectory);
+        $filesystem->mirror(dirname(__DIR__, 2).'/'.$applicationPath.$applicationVariant, $this->temporaryDirectory);
 
         chdir($this->temporaryDirectory);
         $this->cleanUpComposerEnvironment();
+    }
+
+    protected function getApplicationVariant(string $applicationPath): ?string
+    {
+        switch ($applicationPath) {
+            case AbstractTestCase::TEST_APPLICATION_NORMAL:
+                return 'v'.PHP_MAJOR_VERSION;
+
+            default:
+                return null;
+        }
     }
 
     protected function goBackToInitialDirectory(): void
