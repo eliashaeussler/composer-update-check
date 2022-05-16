@@ -10,7 +10,7 @@ jobs:
     env:
       COMPOSE_FILE: docs/build/docker-compose.yaml
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -21,7 +21,7 @@ jobs:
         run: docker-compose run --rm docs build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: rendered-docs
           path: site/
@@ -30,12 +30,12 @@ jobs:
     runs-on: ubuntu-20.04
     needs: render
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Download artifact
         id: download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: rendered-docs
           path: site/
