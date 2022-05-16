@@ -1,0 +1,14 @@
+{
+  "require": {
+    "symfony/console": "^4.4",
+    "symfony/http-kernel": "^4.4"
+  },
+  "require-dev": {
+    "codeception/codeception": "^4.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "eliashaeussler/composer-update-check": true
+    }
+  }
+}

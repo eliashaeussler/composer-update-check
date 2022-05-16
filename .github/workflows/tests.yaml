@@ -153,11 +153,12 @@ jobs:
 
   # Job: Run Docker tests
   tests-docker:
-    name: '[test-docker] Composer ${{ matrix.composer-version }}'
+    name: '[test-docker] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
+        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0"]
         composer-version: ["1", "2"]
     steps:
       - uses: actions/checkout@v2
@@ -166,7 +167,7 @@ jobs:
 
       # Run tests
       - name: Run tests
-        run: ./bin/run-docker-tests.sh --composer-version "${{ matrix.composer-version }}"
+        run: ./bin/run-docker-tests.sh --composer-version "${{ matrix.composer-version }}" --php-version "${{ matrix.php-version }}"
 
   # Job: Run unit tests of composer-update-reporter
   tests-reporter:
@@ -183,5 +184,5 @@ jobs:
           workflow: 'Tests for composer-update-check'
           token: ${{ secrets.PAT_REPORTER_TRIGGER }}
           repo: eliashaeussler/composer-update-reporter
-          ref: 'master'
+          ref: 'main'
           inputs: '{ "update-check-branch": "${{ steps.set-branch.outputs.branch }}", "update-check-sha": "${{ steps.set-sha.outputs.sha }}" }'

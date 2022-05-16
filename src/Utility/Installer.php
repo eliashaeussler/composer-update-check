@@ -25,7 +25,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Utility;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
-use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\Installer as ComposerInstaller;
 use Composer\IO\BufferIO;
 
@@ -63,14 +62,6 @@ final class Installer
             $installer->setRunScripts(false);
         }
 
-        if (method_exists($installer, 'setPlatformRequirementFilter')) {
-            // Composer >= 2.2
-            $installer->setPlatformRequirementFilter(PlatformRequirementFilterFactory::ignoreAll());
-        } else {
-            // Composer < 2.2
-            $installer->setIgnorePlatformRequirements(true);
-        }
-
         return $installer->run();
     }
 
@@ -88,14 +79,6 @@ final class Installer
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
             ->setUpdate(true);
-
-        if (method_exists($installer, 'setPlatformRequirementFilter')) {
-            // Composer >= 2.2
-            $installer->setPlatformRequirementFilter(PlatformRequirementFilterFactory::ignoreAll());
-        } else {
-            // Composer < 2.2
-            $installer->setIgnorePlatformRequirements(true);
-        }
 
         if (method_exists($installer, 'setUpdateAllowList')) {
             // Composer >= 2.0
