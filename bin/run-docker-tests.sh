@@ -4,6 +4,7 @@ set -e
 # Resolve variables
 ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
 APP_PATH="${ROOT_PATH}/tests/Build"
+PHP_VERSION="$(php -r 'echo PHP_MAJOR_VERSION;')"
 COMPOSER_VERSION=""
 
 # Resolve parameters
@@ -46,8 +47,8 @@ docker build \
 _check "Successfully built Docker image: \"${DOCKER_IMAGE}\""
 
 # Test Docker image in test applications
-for testApplication in "${APP_PATH}/test-application" "${APP_PATH}/test-application-empty"; do
-  _check "Running update check for \"$(basename "${testApplication}")\" (see output below)"
+for testApplication in "${APP_PATH}/test-application/v${PHP_VERSION}" "${APP_PATH}/test-application-empty"; do
+  _check "Running update check for \"${testApplication#"$APP_PATH/"}\" (see output below)"
   if [ $# -gt 0 ]; then
     echo "  Command options: $*"
   fi
