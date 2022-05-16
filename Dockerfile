@@ -1,4 +1,5 @@
-FROM php:7.4-alpine
+ARG PHP_VERSION=7.4
+FROM php:${PHP_VERSION}-alpine
 LABEL maintainer="Elias Häußler <elias@haeussler.dev>"
 
 ARG COMPOSER_VERSION=2
