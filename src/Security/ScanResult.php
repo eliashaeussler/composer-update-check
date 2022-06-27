@@ -65,12 +65,17 @@ class ScanResult
         // Parse security advisories
         $insecurePackages = [];
         $advisories = $apiResult['advisories'];
+
         foreach ($advisories as $packageName => $packageAdvisories) {
             $affectedVersions = [];
+
             foreach ($packageAdvisories as $packageAdvisory) {
                 $affectedVersions[] = $packageAdvisory['affectedVersions'];
             }
-            $insecurePackages[] = new InsecurePackage($packageName, $affectedVersions);
+
+            if ([] !== $affectedVersions) {
+                $insecurePackages[] = new InsecurePackage($packageName, $affectedVersions);
+            }
         }
 
         return new self($insecurePackages);

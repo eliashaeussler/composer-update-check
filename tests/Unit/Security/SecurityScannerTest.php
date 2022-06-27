@@ -104,6 +104,43 @@ class SecurityScannerTest extends AbstractTestCase
     /**
      * @test
      */
+    public function scanExcludesPackagesWithoutAffectedVersions(): void
+    {
+        $packages = [
+            new OutdatedPackage('foo', '1.0.0', '1.0.1'),
+            new OutdatedPackage('baz', '2.0.0', '2.1.0'),
+        ];
+        $apiResult = [
+            'advisories' => [
+                'foo' => [
+                    ['affectedVersions' => '>=1.0.0,<2.0.0'],
+                ],
+                'baz' => [],
+            ],
+        ];
+
+        $response = new Response(200, [], json_encode($apiResult));
+        $response->getBody()->rewind();
+        $matcher = function (RequestInterface $request) {
+            self::assertSame('GET', $request->getMethod());
+            self::assertSame(['application/json'], $request->getHeaders()['Accept']);
+            self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
+
+            return true;
+        };
+        $this->client->on(new CallbackRequestMatcher($matcher), $response);
+
+        $scanResult = $this->subject->scan($packages);
+
+        static::assertInstanceOf(ScanResult::class, $scanResult);
+        static::assertCount(1, $scanResult->getInsecurePackages());
+        static::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
+        static::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+    }
+
+    /**
+     * @test
+     */
     public function scanThrowsExceptionIfRequestFails(): void
     {
         $this->client->addException(new TransferException());
