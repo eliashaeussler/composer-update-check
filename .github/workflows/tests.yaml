@@ -12,7 +12,7 @@ jobs:
   # Job: Run unit tests
   tests:
     name: PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -106,7 +106,7 @@ jobs:
   # Job: Run unit tests with lowest installed dependency versions
   tests-lowest:
     name: '[test-lowest] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -155,7 +155,7 @@ jobs:
   # Job: Run Docker tests
   tests-docker:
     name: '[test-docker] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -173,7 +173,7 @@ jobs:
   # Job: Run unit tests of composer-update-reporter
   tests-reporter:
     name: 'Trigger test workflow of eliashaeussler/composer-update-reporter'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - id: set-branch
