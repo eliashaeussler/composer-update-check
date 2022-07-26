@@ -14,6 +14,7 @@ RUN composer self-update --$COMPOSER_VERSION
 
 # Require update check package
 RUN composer global config repositories.update-check path /update-check
+RUN if [ "$COMPOSER_VERSION" = 2 ]; then composer global config allow-plugins.eliashaeussler/composer-update-check true; fi
 RUN composer global require --dev "eliashaeussler/composer-update-check:*@dev"
 
 WORKDIR /app
