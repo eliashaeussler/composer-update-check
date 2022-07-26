@@ -308,7 +308,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.0...develop
+[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.0...main
 [1.5.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/eliashaeussler/composer-update-check/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.3.0...1.4.0
