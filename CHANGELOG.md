@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.1] - 2022-07-26
+
+### Fixed
+
+- Fix version detection in `composer update` output
+
 ## [1.5.0] - 2022-06-27
 
 ### Added
@@ -308,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.0...main
+[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.1...main
+[1.5.1]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/eliashaeussler/composer-update-check/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.3.0...1.4.0
