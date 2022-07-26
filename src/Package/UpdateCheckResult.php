@@ -34,19 +34,19 @@ class UpdateCheckResult
     protected const COMMAND_OUTPUT_PATTERN =
         '#^'.
             '\\s*- Upgrading '.
-            '(?P<name>[^\\s]+) \\('.
-                '(?P<outdated>.+)'.
+            '(?P<name>\\S+) \\('.
+                '(?P<outdated>dev-\\S+ \\S+|(?!dev-)\\S+)'.
                 ' => '.
-                '(?P<new>[^)]+)'.
+                '(?P<new>dev-\S+ \S+|(?!dev-)\S+)'.
             '\\)'.
         '$#';
     protected const LEGACY_COMMAND_OUTPUT_PATTERN =
         '#^'.
             '\\s*- Updating '.
-            '(?P<name>[^\\s]+) \\('.
-                '(?P<outdated>[^)]+)'.
-            '\\) to [^\\s]+ \\('.
-                '(?P<new>[^)]+)'.
+            '(?P<name>dev-\\S+ \\S+|(?!dev-)\\S+) \\('.
+                '(?P<outdated>dev-\S+ \S+|(?!dev-)\S+)'.
+            '\\) to \\S+ \\('.
+                '(?P<new>dev-\S+ \S+|(?!dev-)\S+)'.
             '\\)'.
         '$#';
 
