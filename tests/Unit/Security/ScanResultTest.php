@@ -51,6 +51,7 @@ class ScanResultTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider
      *
      * @param array<string, mixed> $apiResult
@@ -110,6 +111,7 @@ class ScanResultTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider isInsecureReturnsSecurityStateOfGivenPackageDataProvider
      */
     public function isInsecureReturnsSecurityStateOfGivenPackage(OutdatedPackage $outdatedPackage, bool $expected): void

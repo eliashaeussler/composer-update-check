@@ -75,6 +75,7 @@ class InstallerTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider runUpdateExecutesDryRunUpdateDataProvider
      *
      * @param string[] $packages

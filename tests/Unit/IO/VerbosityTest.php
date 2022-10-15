@@ -110,6 +110,7 @@ class VerbosityTest extends AbstractTestCase
 
     /**
      * @dataProvider isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider
+     *
      * @test
      */
     public function isReturnsTrueIfGivenVerbosityEqualsVerbosity(int $verbosity): void

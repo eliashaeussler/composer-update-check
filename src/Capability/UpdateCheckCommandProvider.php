@@ -31,6 +31,7 @@ use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
  * @codeCoverageIgnore
  */
 class UpdateCheckCommandProvider implements CommandProvider

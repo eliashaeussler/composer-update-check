@@ -66,6 +66,7 @@ class UpdateCheckResultTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
      *
      * @param OutdatedPackage[] $expected
@@ -112,6 +113,7 @@ class UpdateCheckResultTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider parseCommandOutputParsesCommandOutputCorrectlyDataProvider
      */
     public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, ?OutdatedPackage $expected): void

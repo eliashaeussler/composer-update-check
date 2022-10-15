@@ -81,6 +81,7 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider isReturnsTrueIfGivenStyleEqualsStyleDataProvider
+     *
      * @test
      */
     public function isReturnsTrueIfGivenStyleEqualsStyle(string $style): void
