@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.3] - 2022-10-15
+
+### Added
+
+- Support for `spatie/emoji` 4.x
+
+### Changed
+
+- Dependabot updates for Composer dependencies
+
+### Fixed
+
+- Replace deprecated job outputs in GitHub workflows
+
 ## [1.5.2] - 2022-07-26
 
 ### Changed
@@ -320,7 +334,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.2...main
+[Unreleased]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.3...main
+[1.5.3]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.2...1.5.3
 [1.5.2]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.1...1.5.2
 [1.5.1]: https://github.com/eliashaeussler/composer-update-check/compare/1.5.0...1.5.1
 [1.5.0]: https://github.com/eliashaeussler/composer-update-check/compare/1.4.1...1.5.0
