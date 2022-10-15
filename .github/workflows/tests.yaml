@@ -120,9 +120,9 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - id: set-branch
-        run: echo "::set-output name=branch::${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
+        run: echo "branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
       - id: set-sha
-        run: echo "::set-output name=sha::${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}"
+        run: echo "sha=${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_OUTPUT
       - name: Trigger workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
