@@ -2,57 +2,57 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/index.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/api.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/changelog.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/contribute.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/docker.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/events.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/features.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/install.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/license.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/plugins.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://composer-update-check.elias-haeussler.de/usage.html</loc>
-         <lastmod>2022-10-15</lastmod>
+         <lastmod>2022-10-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
