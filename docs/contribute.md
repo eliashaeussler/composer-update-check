@@ -49,22 +49,6 @@ composer test
 composer test:coverage
 ```
 
-## :octicons-server-24: Run Docker tests
-
-All test applications can also be executed with the generated Docker
-images. All available parameters for the `update-check` command can be passed.
-
-```bash
-# Run tests for the Docker image using Composer 2.x
-./bin/run-docker-tests.sh --composer-version 2
-
-# Run tests for the Docker image using Composer 2.x and PHP 8.2
-./bin/run-docker-tests.sh --composer-version 2 --php-version "8.2"
-
-# Run tests with optional parameters
-./bin/run-docker-tests.sh --composer-version 2 --security-scan --no-dev
-```
-
 ## :technologist: Simulate application
 
 A Composer script `simulate` exists which lets you run the Composer
