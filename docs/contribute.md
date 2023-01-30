@@ -30,6 +30,10 @@ composer lint:php
 # Run static code analysis
 composer sca
 composer sca:php
+
+# Run code migration
+composer migration
+composer migration:rector
 ```
 
 ## :octicons-bug-24: Run tests
