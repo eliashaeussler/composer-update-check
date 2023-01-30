@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
+use Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
@@ -33,6 +34,8 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
     $rectorConfig->skip([
         __DIR__.'/tests/Build',
+
+        AddLiteralSeparatorToNumberRector::class,
     ]);
 
     $rectorConfig->phpVersion(PhpVersion::PHP_81);
