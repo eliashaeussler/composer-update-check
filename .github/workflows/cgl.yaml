@@ -28,7 +28,7 @@ jobs:
 
       # Install dependencies
       - name: Add required packages
-        run: composer require composer/composer:"^2.0" composer/semver:"*" --no-update
+        run: composer require composer/composer:"^2.0" composer/semver:"^1.0 || ^2.0 || ^3.0" --no-update
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
 
