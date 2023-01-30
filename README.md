@@ -55,4 +55,3 @@ View all notable release notes in the [Changelog](CHANGELOG.md).
 ## :star: License
 
 This project is licensed under [GNU General Public License 3.0 (or later)](LICENSE.md).
-

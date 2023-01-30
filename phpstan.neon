@@ -1,7 +1,7 @@
 parameters:
-    level: 6
-    paths:
-        - src
-        - tests
-    excludePaths:
-        - tests/Build/*
+	level: 6
+	paths:
+		- src
+		- tests
+	excludePaths:
+		- tests/Build/*

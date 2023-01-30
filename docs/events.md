@@ -23,7 +23,7 @@ use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
     // ...
-    
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -32,11 +32,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             ],
         ];
     }
-    
+
     public function onPostUpdateCheck(PostUpdateCheckEvent $event): void
     {
         $updateCheckResult = $event->getUpdateCheckResult();
-        
+
         // ...
     }
 }

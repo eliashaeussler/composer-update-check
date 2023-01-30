@@ -60,18 +60,18 @@ the output from the `composer update-check` command provided by this plugin:
 === "Update check plugin"
 
     ![Composer update-check](assets/img/comparison/composer-update-check.png){ width=500 align=right }
-    
+
     The Composer command `composer update-check` provided by this plugin allows
     checking for version updates based on the exact requirements. In this case
     the output would show an available update to version `5.1.7`.
-    
+
     This is basically the same result one would get when running
     `composer update --root-reqs --dry-run`.
 
     Additionally, one can explicitly exclude several packages from being checked
     for available updates or perform an additional security scan for the currently
     installed package versions.
-    
+
     [Let's get started :material-arrow-right:](install.md)
 
 ## :star: License

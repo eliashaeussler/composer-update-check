@@ -8,4 +8,3 @@ hide:
     [CHANGELOG.md]({{ repository.blob }}/CHANGELOG.md).
 
 --8<-- "CHANGELOG.md"
-
