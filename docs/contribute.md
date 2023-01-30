@@ -54,8 +54,8 @@ images. All available parameters for the `update-check` command can be passed.
 # Run tests for the Docker image using Composer 2.x
 ./bin/run-docker-tests.sh --composer-version 2
 
-# Run tests for the Docker image using Composer 2.x and PHP 8.0
-./bin/run-docker-tests.sh --composer-version 2 --php-version "8.0"
+# Run tests for the Docker image using Composer 2.x and PHP 8.2
+./bin/run-docker-tests.sh --composer-version 2 --php-version "8.2"
 
 # Run tests with optional parameters
 ./bin/run-docker-tests.sh --composer-version 2 --security-scan --no-dev
