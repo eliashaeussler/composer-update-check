@@ -1,0 +1,16 @@
+/.github
+/bin
+/docs
+/tests
+/.dockerignore
+/.gitattributes
+/.gitignore
+/.php-cs-fixer.php
+/CHANGELOG.md
+/codecov.yml
+/composer.lock
+/Dockerfile
+/mkdocs.yml
+/phpstan.neon
+/phpunit.xml
+/phpunit.coverage.xml
