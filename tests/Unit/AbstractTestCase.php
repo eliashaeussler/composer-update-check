@@ -34,22 +34,26 @@ use ReflectionClass;
  */
 abstract class AbstractTestCase extends TestCase
 {
-    public const TEST_APPLICATION_NORMAL = 'tests/Build/test-application';
-    public const TEST_APPLICATION_EMPTY = 'tests/Build/test-application-empty';
-    public const TEST_APPLICATION_ERRONEOUS = 'tests/Build/test-application-erroneous';
+    final public const TEST_APPLICATION_NORMAL = 'tests/Build/test-application';
+    final public const TEST_APPLICATION_EMPTY = 'tests/Build/test-application-empty';
+    final public const TEST_APPLICATION_ERRONEOUS = 'tests/Build/test-application-erroneous';
 
     protected function tearDown(): void
     {
         $reflection = new ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {
-            if (
-                !$property->isStatic() &&
-                !$property->isPrivate() &&
-                0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit')
-            ) {
-                unset($this->{$property->getName()});
+            if ($property->isStatic()) {
+                continue;
             }
+            if ($property->isPrivate()) {
+                continue;
+            }
+            if (str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit')) {
+                continue;
+            }
+            unset($this->{$property->getName()});
         }
+
         unset($reflection, $property);
     }
 }

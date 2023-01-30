@@ -39,33 +39,18 @@ use Spatie\Emoji\Emoji;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateChecker
+final class UpdateChecker
 {
-    /**
-     * @var Composer
-     */
-    private $composer;
-
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
-
-    /**
-     * @var Options
-     */
-    private $options;
-
     /**
      * @var string[]
      */
-    private $packageBlacklist = [];
+    private array $packageBlacklist = [];
 
-    public function __construct(Composer $composer, OutputBehavior $behavior, Options $options)
-    {
-        $this->composer = $composer;
-        $this->behavior = $behavior;
-        $this->options = $options;
+    public function __construct(
+        private readonly Composer $composer,
+        private readonly OutputBehavior $behavior,
+        private readonly Options $options,
+    ) {
     }
 
     public function run(): UpdateCheckResult
@@ -138,9 +123,9 @@ class UpdateChecker
 
         // Handle dev-packages
         if ($this->options->isIncludingDevPackages()) {
-            $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
+            $requiredPackages = [...$requiredPackages, ...$requiredDevPackages];
         } else {
-            $this->packageBlacklist = array_merge($this->packageBlacklist, $requiredDevPackages);
+            $this->packageBlacklist = [...$this->packageBlacklist, ...$requiredDevPackages];
             $this->behavior->io->write(Emoji::prohibited().' Skipped dev-requirements', true, IOInterface::VERBOSE);
         }
 
@@ -159,10 +144,11 @@ class UpdateChecker
      */
     private function removeByIgnorePattern(string $pattern, array $packages): array
     {
-        return array_filter($packages, function (string $package) use ($pattern) {
+        return array_filter($packages, function (string $package) use ($pattern): bool {
             if (!fnmatch($pattern, $package)) {
                 return true;
             }
+
             $this->behavior->io->write(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package), true, IOInterface::VERBOSE);
             $this->packageBlacklist[] = $package;
 

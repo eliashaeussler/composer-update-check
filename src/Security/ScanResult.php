@@ -33,19 +33,14 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ScanResult
+final class ScanResult
 {
-    /**
-     * @var InsecurePackage[]
-     */
-    private $insecurePackages;
-
     /**
      * @param InsecurePackage[] $insecurePackages
      */
-    public function __construct(array $insecurePackages)
-    {
-        $this->insecurePackages = $insecurePackages;
+    public function __construct(
+        private readonly array $insecurePackages,
+    ) {
         $this->validateInsecurePackages();
     }
 
@@ -55,14 +50,15 @@ class ScanResult
     public static function fromApiResult(array $apiResult): self
     {
         // Early return if no advisories were provided
-        if (
-            !array_key_exists('advisories', $apiResult) ||
-            !is_array($apiResult['advisories']) ||
-            [] === $apiResult['advisories']
-        ) {
+        if (!array_key_exists('advisories', $apiResult)) {
             return new self([]);
         }
-
+        if (!is_array($apiResult['advisories'])) {
+            return new self([]);
+        }
+        if ([] === $apiResult['advisories']) {
+            return new self([]);
+        }
         // Parse security advisories
         $insecurePackages = [];
         $advisories = $apiResult['advisories'];

@@ -33,43 +33,20 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 trait TestApplicationTrait
 {
-    /**
-     * @var string|null
-     */
-    protected $initialDirectory;
-
-    /**
-     * @var string|null
-     */
-    protected $temporaryDirectory;
+    protected ?string $initialDirectory = null;
+    protected ?string $temporaryDirectory = null;
 
     protected function goToTestDirectory(string $applicationPath = AbstractTestCase::TEST_APPLICATION_NORMAL): void
     {
         $this->initialDirectory = getcwd();
         $this->temporaryDirectory = tempnam(sys_get_temp_dir(), str_replace('\\', '', strtolower(static::class)));
 
-        $applicationVariant = $this->getApplicationVariant($applicationPath);
-        if (null !== $applicationVariant) {
-            $applicationVariant = '/'.$applicationVariant;
-        }
-
         $filesystem = new Filesystem();
         $filesystem->remove($this->temporaryDirectory);
-        $filesystem->mirror(dirname(__DIR__, 2).'/'.$applicationPath.$applicationVariant, $this->temporaryDirectory);
+        $filesystem->mirror(dirname(__DIR__, 2).'/'.$applicationPath, $this->temporaryDirectory);
 
         chdir($this->temporaryDirectory);
         $this->cleanUpComposerEnvironment();
-    }
-
-    protected function getApplicationVariant(string $applicationPath): ?string
-    {
-        switch ($applicationPath) {
-            case AbstractTestCase::TEST_APPLICATION_NORMAL:
-                return 'v'.PHP_MAJOR_VERSION;
-
-            default:
-                return null;
-        }
     }
 
     protected function goBackToInitialDirectory(): void

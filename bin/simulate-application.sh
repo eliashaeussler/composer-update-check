@@ -3,8 +3,7 @@ set -e
 
 # Resolve variables
 ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
-PHP_VERSION="$(php -r 'echo PHP_MAJOR_VERSION;')"
-APP_PATH="${ROOT_PATH}/tests/Build/test-application/v${PHP_VERSION}"
+APP_PATH="${ROOT_PATH}/tests/Build/test-application"
 TEMP_DIR="/tmp"
 
 # Check if temp directory is writeable
@@ -15,7 +14,7 @@ TEMP_PATH="${TEMP_DIR}/update-check-test"
 
 # Define cleanup function for several signals
 function cleanup() {
-  exitCode=$?
+  local exitCode=$?
   rm -rf "${TEMP_PATH}"
   exit $exitCode
 }

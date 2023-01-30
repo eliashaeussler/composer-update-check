@@ -40,17 +40,10 @@ use RuntimeException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityScannerTest extends AbstractTestCase
+final class SecurityScannerTest extends AbstractTestCase
 {
-    /**
-     * @var SecurityScanner
-     */
-    protected $subject;
-
-    /**
-     * @var Client
-     */
-    protected $client;
+    private SecurityScanner $subject;
+    private Client $client;
 
     protected function setUp(): void
     {
@@ -77,7 +70,7 @@ class SecurityScannerTest extends AbstractTestCase
 
         $response = new Response(200, [], json_encode($apiResult));
         $response->getBody()->rewind();
-        $matcher = function (RequestInterface $request) {
+        $matcher = static function (RequestInterface $request): bool {
             self::assertSame('GET', $request->getMethod());
             self::assertSame(['application/json'], $request->getHeaders()['Accept']);
             self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
@@ -88,10 +81,10 @@ class SecurityScannerTest extends AbstractTestCase
 
         $scanResult = $this->subject->scan($packages);
 
-        static::assertInstanceOf(ScanResult::class, $scanResult);
-        static::assertCount(1, $scanResult->getInsecurePackages());
-        static::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        static::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertInstanceOf(ScanResult::class, $scanResult);
+        self::assertCount(1, $scanResult->getInsecurePackages());
+        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
     /**
@@ -99,7 +92,7 @@ class SecurityScannerTest extends AbstractTestCase
      */
     public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
     {
-        static::assertSame([], $this->subject->scan([])->getInsecurePackages());
+        self::assertSame([], $this->subject->scan([])->getInsecurePackages());
     }
 
     /**
@@ -122,7 +115,7 @@ class SecurityScannerTest extends AbstractTestCase
 
         $response = new Response(200, [], json_encode($apiResult));
         $response->getBody()->rewind();
-        $matcher = function (RequestInterface $request) {
+        $matcher = static function (RequestInterface $request): bool {
             self::assertSame('GET', $request->getMethod());
             self::assertSame(['application/json'], $request->getHeaders()['Accept']);
             self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
@@ -133,10 +126,10 @@ class SecurityScannerTest extends AbstractTestCase
 
         $scanResult = $this->subject->scan($packages);
 
-        static::assertInstanceOf(ScanResult::class, $scanResult);
-        static::assertCount(1, $scanResult->getInsecurePackages());
-        static::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        static::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertInstanceOf(ScanResult::class, $scanResult);
+        self::assertCount(1, $scanResult->getInsecurePackages());
+        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
     /**

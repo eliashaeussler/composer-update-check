@@ -38,19 +38,12 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityScanner
+final class SecurityScanner
 {
     public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
 
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
+    private readonly RequestFactoryInterface $requestFactory;
+    private readonly ClientInterface $client;
 
     public function __construct(ClientInterface $client = null)
     {
@@ -78,6 +71,7 @@ class SecurityScanner
         $query = http_build_query(['packages' => $packagesToScan]);
         $requestUri = new Uri(self::API_ENDPOINT);
         $requestUri = $requestUri->withQuery($query);
+
         $request = $this->requestFactory->createRequest('GET', $requestUri)->withHeader('Accept', 'application/json');
 
         // Send API request and evaluate response
@@ -85,9 +79,11 @@ class SecurityScanner
             $response = $this->client->sendRequest($request);
             $apiResult = $response->getBody()->__toString();
 
-            return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
-        } catch (ClientExceptionInterface $e) {
-            throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
+            return ScanResult::fromApiResult(
+                json_decode($apiResult, true, 512, JSON_THROW_ON_ERROR) ?: [],
+            );
+        } catch (ClientExceptionInterface $clientException) {
+            throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $clientException);
         }
     }
 }

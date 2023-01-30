@@ -35,7 +35,7 @@ use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityTest extends AbstractTestCase
+final class SecurityTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
@@ -54,8 +54,8 @@ class SecurityTest extends AbstractTestCase
 
         $scan = Security::scan([$securePackage, $insecurePackage]);
 
-        static::assertFalse($scan->isInsecure($securePackage));
-        static::assertTrue($scan->isInsecure($insecurePackage));
+        self::assertFalse($scan->isInsecure($securePackage));
+        self::assertTrue($scan->isInsecure($insecurePackage));
     }
 
     /**
@@ -69,8 +69,8 @@ class SecurityTest extends AbstractTestCase
 
         Security::scanAndOverlayResult($result);
 
-        static::assertFalse($securePackage->isInsecure());
-        static::assertTrue($insecurePackage->isInsecure());
+        self::assertFalse($securePackage->isInsecure());
+        self::assertTrue($insecurePackage->isInsecure());
     }
 
     protected function tearDown(): void

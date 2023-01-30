@@ -40,27 +40,45 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 EOM;
 
-$finder = \PhpCsFixer\Finder::create()
-    ->files()
-    ->in(__DIR__)
-    ->ignoreVCSignored(true)
-;
 $config = new \PhpCsFixer\Config();
 
-return $config
+$config
     ->setRules([
         '@PSR2' => true,
         '@Symfony' => true,
-        'global_namespace_import' => ['import_classes' => true, 'import_functions' => true],
+        'global_namespace_import' => [
+            'import_classes' => true,
+            'import_functions' => true,
+        ],
         'header_comment' => [
             'header' => sprintf($header, date('Y')),
             'comment_type' => 'comment',
             'location' => 'after_declare_strict',
             'separate' => 'both',
         ],
-        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
-        'ordered_imports' => ['imports_order' => ['const', 'class', 'function']],
-    ])
-    ->setFinder($finder)
-    ->setRiskyAllowed(true)
-;
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => true,
+        ],
+        'ordered_imports' => [
+            'imports_order' => [
+                'const',
+                'class',
+                'function',
+            ],
+        ],
+        'trailing_comma_in_multiline' => [
+            'elements' => [
+                'arguments',
+                'arrays',
+                'match',
+                'parameters',
+            ],
+        ],
+    ]);
+
+$config->getFinder()
+    ->files()
+    ->in(__DIR__)
+    ->ignoreVCSIgnored(true);
+
+return $config;

@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
-use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
-
 /**
  * ExpectedCommandOutputTrait.
  *
@@ -33,10 +31,12 @@ use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
  */
 trait ExpectedCommandOutputTrait
 {
-    private function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
-    {
-        $isLegacyPlatform = Composer::getMajorVersion() < 2;
-        $output = $isLegacyPlatform ? ' - Updating' : ' - Upgrading';
+    private function getExpectedCommandOutput(
+        string $package = null,
+        string $outdated = null,
+        string $new = null,
+    ): string {
+        $output = ' - Upgrading';
 
         // Early return if no package is specified
         if (null === $package) {
@@ -44,15 +44,18 @@ trait ExpectedCommandOutputTrait
         }
 
         $output .= ' '.$package;
-
         // Early return if package versions are not completely specified
-        if (null === $outdated || null === $new || '' === trim($outdated) || '' === trim($new)) {
+        if (null === $outdated) {
             return $output;
         }
-
-        // Build expected command output
-        if ($isLegacyPlatform) {
-            return sprintf('%s (%s) to %s (%s)', $output, $outdated, $package, $new);
+        if (null === $new) {
+            return $output;
+        }
+        if ('' === trim($outdated)) {
+            return $output;
+        }
+        if ('' === trim($new)) {
+            return $output;
         }
 
         return sprintf('%s (%s => %s)', $output, $outdated, $new);

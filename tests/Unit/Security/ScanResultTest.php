@@ -36,8 +36,29 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ScanResultTest extends AbstractTestCase
+final class ScanResultTest extends AbstractTestCase
 {
+    /**
+     * @var array<string, array<string, array<string, string>[]|array<int, array<string, string>>>>
+     */
+    private const API_RESULT = [
+        'advisories' => [
+            'foo' => [
+                [
+                    'affectedVersions' => '>=1.0.0,<1.1.0',
+                ],
+                [
+                    'affectedVersions' => '2.0.0',
+                ],
+            ],
+            'baz' => [
+                [
+                    'affectedVersions' => '1.0.0-alpha-1',
+                ],
+            ],
+        ],
+    ];
+
     /**
      * @test
      */
@@ -60,7 +81,7 @@ class ScanResultTest extends AbstractTestCase
      */
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(array $apiResult): void
     {
-        static::assertSame([], ScanResult::fromApiResult($apiResult)->getInsecurePackages());
+        self::assertSame([], ScanResult::fromApiResult($apiResult)->getInsecurePackages());
     }
 
     /**
@@ -68,32 +89,14 @@ class ScanResultTest extends AbstractTestCase
      */
     public function fromApiResultReturnsScanResultObjectWithInsecurePackages(): void
     {
-        $apiResult = [
-            'advisories' => [
-                'foo' => [
-                    [
-                        'affectedVersions' => '>=1.0.0,<1.1.0',
-                    ],
-                    [
-                        'affectedVersions' => '2.0.0',
-                    ],
-                ],
-                'baz' => [
-                    [
-                        'affectedVersions' => '1.0.0-alpha-1',
-                    ],
-                ],
-            ],
-        ];
-
-        $subject = ScanResult::fromApiResult($apiResult);
+        $subject = ScanResult::fromApiResult(self::API_RESULT);
         $insecurePackages = $subject->getInsecurePackages();
 
-        static::assertCount(2, $insecurePackages);
-        static::assertSame('foo', $insecurePackages[0]->getName());
-        static::assertSame(['>=1.0.0,<1.1.0', '2.0.0'], $insecurePackages[0]->getAffectedVersions());
-        static::assertSame('baz', $insecurePackages[1]->getName());
-        static::assertSame(['1.0.0-alpha-1'], $insecurePackages[1]->getAffectedVersions());
+        self::assertCount(2, $insecurePackages);
+        self::assertSame('foo', $insecurePackages[0]->getName());
+        self::assertSame(['>=1.0.0,<1.1.0', '2.0.0'], $insecurePackages[0]->getAffectedVersions());
+        self::assertSame('baz', $insecurePackages[1]->getName());
+        self::assertSame(['1.0.0-alpha-1'], $insecurePackages[1]->getAffectedVersions());
     }
 
     /**
@@ -107,8 +110,8 @@ class ScanResultTest extends AbstractTestCase
         ];
         $subject = new ScanResult($insecurePackages);
 
-        static::assertCount(2, $subject->getInsecurePackages());
-        static::assertSame($insecurePackages, $subject->getInsecurePackages());
+        self::assertCount(2, $subject->getInsecurePackages());
+        self::assertSame($insecurePackages, $subject->getInsecurePackages());
     }
 
     /**
@@ -124,7 +127,7 @@ class ScanResultTest extends AbstractTestCase
         ];
         $subject = new ScanResult($insecurePackages);
 
-        static::assertSame($expected, $subject->isInsecure($outdatedPackage));
+        self::assertSame($expected, $subject->isInsecure($outdatedPackage));
     }
 
     /**

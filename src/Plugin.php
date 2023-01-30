@@ -28,7 +28,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
+use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
 
 /**
  * Plugin.
@@ -38,11 +38,11 @@ use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
  *
  * @codeCoverageIgnore
  */
-class Plugin implements PluginInterface, Capable
+final class Plugin implements PluginInterface, Capable, CommandProvider
 {
     public function activate(Composer $composer, IOInterface $io): void
     {
-        $this->autoloadFunctions($composer);
+        // Nothing to do here. Just go ahead :)
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
@@ -58,27 +58,14 @@ class Plugin implements PluginInterface, Capable
     public function getCapabilities(): array
     {
         return [
-            CommandProvider::class => UpdateCheckCommandProvider::class,
+            CommandProvider::class => self::class,
         ];
     }
 
-    /**
-     * Workaround to ensure required functions from dependencies are auto-loaded.
-     *
-     * @see https://github.com/composer/composer/issues/4764#issuecomment-379619265
-     */
-    protected function autoloadFunctions(Composer $composer): void
+    public function getCommands(): array
     {
-        $vendor = $composer->getConfig()->get('vendor-dir');
-
-        $this->loadFailsafe($vendor.'/symfony/polyfill-php73/bootstrap.php');
-        $this->loadFailsafe($vendor.'/symfony/polyfill-php80/bootstrap.php');
-    }
-
-    protected function loadFailsafe(string $vendorFile): void
-    {
-        if (file_exists($vendorFile)) {
-            require_once $vendorFile;
-        }
+        return [
+            new UpdateCheckCommand(),
+        ];
     }
 }

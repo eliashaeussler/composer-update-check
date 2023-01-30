@@ -43,17 +43,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckCommand extends BaseCommand
+final class UpdateCheckCommand extends BaseCommand
 {
-    /**
-     * @var SymfonyStyle
-     */
-    private $symfonyStyle;
-
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
+    private SymfonyStyle $symfonyStyle;
+    private OutputBehavior $behavior;
 
     protected function configure(): void
     {
@@ -63,60 +56,66 @@ class UpdateCheckCommand extends BaseCommand
         $this->addOption(
             'ignore-packages',
             'i',
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Packages to ignore when checking for available updates',
-            []
+            [],
         );
         $this->addOption(
             'no-dev',
             null,
             InputOption::VALUE_NONE,
-            'Disables update check of require-dev packages.'
+            'Disables update check of require-dev packages.',
         );
         $this->addOption(
             'security-scan',
             's',
             InputOption::VALUE_NONE,
-            'Run security scan for all outdated packages'
+            'Run security scan for all outdated packages',
         );
         $this->addOption(
             'json',
             'j',
             InputOption::VALUE_NONE,
-            'Format update check as JSON'
+            'Format update check as JSON',
         );
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $json = $input->getOption('json');
+
+        $style = $json ? Style::Json : Style::Normal;
+        $verbosity = match ($style) {
+            Style::Json => Verbosity::Normal,
+            default => Verbosity::from($output->getVerbosity()),
+        };
+        $output->setVerbosity($verbosity->value);
+
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
+        $this->behavior = new OutputBehavior($style, $verbosity, $this->getIO());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle = new SymfonyStyle($input, $output);
-
-        // Prepare command options
-        $json = $input->getOption('json');
-        $securityScan = $input->getOption('security-scan');
-
-        // Initialize IO
-        $style = new Style($json ? Style::JSON : Style::NORMAL);
-        $verbosity = new Verbosity($style->isJson() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
-        $this->behavior = new OutputBehavior($style, $verbosity, $this->getIO());
-        $output->setVerbosity($verbosity->getLevel());
-
         // Run update check
         $composer = Factory::create(new BufferIO());
         $updateChecker = new UpdateChecker($composer, $this->behavior, Options::fromInput($input));
         $result = $updateChecker->run();
 
         // Decorate update check result
-        $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $securityScan);
+        $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $input->getOption('security-scan'));
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
      * @param string[] $ignoredPackages
      */
-    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
-    {
+    private function decorateResult(
+        UpdateCheckResult $result,
+        array $ignoredPackages,
+        bool $flagInsecurePackages = false,
+    ): void {
         $outdatedPackages = $result->getOutdatedPackages();
 
         // Print message if no packages are outdated
@@ -124,9 +123,9 @@ class UpdateCheckCommand extends BaseCommand
             $countSkipped = count($ignoredPackages);
             $message = sprintf(
                 'All packages are up to date%s.',
-                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : ''
+                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : '',
             );
-            if ($this->behavior->style->isJson()) {
+            if (Style::Json === $this->behavior->style) {
                 $this->buildJsonReport(['status' => $message], $ignoredPackages);
             } else {
                 $this->symfonyStyle->success($message);
@@ -139,7 +138,7 @@ class UpdateCheckCommand extends BaseCommand
         $statusLabel = 1 === count($outdatedPackages)
             ? '1 package is outdated.'
             : sprintf('%d packages are outdated.', count($outdatedPackages));
-        if (!$this->behavior->style->isJson()) {
+        if (Style::Json !== $this->behavior->style) {
             $this->symfonyStyle->warning($statusLabel);
         }
 
@@ -152,27 +151,30 @@ class UpdateCheckCommand extends BaseCommand
                 $outdatedPackage->getNewVersion(),
             ];
             if ($flagInsecurePackages) {
-                if (!$this->behavior->style->isJson() && $outdatedPackage->isInsecure()) {
+                if (Style::Json !== $this->behavior->style && $outdatedPackage->isInsecure()) {
                     $report[1] .= ' <fg=red;options=bold>insecure</>';
-                } elseif ($this->behavior->style->isJson()) {
+                } elseif (Style::Json === $this->behavior->style) {
                     $report[] = $outdatedPackage->isInsecure();
                 }
             }
+
             $tableRows[] = $report;
         }
 
         // Print table
         $tableHeader = ['Package', 'Outdated version', 'New version'];
-        if (!$this->behavior->style->isJson()) {
+        if (Style::Json !== $this->behavior->style) {
             $this->symfonyStyle->table($tableHeader, $tableRows);
         } else {
             $result = [];
             if ($flagInsecurePackages) {
                 $tableHeader[] = 'Insecure';
             }
+
             foreach ($tableRows as $tableRow) {
                 $result[] = array_combine($tableHeader, $tableRow);
             }
+
             $this->buildJsonReport(['status' => $statusLabel, 'result' => $result], $ignoredPackages);
         }
     }
@@ -186,6 +188,7 @@ class UpdateCheckCommand extends BaseCommand
         if ([] !== $ignoredPackages) {
             $report['skipped'] = $ignoredPackages;
         }
-        $this->symfonyStyle->writeln(json_encode($report));
+
+        $this->symfonyStyle->writeln(json_encode($report, JSON_THROW_ON_ERROR));
     }
 }

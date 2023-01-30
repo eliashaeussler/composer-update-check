@@ -32,41 +32,18 @@ use Psr\Http\Message\UriInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OutdatedPackage
+final class OutdatedPackage
 {
     private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
 
-    /**
-     * @var string
-     */
-    private $name;
+    private readonly UriInterface $providerLink;
 
-    /**
-     * @var string
-     */
-    private $outdatedVersion;
-
-    /**
-     * @var string
-     */
-    private $newVersion;
-
-    /**
-     * @var bool
-     */
-    private $insecure;
-
-    /**
-     * @var UriInterface
-     */
-    private $providerLink;
-
-    public function __construct(string $name, string $outdatedVersion, string $newVersion, bool $insecure = false)
-    {
-        $this->name = $name;
-        $this->outdatedVersion = $outdatedVersion;
-        $this->newVersion = $newVersion;
-        $this->insecure = $insecure;
+    public function __construct(
+        private readonly string $name,
+        private readonly string $outdatedVersion,
+        private readonly string $newVersion,
+        private bool $insecure = false,
+    ) {
         $this->providerLink = $this->generateProviderLink();
     }
 
@@ -75,35 +52,14 @@ class OutdatedPackage
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getOutdatedVersion(): string
     {
         return $this->outdatedVersion;
     }
 
-    public function setOutdatedVersion(string $outdatedVersion): self
-    {
-        $this->outdatedVersion = $outdatedVersion;
-
-        return $this;
-    }
-
     public function getNewVersion(): string
     {
         return $this->newVersion;
-    }
-
-    public function setNewVersion(string $newVersion): self
-    {
-        $this->newVersion = $newVersion;
-
-        return $this;
     }
 
     public function isInsecure(): bool
@@ -121,13 +77,6 @@ class OutdatedPackage
     public function getProviderLink(): UriInterface
     {
         return $this->providerLink;
-    }
-
-    public function setProviderLink(Uri $providerLink): self
-    {
-        $this->providerLink = $providerLink;
-
-        return $this;
     }
 
     private function generateProviderLink(): UriInterface

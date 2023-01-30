@@ -33,17 +33,10 @@ use Nyholm\Psr7\Uri;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OutdatedPackageTest extends AbstractTestCase
+final class OutdatedPackageTest extends AbstractTestCase
 {
-    /**
-     * @var OutdatedPackage
-     */
-    protected $subjectWithVersion;
-
-    /**
-     * @var OutdatedPackage
-     */
-    protected $subjectWithBranch;
+    private OutdatedPackage $subjectWithVersion;
+    private OutdatedPackage $subjectWithBranch;
 
     protected function setUp(): void
     {
@@ -51,13 +44,13 @@ class OutdatedPackageTest extends AbstractTestCase
             'foo',
             '1.0.0',
             '1.0.5',
-            true
+            true,
         );
         $this->subjectWithBranch = new OutdatedPackage(
             'buu',
             'dev-master 12345',
             'dev-master 67890',
-            false
+            false,
         );
     }
 
@@ -66,19 +59,8 @@ class OutdatedPackageTest extends AbstractTestCase
      */
     public function getNameReturnsOutdatedPackageName(): void
     {
-        static::assertSame('foo', $this->subjectWithVersion->getName());
-        static::assertSame('buu', $this->subjectWithBranch->getName());
-    }
-
-    /**
-     * @test
-     */
-    public function setNameSetsNameOfOutdatedPackage(): void
-    {
-        $this->subjectWithVersion->setName('baz');
-        static::assertSame('baz', $this->subjectWithVersion->getName());
-        $this->subjectWithBranch->setName('baz');
-        static::assertSame('baz', $this->subjectWithBranch->getName());
+        self::assertSame('foo', $this->subjectWithVersion->getName());
+        self::assertSame('buu', $this->subjectWithBranch->getName());
     }
 
     /**
@@ -86,19 +68,8 @@ class OutdatedPackageTest extends AbstractTestCase
      */
     public function getOutdatedVersionReturnsOutdatedPackageVersion(): void
     {
-        static::assertSame('1.0.0', $this->subjectWithVersion->getOutdatedVersion());
-        static::assertSame('dev-master 12345', $this->subjectWithBranch->getOutdatedVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function setOutdatedVersionSetsOutdatedPackageVersionOfOutdatedPackage(): void
-    {
-        $this->subjectWithVersion->setOutdatedVersion('1.0.4');
-        static::assertSame('1.0.4', $this->subjectWithVersion->getOutdatedVersion());
-        $this->subjectWithBranch->setOutdatedVersion('dev-master 54321');
-        static::assertSame('dev-master 54321', $this->subjectWithBranch->getOutdatedVersion());
+        self::assertSame('1.0.0', $this->subjectWithVersion->getOutdatedVersion());
+        self::assertSame('dev-master 12345', $this->subjectWithBranch->getOutdatedVersion());
     }
 
     /**
@@ -106,19 +77,8 @@ class OutdatedPackageTest extends AbstractTestCase
      */
     public function getNewVersionReturnsNewPackageVersionOfOutdatedPackage(): void
     {
-        static::assertSame('1.0.5', $this->subjectWithVersion->getNewVersion());
-        static::assertSame('dev-master 67890', $this->subjectWithBranch->getNewVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function setNewVersionSetsNewPackageVersionOfOutdatedPackage(): void
-    {
-        $this->subjectWithVersion->setNewVersion('1.1.0');
-        static::assertSame('1.1.0', $this->subjectWithVersion->getNewVersion());
-        $this->subjectWithBranch->setNewVersion('dev-master 09876');
-        static::assertSame('dev-master 09876', $this->subjectWithBranch->getNewVersion());
+        self::assertSame('1.0.5', $this->subjectWithVersion->getNewVersion());
+        self::assertSame('dev-master 67890', $this->subjectWithBranch->getNewVersion());
     }
 
     /**
@@ -126,8 +86,8 @@ class OutdatedPackageTest extends AbstractTestCase
      */
     public function isInsecureReturnsSecurityStateOfOutdatedPackage(): void
     {
-        static::assertTrue($this->subjectWithVersion->isInsecure());
-        static::assertFalse($this->subjectWithBranch->isInsecure());
+        self::assertTrue($this->subjectWithVersion->isInsecure());
+        self::assertFalse($this->subjectWithBranch->isInsecure());
     }
 
     /**
@@ -136,9 +96,9 @@ class OutdatedPackageTest extends AbstractTestCase
     public function setInsecureSetsSecurityStateOfOutdatedPackage(): void
     {
         $this->subjectWithVersion->setInsecure(false);
-        static::assertFalse($this->subjectWithVersion->isInsecure());
+        self::assertFalse($this->subjectWithVersion->isInsecure());
         $this->subjectWithBranch->setInsecure(true);
-        static::assertTrue($this->subjectWithBranch->isInsecure());
+        self::assertTrue($this->subjectWithBranch->isInsecure());
     }
 
     /**
@@ -147,21 +107,8 @@ class OutdatedPackageTest extends AbstractTestCase
     public function getProviderLinkReturnsProviderLinkOfOutdatedPackage(): void
     {
         $expected = new Uri('https://packagist.org/packages/foo#1.0.5');
-        static::assertEquals($expected, $this->subjectWithVersion->getProviderLink());
+        self::assertEquals($expected, $this->subjectWithVersion->getProviderLink());
         $expected = new Uri('https://packagist.org/packages/buu#dev-master');
-        static::assertEquals($expected, $this->subjectWithBranch->getProviderLink());
-    }
-
-    /**
-     * @test
-     */
-    public function setProviderLinkSetsProviderLinkOfOutdatedPackage(): void
-    {
-        $uri = new Uri('https://example.org/foo');
-        $this->subjectWithVersion->setProviderLink($uri);
-        static::assertSame($uri, $this->subjectWithVersion->getProviderLink());
-        $uri = new Uri('https://example.org/buu');
-        $this->subjectWithBranch->setProviderLink($uri);
-        static::assertSame($uri, $this->subjectWithBranch->getProviderLink());
+        self::assertEquals($expected, $this->subjectWithBranch->getProviderLink());
     }
 }

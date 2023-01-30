@@ -23,59 +23,14 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\IO;
 
-use InvalidArgumentException;
-
 /**
  * Style.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Style
+enum Style
 {
-    public const NORMAL = 'normal';
-    public const JSON = 'json';
-
-    /**
-     * @var string
-     */
-    private $style;
-
-    public function __construct(string $style = self::NORMAL)
-    {
-        $this->style = $style;
-        $this->validate();
-    }
-
-    public static function isSupported(string $style): bool
-    {
-        return in_array($style, [self::NORMAL, self::JSON], true);
-    }
-
-    public function isNormal(): bool
-    {
-        return $this->is(self::NORMAL);
-    }
-
-    public function isJson(): bool
-    {
-        return $this->is(self::JSON);
-    }
-
-    public function is(string $style): bool
-    {
-        return $this->style === $style;
-    }
-
-    public function getStyle(): string
-    {
-        return $this->style;
-    }
-
-    private function validate(): void
-    {
-        if (!static::isSupported($this->style)) {
-            throw new InvalidArgumentException('The given style is not supported.', 1617549657);
-        }
-    }
+    case Normal;
+    case Json;
 }

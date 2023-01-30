@@ -31,27 +31,12 @@ use Composer\IO\IOInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OutputBehavior
+final class OutputBehavior
 {
-    /**
-     * @var Style
-     */
-    public $style;
-
-    /**
-     * @var Verbosity
-     */
-    public $verbosity;
-
-    /**
-     * @var IOInterface
-     */
-    public $io;
-
-    public function __construct(Style $style, Verbosity $verbosity, IOInterface $io)
-    {
-        $this->style = $style;
-        $this->verbosity = $verbosity;
-        $this->io = $io;
+    public function __construct(
+        public Style $style,
+        public Verbosity $verbosity,
+        public IOInterface $io,
+    ) {
     }
 }

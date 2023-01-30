@@ -34,12 +34,9 @@ use Symfony\Component\Console\Input\InputOption;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OptionsTest extends AbstractTestCase
+final class OptionsTest extends AbstractTestCase
 {
-    /**
-     * @var Options
-     */
-    protected $subject;
+    private Options $subject;
 
     protected function setUp(): void
     {
@@ -64,9 +61,9 @@ class OptionsTest extends AbstractTestCase
 
         $subject = Options::fromInput($input);
 
-        static::assertSame(['foo/baz'], $subject->getIgnorePackages());
-        static::assertFalse($subject->isIncludingDevPackages());
-        static::assertTrue($subject->isPerformingSecurityScan());
+        self::assertSame(['foo/baz'], $subject->getIgnorePackages());
+        self::assertFalse($subject->isIncludingDevPackages());
+        self::assertTrue($subject->isPerformingSecurityScan());
     }
 
     /**
@@ -76,7 +73,7 @@ class OptionsTest extends AbstractTestCase
     {
         $this->subject->setIgnorePackages(['foo/*', 'baz/*']);
 
-        static::assertSame(['foo/*', 'baz/*'], $this->subject->getIgnorePackages());
+        self::assertSame(['foo/*', 'baz/*'], $this->subject->getIgnorePackages());
     }
 
     /**
@@ -84,15 +81,15 @@ class OptionsTest extends AbstractTestCase
      */
     public function isIncludingDevPackagesReturnsCorrectStateOfNoDevOption(): void
     {
-        static::assertTrue($this->subject->isIncludingDevPackages());
+        self::assertTrue($this->subject->isIncludingDevPackages());
 
         $this->subject->setIncludeDevPackages(false);
 
-        static::assertFalse($this->subject->isIncludingDevPackages());
+        self::assertFalse($this->subject->isIncludingDevPackages());
 
         $this->subject->setIncludeDevPackages(true);
 
-        static::assertTrue($this->subject->isIncludingDevPackages());
+        self::assertTrue($this->subject->isIncludingDevPackages());
     }
 
     /**
@@ -100,14 +97,14 @@ class OptionsTest extends AbstractTestCase
      */
     public function isPerformingSecurityScanReturnsCorrectStateOfSecurityScanOption(): void
     {
-        static::assertFalse($this->subject->isPerformingSecurityScan());
+        self::assertFalse($this->subject->isPerformingSecurityScan());
 
         $this->subject->setPerformSecurityScan(true);
 
-        static::assertTrue($this->subject->isPerformingSecurityScan());
+        self::assertTrue($this->subject->isPerformingSecurityScan());
 
         $this->subject->setPerformSecurityScan(false);
 
-        static::assertFalse($this->subject->isPerformingSecurityScan());
+        self::assertFalse($this->subject->isPerformingSecurityScan());
     }
 }
