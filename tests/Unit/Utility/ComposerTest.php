@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +21,12 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
+
 use Composer\Plugin\PluginInterface;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
+use InvalidArgumentException;
 
 /**
  * ComposerTest.
@@ -68,7 +69,7 @@ class ComposerTest extends AbstractTestCase
      */
     public function getPlatformVersionThrowsExceptionIfUnsupportedVersionTypeIsGiven(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1603794822);
         Composer::getPlatformVersion(-99);
     }

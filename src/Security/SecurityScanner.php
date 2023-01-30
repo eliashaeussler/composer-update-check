@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Security;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +21,15 @@ namespace EliasHaeussler\ComposerUpdateCheck\Security;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Security;
+
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use RuntimeException;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
@@ -86,7 +87,7 @@ class SecurityScanner
 
             return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
         } catch (ClientExceptionInterface $e) {
-            throw new \RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
+            throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
         }
     }
 }

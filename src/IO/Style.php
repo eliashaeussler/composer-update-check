@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\IO;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +20,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+namespace EliasHaeussler\ComposerUpdateCheck\IO;
+
+use InvalidArgumentException;
 
 /**
  * Style.
@@ -73,7 +75,7 @@ class Style
     private function validate(): void
     {
         if (!static::isSupported($this->style)) {
-            throw new \InvalidArgumentException('The given style is not supported.', 1617549657);
+            throw new InvalidArgumentException('The given style is not supported.', 1617549657);
         }
     }
 }

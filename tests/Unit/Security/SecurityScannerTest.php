@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
+
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
@@ -32,6 +32,7 @@ use Http\Message\RequestMatcher\CallbackRequestMatcher;
 use Http\Mock\Client;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use RuntimeException;
 
 /**
  * SecurityScannerTest.
@@ -145,7 +146,7 @@ class SecurityScannerTest extends AbstractTestCase
     {
         $this->client->addException(new TransferException());
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionCode(1610706128);
 
         $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);

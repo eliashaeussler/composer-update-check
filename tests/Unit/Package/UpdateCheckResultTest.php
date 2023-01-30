@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +21,14 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
+
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
+use Generator;
+use InvalidArgumentException;
 
 /**
  * UpdateCheckResultTest.
@@ -43,7 +45,7 @@ class UpdateCheckResultTest extends AbstractTestCase
      */
     public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
 
         /* @noinspection PhpParamsInspection */
@@ -124,7 +126,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string, array<OutdatedPackage>}>
      */
-    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
+    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): Generator
     {
         yield 'no output' => [
             '',
@@ -153,7 +155,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string, OutdatedPackage|null}>
      */
-    public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
+    public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): Generator
     {
         yield 'no output' => [
             '',

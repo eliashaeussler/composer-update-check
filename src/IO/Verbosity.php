@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\IO;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +21,9 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\IO;
+
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -99,7 +100,7 @@ class Verbosity
     private function validate(): void
     {
         if (!static::isSupported($this->level)) {
-            throw new \InvalidArgumentException('The given verbosity level is not supported.', 1617549839);
+            throw new InvalidArgumentException('The given verbosity level is not supported.', 1617549839);
         }
     }
 }

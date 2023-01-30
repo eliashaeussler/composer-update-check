@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +21,14 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
+
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use Generator;
+use InvalidArgumentException;
 
 /**
  * ScanResultTest.
@@ -41,7 +43,7 @@ class ScanResultTest extends AbstractTestCase
      */
     public function constructorThrowsExceptionIfGivenInsecurePackagesAreInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1610707087);
 
         /* @noinspection PhpParamsInspection */
@@ -126,9 +128,9 @@ class ScanResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, mixed>
+     * @return Generator<string, mixed>
      */
-    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): \Generator
+    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): Generator
     {
         yield 'empty array' => [[]];
         yield 'array without advisories' => [['foo' => 'baz']];
@@ -136,9 +138,9 @@ class ScanResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, mixed>
+     * @return Generator<string, mixed>
      */
-    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): \Generator
+    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): Generator
     {
         yield 'secure package without any insecure versions' => [
             new OutdatedPackage('secure/package', '1.0.0', '1.0.1'),

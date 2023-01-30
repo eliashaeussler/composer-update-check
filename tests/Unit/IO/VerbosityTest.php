@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\IO;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +21,12 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\IO;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\IO;
+
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use Generator;
+use InvalidArgumentException;
 
 /**
  * VerbosityTest.
@@ -39,7 +41,7 @@ class VerbosityTest extends AbstractTestCase
      */
     public function constructorThrowsExceptionIfGivenVerbosityIsNotSupported(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1617549839);
 
         new Verbosity(-1);
@@ -133,7 +135,7 @@ class VerbosityTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{int}>
      */
-    public function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): \Generator
+    public function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): Generator
     {
         yield 'quiet level' => [Verbosity::QUIET];
         yield 'normal level' => [Verbosity::NORMAL];

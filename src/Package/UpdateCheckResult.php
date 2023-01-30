@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Package;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +20,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Package;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+namespace EliasHaeussler\ComposerUpdateCheck\Package;
+
+use InvalidArgumentException;
 
 /**
  * UpdateCheckResult.
@@ -125,7 +127,7 @@ class UpdateCheckResult
     {
         foreach ($this->outdatedPackages as $key => $outdatedPackage) {
             if (!($outdatedPackage instanceof OutdatedPackage)) {
-                throw new \InvalidArgumentException(sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class), 1600276584);
+                throw new InvalidArgumentException(sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class), 1600276584);
             }
         }
     }

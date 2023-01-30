@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +21,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
+
 use Composer\Composer as BaseComposer;
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
@@ -31,6 +31,7 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
+use Generator;
 
 /**
  * InstallerTest.
@@ -93,9 +94,9 @@ class InstallerTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, mixed>
+     * @return Generator<string, mixed>
      */
-    public function runUpdateExecutesDryRunUpdateDataProvider(): \Generator
+    public function runUpdateExecutesDryRunUpdateDataProvider(): Generator
     {
         yield 'no explicit whitelist' => [
             [],
