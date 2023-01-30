@@ -31,12 +31,14 @@ jobs:
         run: composer require composer/composer:"^1.7 || ^2.0" composer/semver:"^1.0 || ^2.0 || ^3.0" --no-update
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
 
       # Check Composer dependencies
       - name: Check dependencies
         run: composer-require-checker check
       - name: Reset composer.json
-        run: git checkout composer.json
+        run: git checkout composer.json composer.lock
       - name: Re-install Composer dependencies
         uses: ramsey/composer-install@v2
       - name: Check for unused dependencies
