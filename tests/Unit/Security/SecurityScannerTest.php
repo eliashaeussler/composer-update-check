@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
+use EliasHaeussler\ComposerUpdateCheck\Exception\UnexpectedApiResponseException;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
@@ -141,6 +142,22 @@ final class SecurityScannerTest extends AbstractTestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionCode(1610706128);
+
+        $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);
+    }
+
+    /**
+     * @test
+     */
+    public function scanThrowsExceptionIfApiResponseIsInvalid(): void
+    {
+        $response = new Response();
+        $response->getBody()->write('{"advisories": "foo"}');
+
+        $this->client->addResponse($response);
+
+        $this->expectException(UnexpectedApiResponseException::class);
+        $this->expectExceptionCode(1678126738);
 
         $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);
     }

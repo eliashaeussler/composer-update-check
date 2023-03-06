@@ -27,6 +27,8 @@ use Composer\Semver\Semver;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use InvalidArgumentException;
 
+use function array_column;
+
 /**
  * ScanResult.
  *
@@ -45,30 +47,14 @@ final class ScanResult
     }
 
     /**
-     * @param array<string, mixed> $apiResult
+     * @param array{advisories: array<string, list<array{affectedVersions: string}>>} $apiResult
      */
     public static function fromApiResult(array $apiResult): self
     {
-        // Early return if no advisories were provided
-        if (!array_key_exists('advisories', $apiResult)) {
-            return new self([]);
-        }
-        if (!is_array($apiResult['advisories'])) {
-            return new self([]);
-        }
-        if ([] === $apiResult['advisories']) {
-            return new self([]);
-        }
-        // Parse security advisories
         $insecurePackages = [];
-        $advisories = $apiResult['advisories'];
 
-        foreach ($advisories as $packageName => $packageAdvisories) {
-            $affectedVersions = [];
-
-            foreach ($packageAdvisories as $packageAdvisory) {
-                $affectedVersions[] = $packageAdvisory['affectedVersions'];
-            }
+        foreach ($apiResult['advisories'] as $packageName => $packageAdvisories) {
+            $affectedVersions = array_column($packageAdvisories, 'affectedVersions');
 
             if ([] !== $affectedVersions) {
                 $insecurePackages[] = new InsecurePackage($packageName, $affectedVersions);

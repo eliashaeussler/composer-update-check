@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
@@ -43,16 +45,19 @@ final class SecurityScanner
     public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
 
     private readonly RequestFactoryInterface $requestFactory;
-    private readonly ClientInterface $client;
+    private readonly Valinor\Mapper\TreeMapper $mapper;
 
-    public function __construct(ClientInterface $client = null)
-    {
+    public function __construct(
+        private readonly ClientInterface $client = new Psr18Client(),
+    ) {
         $this->requestFactory = new Psr17Factory();
-        $this->client = $client ?? new Psr18Client();
+        $this->mapper = $this->createMapper();
     }
 
     /**
      * @param OutdatedPackage[] $packages
+     *
+     * @throws Exception\UnexpectedApiResponseException
      */
     public function scan(array $packages): ScanResult
     {
@@ -77,13 +82,24 @@ final class SecurityScanner
         // Send API request and evaluate response
         try {
             $response = $this->client->sendRequest($request);
-            $apiResult = $response->getBody()->__toString();
+            $apiResult = (string) $response->getBody();
 
-            return ScanResult::fromApiResult(
-                json_decode($apiResult, true, 512, JSON_THROW_ON_ERROR) ?: [],
-            );
+            return $this->mapper->map(ScanResult::class, Valinor\Mapper\Source\Source::json($apiResult));
         } catch (ClientExceptionInterface $clientException) {
             throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $clientException);
+        } catch (Valinor\Mapper\MappingError $error) {
+            throw Exception\UnexpectedApiResponseException::create($error);
         }
+    }
+
+    private function createMapper(): Valinor\Mapper\TreeMapper
+    {
+        return (new Valinor\MapperBuilder())
+            ->registerConstructor(
+                ScanResult::fromApiResult(...),
+            )
+            ->allowSuperfluousKeys()
+            ->mapper()
+        ;
     }
 }
