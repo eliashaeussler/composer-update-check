@@ -59,7 +59,7 @@ final class UnexpectedApiResponseException extends Exception
         return implode(
             PHP_EOL,
             array_map(
-                static fn (Valinor\Mapper\Tree\Message\NodeMessage $message) => '  * '.$message->toString(),
+                static fn (Valinor\Mapper\Tree\Message\NodeMessage $message): string => '  * '.$message->toString(),
                 $messages->toArray(),
             ),
         );
