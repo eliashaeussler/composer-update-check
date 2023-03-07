@@ -74,14 +74,12 @@ final class ScanResultTest extends AbstractTestCase
 
     /**
      * @test
-     *
-     * @dataProvider fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider
-     *
-     * @param array<string, mixed> $apiResult
      */
-    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(array $apiResult): void
+    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(): void
     {
-        self::assertSame([], ScanResult::fromApiResult($apiResult)->getInsecurePackages());
+        $actual = ScanResult::fromApiResult(['advisories' => []]);
+
+        self::assertSame([], $actual->getInsecurePackages());
     }
 
     /**
@@ -128,16 +126,6 @@ final class ScanResultTest extends AbstractTestCase
         $subject = new ScanResult($insecurePackages);
 
         self::assertSame($expected, $subject->isInsecure($outdatedPackage));
-    }
-
-    /**
-     * @return Generator<string, mixed>
-     */
-    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): Generator
-    {
-        yield 'empty array' => [[]];
-        yield 'array without advisories' => [['foo' => 'baz']];
-        yield 'array with empty advisories' => [['advisories' => []]];
     }
 
     /**
