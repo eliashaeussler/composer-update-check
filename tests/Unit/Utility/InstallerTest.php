@@ -31,6 +31,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * InstallerTest.
@@ -56,9 +58,7 @@ final class InstallerTest extends AbstractTestCase
         $this->composer = $application->getComposer();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runInstallInstallsComposerDependencies(): void
     {
         $expected = 'Installing dependencies from lock file (including require-dev)';
@@ -68,12 +68,10 @@ final class InstallerTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     *
-     * @dataProvider runUpdateExecutesDryRunUpdateDataProvider
-     *
      * @param string[] $packages
      */
+    #[Test]
+    #[DataProvider('runUpdateExecutesDryRunUpdateDataProvider')]
     public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null): void
     {
         // Ensure dependencies are installed
@@ -89,21 +87,21 @@ final class InstallerTest extends AbstractTestCase
     /**
      * @return Generator<string, mixed>
      */
-    public function runUpdateExecutesDryRunUpdateDataProvider(): Generator
+    public static function runUpdateExecutesDryRunUpdateDataProvider(): Generator
     {
         yield 'no explicit whitelist' => [
             [],
-            $this->getExpectedCommandOutput(),
+            self::getExpectedCommandOutput(),
         ];
         yield 'symfony/console only' => [
             ['symfony/console'],
-            $this->getExpectedCommandOutput('symfony/console'),
-            $this->getExpectedCommandOutput('symfony/http-kernel'),
+            self::getExpectedCommandOutput('symfony/console'),
+            self::getExpectedCommandOutput('symfony/http-kernel'),
         ];
         yield 'symfony/http-kernel only' => [
             ['symfony/http-kernel'],
-            $this->getExpectedCommandOutput('symfony/http-kernel'),
-            $this->getExpectedCommandOutput('symfony/console'),
+            self::getExpectedCommandOutput('symfony/http-kernel'),
+            self::getExpectedCommandOutput('symfony/console'),
         ];
     }
 

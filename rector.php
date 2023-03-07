@@ -24,6 +24,8 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector;
+use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
@@ -36,6 +38,9 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/tests/Build',
 
         AddLiteralSeparatorToNumberRector::class,
+        AnnotationToAttributeRector::class => [
+            __DIR__.'/src',
+        ],
     ]);
 
     $rectorConfig->phpVersion(PhpVersion::PHP_81);
@@ -47,5 +52,9 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::EARLY_RETURN,
         SetList::PRIVATIZATION,
         SetList::TYPE_DECLARATION,
+        PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
     ]);
 };

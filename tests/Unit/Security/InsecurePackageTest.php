@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Security\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * InsecurePackageTest.
@@ -41,17 +42,13 @@ final class InsecurePackageTest extends AbstractTestCase
         $this->subject = new InsecurePackage('foo', ['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getNameReturnsInsecurePackageName(): void
     {
         self::assertSame('foo', $this->subject->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getAffectedVersionsReturnsAffectedVersionsOfInsecurePackage(): void
     {
         self::assertSame(['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0'], $this->subject->getAffectedVersions());

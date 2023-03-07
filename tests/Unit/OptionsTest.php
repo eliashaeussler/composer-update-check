@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
 
 use EliasHaeussler\ComposerUpdateCheck\Options;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,9 +44,7 @@ final class OptionsTest extends AbstractTestCase
         $this->subject = new Options();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromInputReadsInputOptionsCorrectly(): void
     {
         $definition = new InputDefinition([
@@ -66,9 +65,7 @@ final class OptionsTest extends AbstractTestCase
         self::assertTrue($subject->isPerformingSecurityScan());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getIgnorePackagesReturnsIgnoredPackages(): void
     {
         $this->subject->setIgnorePackages(['foo/*', 'baz/*']);
@@ -76,9 +73,7 @@ final class OptionsTest extends AbstractTestCase
         self::assertSame(['foo/*', 'baz/*'], $this->subject->getIgnorePackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isIncludingDevPackagesReturnsCorrectStateOfNoDevOption(): void
     {
         self::assertTrue($this->subject->isIncludingDevPackages());
@@ -92,9 +87,7 @@ final class OptionsTest extends AbstractTestCase
         self::assertTrue($this->subject->isIncludingDevPackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isPerformingSecurityScanReturnsCorrectStateOfSecurityScanOption(): void
     {
         self::assertFalse($this->subject->isPerformingSecurityScan());

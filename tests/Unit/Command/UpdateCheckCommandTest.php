@@ -28,6 +28,7 @@ use Composer\Json\JsonValidationException;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -55,9 +56,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         $this->commandTester = new CommandTester($application->find('update-check'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsNoOutdatedPackagesMessageIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
@@ -68,9 +67,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped(): void
     {
         $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/*'], '--no-dev' => true]);
@@ -82,9 +79,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsListOfOutdatedPackagesWithoutDevRequirements(): void
     {
         $this->commandTester->execute(['--json' => true, '--no-dev' => true]);
@@ -104,9 +99,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $actualJson['result'][1]['New version']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages(): void
     {
         $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/console']]);
@@ -126,9 +119,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $actualJson['result'][1]['New version']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsListOfOutdatedPackages(): void
     {
         $this->commandTester->execute(['--json' => true]);
@@ -152,9 +143,7 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $actualJson['result'][2]['New version']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function executePrintsListOfOutdatedPackagesAndFlagsInsecurePackages(): void
     {
         $this->commandTester->execute(['--json' => true, '--security-scan' => true]);

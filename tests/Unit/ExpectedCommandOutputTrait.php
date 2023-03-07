@@ -31,7 +31,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
  */
 trait ExpectedCommandOutputTrait
 {
-    private function getExpectedCommandOutput(
+    private static function getExpectedCommandOutput(
         string $package = null,
         string $outdated = null,
         string $new = null,

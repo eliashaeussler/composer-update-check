@@ -28,6 +28,7 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * SecurityTest.
@@ -44,9 +45,7 @@ final class SecurityTest extends AbstractTestCase
         $this->goToTestDirectory();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsSecurityVulnerabilities(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
@@ -58,9 +57,7 @@ final class SecurityTest extends AbstractTestCase
         self::assertTrue($scan->isInsecure($insecurePackage));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanAndOverlayResultsAppliesInsecureFlagsToInsecureOutdatedPackages(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');

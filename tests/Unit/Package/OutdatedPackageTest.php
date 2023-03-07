@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Nyholm\Psr7\Uri;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * OutdatedPackageTest.
@@ -54,45 +55,35 @@ final class OutdatedPackageTest extends AbstractTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getNameReturnsOutdatedPackageName(): void
     {
         self::assertSame('foo', $this->subjectWithVersion->getName());
         self::assertSame('buu', $this->subjectWithBranch->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getOutdatedVersionReturnsOutdatedPackageVersion(): void
     {
         self::assertSame('1.0.0', $this->subjectWithVersion->getOutdatedVersion());
         self::assertSame('dev-master 12345', $this->subjectWithBranch->getOutdatedVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getNewVersionReturnsNewPackageVersionOfOutdatedPackage(): void
     {
         self::assertSame('1.0.5', $this->subjectWithVersion->getNewVersion());
         self::assertSame('dev-master 67890', $this->subjectWithBranch->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isInsecureReturnsSecurityStateOfOutdatedPackage(): void
     {
         self::assertTrue($this->subjectWithVersion->isInsecure());
         self::assertFalse($this->subjectWithBranch->isInsecure());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function setInsecureSetsSecurityStateOfOutdatedPackage(): void
     {
         $this->subjectWithVersion->setInsecure(false);
@@ -101,9 +92,7 @@ final class OutdatedPackageTest extends AbstractTestCase
         self::assertTrue($this->subjectWithBranch->isInsecure());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getProviderLinkReturnsProviderLinkOfOutdatedPackage(): void
     {
         $expected = new Uri('https://packagist.org/packages/foo#1.0.5');

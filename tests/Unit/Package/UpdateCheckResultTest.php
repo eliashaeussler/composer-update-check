@@ -29,6 +29,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * UpdateCheckResultTest.
@@ -44,9 +46,7 @@ final class UpdateCheckResultTest extends AbstractTestCase
         'foo/baz',
     ];
 
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -57,9 +57,7 @@ final class UpdateCheckResultTest extends AbstractTestCase
         new UpdateCheckResult(['foo']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getOutdatedPackagesReturnsListOfOutdatedPackages(): void
     {
         $outdatedPackage1 = new OutdatedPackage('foo', '1.0.0', '1.0.5');
@@ -71,12 +69,10 @@ final class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     *
-     * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
-     *
      * @param OutdatedPackage[] $expected
      */
+    #[Test]
+    #[DataProvider('fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider')]
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
         array $expected,
@@ -95,14 +91,12 @@ final class UpdateCheckResultTest extends AbstractTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromCommandOutputExcludesNonAllowedPackagesFromResult(): void
     {
         $output = implode(PHP_EOL, [
-            $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+            self::getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+            self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
         ]);
 
         $subject = UpdateCheckResult::fromCommandOutput($output, self::ALLOWED_PACKAGES);
@@ -117,7 +111,7 @@ final class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string, array<OutdatedPackage>}>
      */
-    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): Generator
+    public static function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): Generator
     {
         yield 'no output' => [
             '',
@@ -132,8 +126,8 @@ final class UpdateCheckResultTest extends AbstractTestCase
                 'this is some dummy text',
                 'just ignore it',
                 'but these lines are important:',
-                $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-                $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+                self::getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
                 'bye',
             ]),
             [
@@ -157,7 +151,7 @@ final class UpdateCheckResultTest extends AbstractTestCase
             null,
         ];
         yield 'matching package' => [
-            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+            self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
             new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
         ];
     }

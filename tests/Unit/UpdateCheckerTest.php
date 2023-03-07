@@ -34,6 +34,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * UpdateCheckerTest.
@@ -64,10 +65,9 @@ final class UpdateCheckerTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     *
      * @throws JsonValidationException
      */
+    #[Test]
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
@@ -78,9 +78,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertEquals($expected, $subject->run());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
     {
         $this->options->setIgnorePackages(['symfony/*']);
@@ -90,9 +88,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertEquals($expected, $this->subject->run());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultWithoutDevRequirements(): void
     {
         $this->options->setIncludeDevPackages(false);
@@ -112,9 +108,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $secondOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultWithoutSkippedPackages(): void
     {
         $this->options->setIgnorePackages(['symfony/console']);
@@ -134,9 +128,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $secondOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultListOfOutdatedPackages(): void
     {
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
@@ -159,9 +151,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertNotSame('v5.4.20', $thirdOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultListOfOutdatedPackagesAndFlagsInsecurePackages(): void
     {
         $this->options->setPerformSecurityScan(true);
@@ -189,9 +179,7 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertFalse($thirdOutdatedPackage->isInsecure());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runDispatchesPostUpdateCheckEvent(): void
     {
         $listener = function (PostUpdateCheckEvent $event): void {

@@ -29,6 +29,8 @@ use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ScanResultTest.
@@ -59,9 +61,7 @@ final class ScanResultTest extends AbstractTestCase
         ],
     ];
 
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfGivenInsecurePackagesAreInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -72,9 +72,7 @@ final class ScanResultTest extends AbstractTestCase
         new ScanResult(['foo' => 'baz']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(): void
     {
         $actual = ScanResult::fromApiResult(['advisories' => []]);
@@ -82,9 +80,7 @@ final class ScanResultTest extends AbstractTestCase
         self::assertSame([], $actual->getInsecurePackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromApiResultReturnsScanResultObjectWithInsecurePackages(): void
     {
         $subject = ScanResult::fromApiResult(self::API_RESULT);
@@ -97,9 +93,7 @@ final class ScanResultTest extends AbstractTestCase
         self::assertSame(['1.0.0-alpha-1'], $insecurePackages[1]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getInsecurePackagesReturnsInsecurePackagesFromScanResult(): void
     {
         $insecurePackages = [
@@ -112,11 +106,8 @@ final class ScanResultTest extends AbstractTestCase
         self::assertSame($insecurePackages, $subject->getInsecurePackages());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider isInsecureReturnsSecurityStateOfGivenPackageDataProvider
-     */
+    #[Test]
+    #[DataProvider('isInsecureReturnsSecurityStateOfGivenPackageDataProvider')]
     public function isInsecureReturnsSecurityStateOfGivenPackage(OutdatedPackage $outdatedPackage, bool $expected): void
     {
         $insecurePackages = [
@@ -131,7 +122,7 @@ final class ScanResultTest extends AbstractTestCase
     /**
      * @return Generator<string, mixed>
      */
-    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): Generator
+    public static function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): Generator
     {
         yield 'secure package without any insecure versions' => [
             new OutdatedPackage('secure/package', '1.0.0', '1.0.1'),

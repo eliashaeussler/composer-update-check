@@ -32,6 +32,7 @@ use Http\Client\Exception\TransferException;
 use Http\Message\RequestMatcher\CallbackRequestMatcher;
 use Http\Mock\Client;
 use Nyholm\Psr7\Response;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\RequestInterface;
 use RuntimeException;
 
@@ -52,9 +53,7 @@ final class SecurityScannerTest extends AbstractTestCase
         $this->subject = new SecurityScanner($this->client);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsScanResult(): void
     {
         $packages = [
@@ -88,17 +87,13 @@ final class SecurityScannerTest extends AbstractTestCase
         self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
     {
         self::assertSame([], $this->subject->scan([])->getInsecurePackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanExcludesPackagesWithoutAffectedVersions(): void
     {
         $packages = [
@@ -133,9 +128,7 @@ final class SecurityScannerTest extends AbstractTestCase
         self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanThrowsExceptionIfRequestFails(): void
     {
         $this->client->addException(new TransferException());
@@ -146,9 +139,7 @@ final class SecurityScannerTest extends AbstractTestCase
         $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanThrowsExceptionIfApiResponseIsInvalid(): void
     {
         $response = new Response();
