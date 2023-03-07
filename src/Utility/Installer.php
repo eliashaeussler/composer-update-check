@@ -50,14 +50,7 @@ final class Installer
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true);
-
-        if (method_exists($eventDispatcher, 'setRunScripts')) {
-            // Composer >= 2.1.2
-            $eventDispatcher->setRunScripts(false);
-        } else {
-            // Composer < 2.1.2
-            $installer->setRunScripts(false);
-        }
+        $eventDispatcher->setRunScripts(false);
 
         return $installer->run();
     }
