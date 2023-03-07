@@ -118,7 +118,7 @@ jobs:
   tests-reporter:
     name: Tests of eliashaeussler/composer-update-reporter
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor != 'renovate[bot]' }}
     steps:
       - id: set-branch
         run: echo "branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
