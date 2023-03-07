@@ -51,6 +51,7 @@ abstract class AbstractTestCase extends TestCase
             if (str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit')) {
                 continue;
             }
+            /* @phpstan-ignore-next-line */
             unset($this->{$property->getName()});
         }
 

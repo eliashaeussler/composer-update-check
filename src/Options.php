@@ -51,7 +51,7 @@ final class Options
             $instance->setIgnorePackages($input->getOption('ignore-packages'));
         }
         if ($input->hasOption('no-dev')) {
-            $instance->setIncludeDevPackages(!$input->getOption('no-dev'));
+            $instance->setIncludeDevPackages(false === $input->getOption('no-dev'));
         }
         if ($input->hasOption('security-scan')) {
             $instance->setPerformSecurityScan($input->getOption('security-scan'));

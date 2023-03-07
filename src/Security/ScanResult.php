@@ -88,6 +88,7 @@ final class ScanResult
     private function validateInsecurePackages(): void
     {
         foreach ($this->insecurePackages as $key => $insecurePackage) {
+            /* @phpstan-ignore-next-line */
             if (!($insecurePackage instanceof InsecurePackage)) {
                 throw new InvalidArgumentException(sprintf('Insecure package #%s must be an instance of "%s".', $key, InsecurePackage::class), 1610707087);
             }

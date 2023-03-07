@@ -5,3 +5,5 @@ parameters:
 		- tests
 	excludePaths:
 		- tests/Build/*
+	symfony:
+		consoleApplicationLoader: tests/Build/console-application.php

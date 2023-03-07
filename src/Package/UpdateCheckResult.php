@@ -124,6 +124,7 @@ final class UpdateCheckResult
     private function validateOutdatedPackages(): void
     {
         foreach ($this->outdatedPackages as $key => $outdatedPackage) {
+            /* @phpstan-ignore-next-line */
             if (!($outdatedPackage instanceof OutdatedPackage)) {
                 throw new InvalidArgumentException(sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class), 1600276584);
             }
