@@ -104,12 +104,12 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertCount(2, $outdatedPackages);
 
         self::assertSame('symfony/console', $firstOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $firstOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $firstOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.19', $firstOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.19', $firstOutdatedPackage->getNewVersion());
 
         self::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.20', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.20', $secondOutdatedPackage->getNewVersion());
     }
 
     /**
@@ -130,8 +130,8 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
 
         self::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.20', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.20', $secondOutdatedPackage->getNewVersion());
     }
 
     /**
@@ -151,12 +151,12 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
 
         self::assertSame('symfony/console', $secondOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.19', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.19', $secondOutdatedPackage->getNewVersion());
 
         self::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $thirdOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $thirdOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.20', $thirdOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.20', $thirdOutdatedPackage->getNewVersion());
     }
 
     /**
@@ -179,13 +179,13 @@ final class UpdateCheckerTest extends AbstractTestCase
         self::assertTrue($firstOutdatedPackage->isInsecure());
 
         self::assertSame('symfony/console', $secondOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.19', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.19', $secondOutdatedPackage->getNewVersion());
         self::assertFalse($secondOutdatedPackage->isInsecure());
 
         self::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
-        self::assertSame('v5.4.9', $thirdOutdatedPackage->getOutdatedVersion());
-        self::assertNotSame('v5.4.9', $thirdOutdatedPackage->getNewVersion());
+        self::assertSame('v5.4.20', $thirdOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v5.4.20', $thirdOutdatedPackage->getNewVersion());
         self::assertFalse($thirdOutdatedPackage->isInsecure());
     }
 
@@ -204,8 +204,8 @@ final class UpdateCheckerTest extends AbstractTestCase
 
             self::assertCount(1, $outdatedPackages);
             self::assertSame('symfony/http-kernel', $outdatedPackage->getName());
-            self::assertSame('v5.4.9', $outdatedPackage->getOutdatedVersion());
-            self::assertNotSame('v5.4.9', $outdatedPackage->getNewVersion());
+            self::assertSame('v5.4.20', $outdatedPackage->getOutdatedVersion());
+            self::assertNotSame('v5.4.20', $outdatedPackage->getNewVersion());
         };
 
         $this->options->setIgnorePackages(['symfony/console']);

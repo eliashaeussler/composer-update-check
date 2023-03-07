@@ -96,12 +96,12 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertCount(2, $actualJson['result']);
 
         self::assertSame('symfony/console', $actualJson['result'][0]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][0]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][0]['New version']);
+        self::assertSame('v5.4.19', $actualJson['result'][0]['Outdated version']);
+        self::assertNotSame('v5.4.19', $actualJson['result'][0]['New version']);
 
         self::assertSame('symfony/http-kernel', $actualJson['result'][1]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame('v5.4.20', $actualJson['result'][1]['Outdated version']);
+        self::assertNotSame('v5.4.20', $actualJson['result'][1]['New version']);
     }
 
     /**
@@ -122,8 +122,8 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
 
         self::assertSame('symfony/http-kernel', $actualJson['result'][1]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame('v5.4.20', $actualJson['result'][1]['Outdated version']);
+        self::assertNotSame('v5.4.20', $actualJson['result'][1]['New version']);
     }
 
     /**
@@ -144,12 +144,12 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
 
         self::assertSame('symfony/console', $actualJson['result'][1]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame('v5.4.19', $actualJson['result'][1]['Outdated version']);
+        self::assertNotSame('v5.4.19', $actualJson['result'][1]['New version']);
 
         self::assertSame('symfony/http-kernel', $actualJson['result'][2]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][2]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][2]['New version']);
+        self::assertSame('v5.4.20', $actualJson['result'][2]['Outdated version']);
+        self::assertNotSame('v5.4.20', $actualJson['result'][2]['New version']);
     }
 
     /**
@@ -171,13 +171,13 @@ final class UpdateCheckCommandTest extends AbstractTestCase
         self::assertTrue($actualJson['result'][0]['Insecure']);
 
         self::assertSame('symfony/console', $actualJson['result'][1]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame('v5.4.19', $actualJson['result'][1]['Outdated version']);
+        self::assertNotSame('v5.4.19', $actualJson['result'][1]['New version']);
         self::assertFalse($actualJson['result'][1]['Insecure']);
 
         self::assertSame('symfony/http-kernel', $actualJson['result'][2]['Package']);
-        self::assertSame('v5.4.9', $actualJson['result'][2]['Outdated version']);
-        self::assertNotSame('v5.4.9', $actualJson['result'][2]['New version']);
+        self::assertSame('v5.4.20', $actualJson['result'][2]['Outdated version']);
+        self::assertNotSame('v5.4.20', $actualJson['result'][2]['New version']);
         self::assertFalse($actualJson['result'][2]['Insecure']);
     }
 
