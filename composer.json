@@ -84,7 +84,7 @@
 		],
 		"lint:composer": [
 			"@composer normalize",
-			"@composer normalize tests/Build/test-application/v8/composer.json",
+			"@composer normalize tests/Build/test-application/composer.json",
 			"@composer normalize tests/Build/test-application-empty/composer.json",
 			"@composer normalize tests/Build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
 		],
