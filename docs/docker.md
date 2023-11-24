@@ -18,8 +18,6 @@ Composer version you're using in your project:
 | `eliashaeussler/composer-update-check:latest` | v2 | latest |
 | `eliashaeussler/composer-update-check:<version>-v2` | v2 | `<version>` |
 | `eliashaeussler/composer-update-check:v2` | v2 | latest |
-| `eliashaeussler/composer-update-check:<version>-v1` | v1 | `<version>` |
-| `eliashaeussler/composer-update-check:v1` | v1 | latest |
 
 ## Usage
 

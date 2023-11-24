@@ -12,11 +12,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - composer-version: 1
-            tags: |
-              type=semver,pattern={{version}}-v1
-              type=raw,value=v1
-            latest: false
           - composer-version: 2
             tags: |
               type=semver,pattern={{version}}-v2
