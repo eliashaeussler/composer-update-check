@@ -7,7 +7,6 @@
 /.gitattributes
 /.gitignore
 /.php-cs-fixer.php
-/CHANGELOG.md
 /codecov.yml
 /composer.lock
 /Dockerfile

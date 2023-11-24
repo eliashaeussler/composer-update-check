@@ -25,7 +25,6 @@ nav:
     - Plugins: plugins.md
   - About:
     - Contribution: contribute.md
-    - Changelog: changelog.md
     - License: license.md
 
 # Theme configuration
