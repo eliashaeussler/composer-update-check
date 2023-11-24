@@ -77,19 +77,27 @@
 		"docs:open": "open http://$(docker-compose -f docs/build/docker-compose.yaml port docs 8000)",
 		"docs:start": "@docs:exec up -d",
 		"docs:stop": "@docs:exec down",
-		"lint": [
-			"@lint:composer",
-			"@lint:editorconfig",
-			"@lint:php"
+		"fix": [
+			"@fix:composer",
+			"@fix:editorconfig",
+			"@fix:php"
 		],
-		"lint:composer": [
+		"fix:composer": [
 			"@composer normalize",
 			"@composer normalize tests/Build/test-application/composer.json",
 			"@composer normalize tests/Build/test-application-empty/composer.json",
 			"@composer normalize tests/Build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
 		],
-		"lint:editorconfig": "ec --fix --git-only",
-		"lint:php": "php-cs-fixer fix",
+		"fix:editorconfig": "@lint:editorconfig --fix",
+		"fix:php": "php-cs-fixer fix",
+		"lint": [
+			"@lint:composer",
+			"@lint:editorconfig",
+			"@lint:php"
+		],
+		"lint:composer": "@fix:composer --dry-run",
+		"lint:editorconfig": "ec --git-only",
+		"lint:php": "@fix:php --dry-run",
 		"sca": [
 			"@sca:php"
 		],
