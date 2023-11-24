@@ -12,4 +12,5 @@
 /Dockerfile
 /mkdocs.yml
 /phpstan.php
+/phpstan-baseline.neon
 /phpunit.xml

@@ -78,30 +78,10 @@ final class Installer
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode(true)
-            ->setUpdate(true);
-
-        if (method_exists($installer, 'setUpdateAllowList')) {
-            // Composer >= 2.0
-            $installer->setUpdateAllowList($packages);
-        } else {
-            // Composer < 2.0
-            /* @noinspection PhpUndefinedMethodInspection */
-            /* @phpstan-ignore-next-line */
-            $installer->setUpdateWhitelist($packages);
-        }
-
-        if (method_exists($installer, 'setUpdateAllowTransitiveDependencies')) {
-            // Composer >= 2.0
-            $installer->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS);
-        } elseif (method_exists($installer, 'setAllowListAllDependencies')) {
-            // Composer >= 1.10.8
-            $installer->setAllowListAllDependencies(true);
-        } else {
-            // Composer < 1.10.8
-            /* @noinspection PhpUndefinedMethodInspection */
-            /* @phpstan-ignore-next-line */
-            $installer->setWhitelistDependencies(true);
-        }
+            ->setUpdate(true)
+            ->setUpdateAllowList($packages)
+            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
+        ;
 
         return $installer->run();
     }

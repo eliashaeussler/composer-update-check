@@ -1,0 +1,29 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Instanceof between EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\OutdatedPackage and EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\OutdatedPackage will always evaluate to true\\.$#"
+			count: 1
+			path: src/Package/UpdateCheckResult.php
+
+		-
+			message: "#^Instanceof between EliasHaeussler\\\\ComposerUpdateCheck\\\\Security\\\\InsecurePackage and EliasHaeussler\\\\ComposerUpdateCheck\\\\Security\\\\InsecurePackage will always evaluate to true\\.$#"
+			count: 1
+			path: src/Security/ScanResult.php
+
+		-
+			message: """
+				#^Call to deprecated method setRunScripts\\(\\) of class Composer\\\\Installer\\:
+				Use setRunScripts\\(false\\) on the EventDispatcher instance being injected instead$#
+			"""
+			count: 1
+			path: src/Utility/Installer.php
+
+		-
+			message: "#^Call to function method_exists\\(\\) with Composer\\\\EventDispatcher\\\\EventDispatcher and 'setRunScripts' will always evaluate to true\\.$#"
+			count: 1
+			path: src/Utility/Installer.php
+
+		-
+			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Tests\\\\Unit\\\\AbstractTestCase\\)\\.$#"
+			count: 1
+			path: tests/Unit/AbstractTestCase.php

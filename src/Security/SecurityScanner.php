@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use JsonException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -85,8 +86,8 @@ class SecurityScanner
             $response = $this->client->sendRequest($request);
             $apiResult = $response->getBody()->__toString();
 
-            return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
-        } catch (ClientExceptionInterface $e) {
+            return ScanResult::fromApiResult(json_decode($apiResult, true, 512, JSON_THROW_ON_ERROR));
+        } catch (ClientExceptionInterface|JsonException $e) {
             throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
         }
     }

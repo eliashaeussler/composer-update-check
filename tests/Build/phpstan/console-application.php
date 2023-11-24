@@ -21,22 +21,9 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\PHPStanConfig;
+require_once __DIR__.'/../../../vendor/autoload.php';
 
-$symfonySet = PHPStanConfig\Set\SymfonySet::create()
-    ->withConsoleApplicationLoader('Tests/Build/phpstan/console-application.php')
-;
+$application = new \Symfony\Component\Console\Application();
+$application->add(new \EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand());
 
-return PHPStanConfig\Config\Config::create(__DIR__)
-    ->in(
-        'src',
-        'tests',
-    )
-    ->not(
-        'tests/Build/*',
-    )
-    ->withBaseline()
-    ->level(6)
-    ->withSets($symfonySet)
-    ->toArray()
-;
+return $application;
