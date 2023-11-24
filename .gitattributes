@@ -16,5 +16,4 @@
 /mkdocs.yml               export-ignore
 /phpstan.neon             export-ignore
 /phpunit.xml              export-ignore
-/phpunit.coverage.xml     export-ignore
 /renovate.json            export-ignore

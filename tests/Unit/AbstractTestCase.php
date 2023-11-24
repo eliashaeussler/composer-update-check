@@ -42,9 +42,9 @@ abstract class AbstractTestCase extends TestCase
         $reflection = new \ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {
             if (
-                !$property->isStatic() &&
-                !$property->isPrivate() &&
-                0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit')
+                !$property->isStatic()
+                && !$property->isPrivate()
+                && 0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit')
             ) {
                 unset($this->{$property->getName()});
             }

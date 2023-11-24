@@ -99,8 +99,8 @@ class UpdateCheckResult
     public static function parseCommandOutput(string $output): ?OutdatedPackage
     {
         if (
-            !preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches) &&
-            !preg_match(static::LEGACY_COMMAND_OUTPUT_PATTERN, $output, $matches)
+            !preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches)
+            && !preg_match(static::LEGACY_COMMAND_OUTPUT_PATTERN, $output, $matches)
         ) {
             return null;
         }

@@ -33,7 +33,7 @@ use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
  */
 trait ExpectedCommandOutputTrait
 {
-    private function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
+    private static function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
     {
         $isLegacyPlatform = Composer::getMajorVersion() < 2;
         $output = $isLegacyPlatform ? ' - Updating' : ' - Upgrading';

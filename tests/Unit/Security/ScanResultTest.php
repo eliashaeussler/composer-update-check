@@ -128,7 +128,7 @@ class ScanResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, mixed>
      */
-    public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): \Generator
+    public static function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider(): \Generator
     {
         yield 'empty array' => [[]];
         yield 'array without advisories' => [['foo' => 'baz']];
@@ -138,7 +138,7 @@ class ScanResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, mixed>
      */
-    public function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): \Generator
+    public static function isInsecureReturnsSecurityStateOfGivenPackageDataProvider(): \Generator
     {
         yield 'secure package without any insecure versions' => [
             new OutdatedPackage('secure/package', '1.0.0', '1.0.1'),

@@ -95,8 +95,8 @@ class UpdateCheckResultTest extends AbstractTestCase
     public function fromCommandOutputExcludesNonAllowedPackagesFromResult(): void
     {
         $output = implode(PHP_EOL, [
-            $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+            self::getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+            self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
         ]);
         $allowedPackages = [
             'foo/baz',
@@ -124,7 +124,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string, array<OutdatedPackage>}>
      */
-    public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
+    public static function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
     {
         yield 'no output' => [
             '',
@@ -139,8 +139,8 @@ class UpdateCheckResultTest extends AbstractTestCase
                 'this is some dummy text',
                 'just ignore it',
                 'but these lines are important:',
-                $this->getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
-                $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+                self::getExpectedCommandOutput('dummy/package', 'dev-master 12345', 'dev-master 67890'),
+                self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
                 'bye',
             ]),
             [
@@ -153,7 +153,7 @@ class UpdateCheckResultTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string, OutdatedPackage|null}>
      */
-    public function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
+    public static function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
     {
         yield 'no output' => [
             '',
@@ -164,7 +164,7 @@ class UpdateCheckResultTest extends AbstractTestCase
             null,
         ];
         yield 'matching package' => [
-            $this->getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
+            self::getExpectedCommandOutput('foo/baz', '1.0.0', '1.0.5'),
             new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
         ];
     }

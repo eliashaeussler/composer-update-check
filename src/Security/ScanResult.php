@@ -55,9 +55,9 @@ class ScanResult
     {
         // Early return if no advisories were provided
         if (
-            !array_key_exists('advisories', $apiResult) ||
-            !is_array($apiResult['advisories']) ||
-            [] === $apiResult['advisories']
+            !array_key_exists('advisories', $apiResult)
+            || !is_array($apiResult['advisories'])
+            || [] === $apiResult['advisories']
         ) {
             return new self([]);
         }

@@ -104,7 +104,7 @@ class StyleTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{string}>
      */
-    public function isReturnsTrueIfGivenStyleEqualsStyleDataProvider(): \Generator
+    public static function isReturnsTrueIfGivenStyleEqualsStyleDataProvider(): \Generator
     {
         yield 'normal style' => [Style::NORMAL];
         yield 'json style' => [Style::JSON];

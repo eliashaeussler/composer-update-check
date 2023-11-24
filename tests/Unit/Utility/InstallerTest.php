@@ -95,21 +95,21 @@ class InstallerTest extends AbstractTestCase
     /**
      * @return \Generator<string, mixed>
      */
-    public function runUpdateExecutesDryRunUpdateDataProvider(): \Generator
+    public static function runUpdateExecutesDryRunUpdateDataProvider(): \Generator
     {
         yield 'no explicit whitelist' => [
             [],
-            $this->getExpectedCommandOutput(),
+            self::getExpectedCommandOutput(),
         ];
         yield 'symfony/console only' => [
             ['symfony/console'],
-            $this->getExpectedCommandOutput('symfony/console'),
-            $this->getExpectedCommandOutput('symfony/http-kernel'),
+            self::getExpectedCommandOutput('symfony/console'),
+            self::getExpectedCommandOutput('symfony/http-kernel'),
         ];
         yield 'symfony/http-kernel only' => [
             ['symfony/http-kernel'],
-            $this->getExpectedCommandOutput('symfony/http-kernel'),
-            $this->getExpectedCommandOutput('symfony/console'),
+            self::getExpectedCommandOutput('symfony/http-kernel'),
+            self::getExpectedCommandOutput('symfony/console'),
         ];
     }
 

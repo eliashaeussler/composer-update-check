@@ -133,7 +133,7 @@ class VerbosityTest extends AbstractTestCase
     /**
      * @return \Generator<string, array{int}>
      */
-    public function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): \Generator
+    public static function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): \Generator
     {
         yield 'quiet level' => [Verbosity::QUIET];
         yield 'normal level' => [Verbosity::NORMAL];
