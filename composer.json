@@ -82,7 +82,12 @@
 			"@lint:editorconfig",
 			"@lint:php"
 		],
-		"lint:composer": "@composer normalize",
+		"lint:composer": [
+			"@composer normalize",
+			"@composer normalize tests/Build/test-application/v8/composer.json",
+			"@composer normalize tests/Build/test-application-empty/composer.json",
+			"@composer normalize tests/Build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
+		],
 		"lint:editorconfig": "ec --fix --git-only",
 		"lint:php": "php-cs-fixer fix",
 		"sca": [

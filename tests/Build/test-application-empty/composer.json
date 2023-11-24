@@ -1,9 +1,9 @@
 {
-  "require": {},
-  "require-dev": {},
-  "config": {
-    "allow-plugins": {
-      "eliashaeussler/composer-update-check": true
-    }
-  }
+	"require": {},
+	"require-dev": {},
+	"config": {
+		"allow-plugins": {
+			"eliashaeussler/composer-update-check": true
+		}
+	}
 }
