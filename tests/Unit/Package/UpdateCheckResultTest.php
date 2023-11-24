@@ -29,6 +29,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * UpdateCheckResultTest.
@@ -36,13 +38,11 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckResultTest extends AbstractTestCase
+final class UpdateCheckResultTest extends AbstractTestCase
 {
     use ExpectedCommandOutputTrait;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -53,26 +53,22 @@ class UpdateCheckResultTest extends AbstractTestCase
         new UpdateCheckResult(['foo']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getOutdatedPackagesReturnsListOfOutdatedPackages(): void
     {
         $outdatedPackage1 = new OutdatedPackage('foo', '1.0.0', '1.0.5');
         $outdatedPackage2 = new OutdatedPackage('baz', '2.0.1', '2.1.2');
         $subject = new UpdateCheckResult([$outdatedPackage1, $outdatedPackage2]);
 
-        static::assertCount(2, $subject->getOutdatedPackages());
-        static::assertSame([$outdatedPackage2, $outdatedPackage1], $subject->getOutdatedPackages());
+        self::assertCount(2, $subject->getOutdatedPackages());
+        self::assertSame([$outdatedPackage2, $outdatedPackage1], $subject->getOutdatedPackages());
     }
 
     /**
-     * @test
-     *
-     * @dataProvider fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider
-     *
      * @param OutdatedPackage[] $expected
      */
+    #[Test]
+    #[DataProvider('fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider')]
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
         array $expected,
@@ -80,20 +76,17 @@ class UpdateCheckResultTest extends AbstractTestCase
         $subject = UpdateCheckResult::fromCommandOutput($commandOutput, ['dummy/package', 'foo/baz']);
         $outdatedPackages = $subject->getOutdatedPackages();
 
-        static::assertCount(count($expected), $outdatedPackages);
+        self::assertCount(count($expected), $outdatedPackages);
 
-        reset($outdatedPackages);
         foreach ($expected as $expectedOutdatedPackage) {
-            static::assertSame($expectedOutdatedPackage->getName(), current($outdatedPackages)->getName());
-            static::assertSame($expectedOutdatedPackage->getOutdatedVersion(), current($outdatedPackages)->getOutdatedVersion());
-            static::assertSame($expectedOutdatedPackage->getNewVersion(), current($outdatedPackages)->getNewVersion());
+            self::assertSame($expectedOutdatedPackage->getName(), current($outdatedPackages)->getName());
+            self::assertSame($expectedOutdatedPackage->getOutdatedVersion(), current($outdatedPackages)->getOutdatedVersion());
+            self::assertSame($expectedOutdatedPackage->getNewVersion(), current($outdatedPackages)->getNewVersion());
             next($outdatedPackages);
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromCommandOutputExcludesNonAllowedPackagesFromResult(): void
     {
         $output = implode(PHP_EOL, [
@@ -107,20 +100,17 @@ class UpdateCheckResultTest extends AbstractTestCase
         $subject = UpdateCheckResult::fromCommandOutput($output, $allowedPackages);
         $outdatedPackages = $subject->getOutdatedPackages();
 
-        static::assertCount(1, $outdatedPackages);
-        static::assertSame('foo/baz', reset($outdatedPackages)->getName());
-        static::assertSame('1.0.0', reset($outdatedPackages)->getOutdatedVersion());
-        static::assertSame('1.0.5', reset($outdatedPackages)->getNewVersion());
+        self::assertCount(1, $outdatedPackages);
+        self::assertSame('foo/baz', reset($outdatedPackages)->getName());
+        self::assertSame('1.0.0', reset($outdatedPackages)->getOutdatedVersion());
+        self::assertSame('1.0.5', reset($outdatedPackages)->getNewVersion());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider parseCommandOutputParsesCommandOutputCorrectlyDataProvider
-     */
+    #[Test]
+    #[DataProvider('parseCommandOutputParsesCommandOutputCorrectlyDataProvider')]
     public function parseCommandOutputParsesCommandOutputCorrectly(string $commandOutput, ?OutdatedPackage $expected): void
     {
-        static::assertEquals($expected, UpdateCheckResult::parseCommandOutput($commandOutput));
+        self::assertEquals($expected, UpdateCheckResult::parseCommandOutput($commandOutput));
     }
 
     /**

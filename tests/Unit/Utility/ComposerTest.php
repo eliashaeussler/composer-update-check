@@ -27,6 +27,7 @@ use Composer\Plugin\PluginInterface;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ComposerTest.
@@ -34,39 +35,31 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ComposerTest extends AbstractTestCase
+final class ComposerTest extends AbstractTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function getPlatformVersionReturnsFullPlatformVersion(): void
     {
         $expected = PluginInterface::PLUGIN_API_VERSION;
-        static::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_FULL));
+        self::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_FULL));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getPlatformVersionReturnsMajorPlatformVersion(): void
     {
         [$expected] = explode('.', PluginInterface::PLUGIN_API_VERSION);
-        static::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_MAJOR));
+        self::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_MAJOR));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getPlatformVersionReturnsPlatformBranch(): void
     {
         [$major, $minor] = explode('.', PluginInterface::PLUGIN_API_VERSION);
         $expected = $major.'.'.$minor;
-        static::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_BRANCH));
+        self::assertSame($expected, Composer::getPlatformVersion(Composer::VERSION_BRANCH));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getPlatformVersionThrowsExceptionIfUnsupportedVersionTypeIsGiven(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -74,12 +67,10 @@ class ComposerTest extends AbstractTestCase
         Composer::getPlatformVersion(-99);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getMajorVersionReturnsMajorPlatformVersion(): void
     {
         [$expected] = explode('.', PluginInterface::PLUGIN_API_VERSION);
-        static::assertSame((int) $expected, Composer::getMajorVersion());
+        self::assertSame((int) $expected, Composer::getMajorVersion());
     }
 }

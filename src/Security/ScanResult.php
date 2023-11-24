@@ -33,19 +33,14 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ScanResult
+final class ScanResult
 {
-    /**
-     * @var InsecurePackage[]
-     */
-    private $insecurePackages;
-
     /**
      * @param InsecurePackage[] $insecurePackages
      */
-    public function __construct(array $insecurePackages)
-    {
-        $this->insecurePackages = $insecurePackages;
+    public function __construct(
+        private readonly array $insecurePackages,
+    ) {
         $this->validateInsecurePackages();
     }
 

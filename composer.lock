@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1db4ed18e70de4518ff66a1037ba464b",
+    "content-hash": "589ea1dd2476547caa86af42ebbe561e",
     "packages": [
         {
             "name": "nyholm/psr7",
@@ -2104,6 +2104,66 @@
                 "source": "https://github.com/eliashaeussler/phpstan-config/tree/2.4.0"
             },
             "time": "2023-11-23T08:48:50+00:00"
+        },
+        {
+            "name": "eliashaeussler/rector-config",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eliashaeussler/rector-config.git",
+                "reference": "2eaed22ddc5e893a1b3c415b06863a87d79e7769"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eliashaeussler/rector-config/zipball/2eaed22ddc5e893a1b3c415b06863a87d79e7769",
+                "reference": "2eaed22ddc5e893a1b3c415b06863a87d79e7769",
+                "shasum": ""
+            },
+            "require": {
+                "composer-runtime-api": "^2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+                "rector/rector": "^0.15.21 || ^0.16.0 || ^0.17.0 || ^0.18.0"
+            },
+            "require-dev": {
+                "armin/editorconfig-cli": "^1.5",
+                "composer/composer": "^2.0",
+                "eliashaeussler/php-cs-fixer-config": "^1.1",
+                "eliashaeussler/phpstan-config": "^2.0",
+                "ergebnis/composer-normalize": "^2.30",
+                "phpstan/extension-installer": "^1.2",
+                "phpunit/phpunit": "^10.1",
+                "ssch/typo3-rector": "^1.2",
+                "symfony/config": "^5.4 || ^6.0",
+                "symfony/dependency-injection": "^5.4 || ^6.0",
+                "typo3/cms-core": "^12.4"
+            },
+            "suggest": {
+                "ssch/typo3-rector": "Configures additional Rector rules for TYPO3 CMS projects"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EliasHaeussler\\RectorConfig\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Elias Häußler",
+                    "email": "elias@haeussler.dev",
+                    "homepage": "https://haeussler.dev",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "My personal configuration for Rector",
+            "support": {
+                "issues": "https://github.com/eliashaeussler/rector-config/issues",
+                "source": "https://github.com/eliashaeussler/rector-config/tree/2.0.0"
+            },
+            "time": "2023-11-17T16:20:45+00:00"
         },
         {
             "name": "ergebnis/composer-normalize",
@@ -4224,6 +4284,62 @@
                 }
             ],
             "time": "2022-02-11T10:27:51+00:00"
+        },
+        {
+            "name": "rector/rector",
+            "version": "0.18.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rectorphp/rector.git",
+                "reference": "f36bc0a707fd8af301df5108740ce41f9db8eded"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f36bc0a707fd8af301df5108740ce41f9db8eded",
+                "reference": "f36bc0a707fd8af301df5108740ce41f9db8eded",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2|^8.0",
+                "phpstan/phpstan": "^1.10.35"
+            },
+            "conflict": {
+                "rector/rector-doctrine": "*",
+                "rector/rector-downgrade-php": "*",
+                "rector/rector-phpunit": "*",
+                "rector/rector-symfony": "*"
+            },
+            "bin": [
+                "bin/rector"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Instant Upgrade and Automated Refactoring of any PHP code",
+            "keywords": [
+                "automation",
+                "dev",
+                "migration",
+                "refactoring"
+            ],
+            "support": {
+                "issues": "https://github.com/rectorphp/rector/issues",
+                "source": "https://github.com/rectorphp/rector/tree/0.18.10"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/tomasvotruba",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-11-16T19:42:21+00:00"
         },
         {
             "name": "sebastian/cli-parser",

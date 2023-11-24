@@ -32,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Verbosity
+final class Verbosity
 {
     public const QUIET = OutputInterface::VERBOSITY_QUIET;
     public const NORMAL = OutputInterface::VERBOSITY_NORMAL;
@@ -40,14 +40,9 @@ class Verbosity
     public const VERY_VERBOSE = OutputInterface::VERBOSITY_VERY_VERBOSE;
     public const DEBUG = OutputInterface::VERBOSITY_DEBUG;
 
-    /**
-     * @var int
-     */
-    private $level;
-
-    public function __construct(int $level = OutputInterface::VERBOSITY_NORMAL)
-    {
-        $this->level = $level;
+    public function __construct(
+        private readonly int $level = OutputInterface::VERBOSITY_NORMAL,
+    ) {
         $this->validate();
     }
 

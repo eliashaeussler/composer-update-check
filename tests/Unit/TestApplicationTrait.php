@@ -33,15 +33,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 trait TestApplicationTrait
 {
-    /**
-     * @var string|null
-     */
-    protected $initialDirectory;
-
-    /**
-     * @var string|null
-     */
-    protected $temporaryDirectory;
+    protected ?string $initialDirectory = null;
+    protected ?string $temporaryDirectory = null;
 
     protected function goToTestDirectory(string $applicationPath = AbstractTestCase::TEST_APPLICATION_NORMAL): void
     {

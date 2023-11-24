@@ -29,26 +29,15 @@ namespace EliasHaeussler\ComposerUpdateCheck\Security;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class InsecurePackage
+final class InsecurePackage
 {
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var string[]
-     */
-    private $affectedVersions;
-
     /**
      * @param string[] $affectedVersions
      */
-    public function __construct(string $name, array $affectedVersions)
-    {
-        $this->name = $name;
-        $this->affectedVersions = $affectedVersions;
-    }
+    public function __construct(
+        private string $name,
+        private array $affectedVersions,
+    ) {}
 
     public function getName(): string
     {

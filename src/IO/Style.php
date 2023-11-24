@@ -31,19 +31,14 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Style
+final class Style
 {
     public const NORMAL = 'normal';
     public const JSON = 'json';
 
-    /**
-     * @var string
-     */
-    private $style;
-
-    public function __construct(string $style = self::NORMAL)
-    {
-        $this->style = $style;
+    public function __construct(
+        private readonly string $style = self::NORMAL,
+    ) {
         $this->validate();
     }
 

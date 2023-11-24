@@ -31,6 +31,7 @@ use Http\Client\Exception\TransferException;
 use Http\Message\RequestMatcher\CallbackRequestMatcher;
 use Http\Mock\Client;
 use Nyholm\Psr7\Response;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\RequestInterface;
 use RuntimeException;
 
@@ -40,17 +41,11 @@ use RuntimeException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityScannerTest extends AbstractTestCase
+final class SecurityScannerTest extends AbstractTestCase
 {
-    /**
-     * @var SecurityScanner
-     */
-    protected $subject;
+    private SecurityScanner $subject;
 
-    /**
-     * @var Client
-     */
-    protected $client;
+    private Client $client;
 
     protected function setUp(): void
     {
@@ -58,9 +53,7 @@ class SecurityScannerTest extends AbstractTestCase
         $this->subject = new SecurityScanner($this->client);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsScanResult(): void
     {
         $packages = [
@@ -88,23 +81,19 @@ class SecurityScannerTest extends AbstractTestCase
 
         $scanResult = $this->subject->scan($packages);
 
-        static::assertInstanceOf(ScanResult::class, $scanResult);
-        static::assertCount(1, $scanResult->getInsecurePackages());
-        static::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        static::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertInstanceOf(ScanResult::class, $scanResult);
+        self::assertCount(1, $scanResult->getInsecurePackages());
+        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
     {
-        static::assertSame([], $this->subject->scan([])->getInsecurePackages());
+        self::assertSame([], $this->subject->scan([])->getInsecurePackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanExcludesPackagesWithoutAffectedVersions(): void
     {
         $packages = [
@@ -133,15 +122,13 @@ class SecurityScannerTest extends AbstractTestCase
 
         $scanResult = $this->subject->scan($packages);
 
-        static::assertInstanceOf(ScanResult::class, $scanResult);
-        static::assertCount(1, $scanResult->getInsecurePackages());
-        static::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        static::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertInstanceOf(ScanResult::class, $scanResult);
+        self::assertCount(1, $scanResult->getInsecurePackages());
+        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanThrowsExceptionIfRequestFails(): void
     {
         $this->client->addException(new TransferException());

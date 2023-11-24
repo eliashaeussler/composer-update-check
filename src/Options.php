@@ -31,22 +31,14 @@ use Symfony\Component\Console\Input\InputInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Options
+final class Options
 {
     /**
      * @var string[]
      */
-    private $ignorePackages = [];
-
-    /**
-     * @var bool
-     */
-    private $includeDevPackages = true;
-
-    /**
-     * @var bool
-     */
-    private $performSecurityScan = false;
+    private array $ignorePackages = [];
+    private bool $includeDevPackages = true;
+    private bool $performSecurityScan = false;
 
     public static function fromInput(InputInterface $input): self
     {

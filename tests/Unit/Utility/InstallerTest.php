@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
-use Composer\Composer as BaseComposer;
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
@@ -32,6 +31,8 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * InstallerTest.
@@ -39,15 +40,12 @@ use Generator;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class InstallerTest extends AbstractTestCase
+final class InstallerTest extends AbstractTestCase
 {
     use ExpectedCommandOutputTrait;
     use TestApplicationTrait;
 
-    /**
-     * @var BaseComposer
-     */
-    protected $composer;
+    private ?\Composer\Composer $composer = null;
 
     /**
      * @throws JsonValidationException
@@ -60,9 +58,7 @@ class InstallerTest extends AbstractTestCase
         $this->composer = $application->getComposer();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runInstallInstallsComposerDependencies(): void
     {
         $expected = 'Installing dependencies from lock file (including require-dev)';
@@ -70,26 +66,24 @@ class InstallerTest extends AbstractTestCase
             $expected = 'Installing dependencies (including require-dev) from lock file';
         }
 
-        static::assertSame(0, Installer::runInstall($this->composer));
-        static::assertStringContainsString($expected, Installer::getLastOutput());
+        self::assertSame(0, Installer::runInstall($this->composer));
+        self::assertStringContainsString($expected, Installer::getLastOutput());
     }
 
     /**
-     * @test
-     *
-     * @dataProvider runUpdateExecutesDryRunUpdateDataProvider
-     *
      * @param string[] $packages
      */
+    #[Test]
+    #[DataProvider('runUpdateExecutesDryRunUpdateDataProvider')]
     public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null): void
     {
         // Ensure dependencies are installed
         Installer::runInstall($this->composer);
 
-        static::assertSame(0, Installer::runUpdate($packages, $this->composer));
-        static::assertStringContainsString($expected, Installer::getLastOutput());
+        self::assertSame(0, Installer::runUpdate($packages, $this->composer));
+        self::assertStringContainsString($expected, Installer::getLastOutput());
         if (null !== $notExpected) {
-            static::assertStringNotContainsString($notExpected, Installer::getLastOutput());
+            self::assertStringNotContainsString($notExpected, Installer::getLastOutput());
         }
     }
 

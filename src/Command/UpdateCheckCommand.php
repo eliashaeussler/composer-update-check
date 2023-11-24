@@ -43,17 +43,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckCommand extends BaseCommand
+final class UpdateCheckCommand extends BaseCommand
 {
-    /**
-     * @var SymfonyStyle
-     */
-    private $symfonyStyle;
+    private ?SymfonyStyle $symfonyStyle = null;
 
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
+    private ?OutputBehavior $behavior = null;
 
     protected function configure(): void
     {

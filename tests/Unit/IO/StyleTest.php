@@ -27,6 +27,8 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * StyleTest.
@@ -34,11 +36,9 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class StyleTest extends AbstractTestCase
+final class StyleTest extends AbstractTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfGivenStyleIsNotSupported(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -47,60 +47,49 @@ class StyleTest extends AbstractTestCase
         new Style('foo');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isSupportedReturnsTrueIfGivenStyleIsSupported(): void
     {
-        static::assertTrue(Style::isSupported(Style::NORMAL));
-        static::assertTrue(Style::isSupported(Style::JSON));
-        static::assertFalse(Style::isSupported('foo'));
+        self::assertTrue(Style::isSupported(Style::NORMAL));
+        self::assertTrue(Style::isSupported(Style::JSON));
+        self::assertFalse(Style::isSupported('foo'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isNormalReturnsTrueIfStyleIsNormal(): void
     {
         $subject = new Style(Style::NORMAL);
 
-        static::assertTrue($subject->isNormal());
-        static::assertFalse($subject->isJson());
-        static::assertFalse($subject->is('foo'));
+        self::assertTrue($subject->isNormal());
+        self::assertFalse($subject->isJson());
+        self::assertFalse($subject->is('foo'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isJsonReturnsTrueIfStyleIsJson(): void
     {
         $subject = new Style(Style::JSON);
 
-        static::assertTrue($subject->isJson());
-        static::assertFalse($subject->isNormal());
-        static::assertFalse($subject->is('foo'));
+        self::assertTrue($subject->isJson());
+        self::assertFalse($subject->isNormal());
+        self::assertFalse($subject->is('foo'));
     }
 
-    /**
-     * @dataProvider isReturnsTrueIfGivenStyleEqualsStyleDataProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('isReturnsTrueIfGivenStyleEqualsStyleDataProvider')]
     public function isReturnsTrueIfGivenStyleEqualsStyle(string $style): void
     {
         $subject = new Style($style);
 
-        static::assertTrue($subject->is($style));
+        self::assertTrue($subject->is($style));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getStyleReturnsStyle(): void
     {
         $subject = new Style(Style::JSON);
 
-        static::assertSame(Style::JSON, $subject->getStyle());
+        self::assertSame(Style::JSON, $subject->getStyle());
     }
 
     /**

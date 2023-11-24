@@ -27,6 +27,8 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * VerbosityTest.
@@ -34,11 +36,9 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class VerbosityTest extends AbstractTestCase
+final class VerbosityTest extends AbstractTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfGivenVerbosityIsNotSupported(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -47,89 +47,72 @@ class VerbosityTest extends AbstractTestCase
         new Verbosity(-1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isSupportedReturnsTrueIfVerbosityLevelIsSupported(): void
     {
-        static::assertTrue(Verbosity::isSupported(Verbosity::QUIET));
-        static::assertTrue(Verbosity::isSupported(Verbosity::NORMAL));
-        static::assertTrue(Verbosity::isSupported(Verbosity::VERBOSE));
-        static::assertTrue(Verbosity::isSupported(Verbosity::VERY_VERBOSE));
-        static::assertTrue(Verbosity::isSupported(Verbosity::DEBUG));
-        static::assertFalse(Verbosity::isSupported(-1));
+        self::assertTrue(Verbosity::isSupported(Verbosity::QUIET));
+        self::assertTrue(Verbosity::isSupported(Verbosity::NORMAL));
+        self::assertTrue(Verbosity::isSupported(Verbosity::VERBOSE));
+        self::assertTrue(Verbosity::isSupported(Verbosity::VERY_VERBOSE));
+        self::assertTrue(Verbosity::isSupported(Verbosity::DEBUG));
+        self::assertFalse(Verbosity::isSupported(-1));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isQuietReturnsTrueIfVerbosityLevelIsQuiet(): void
     {
         $subject = new Verbosity(Verbosity::QUIET);
 
-        static::assertTrue($subject->isQuiet());
+        self::assertTrue($subject->isQuiet());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isNormalReturnsTrueIfVerbosityLevelIsNormal(): void
     {
         $subject = new Verbosity(Verbosity::NORMAL);
 
-        static::assertTrue($subject->isNormal());
+        self::assertTrue($subject->isNormal());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isVerboseReturnsTrueIfVerbosityLevelIsVerbose(): void
     {
         $subject = new Verbosity(Verbosity::VERBOSE);
 
-        static::assertTrue($subject->isVerbose());
+        self::assertTrue($subject->isVerbose());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isVeryVerboseReturnsTrueIfVerbosityLevelIsVeryVerbose(): void
     {
         $subject = new Verbosity(Verbosity::VERY_VERBOSE);
 
-        static::assertTrue($subject->isVeryVerbose());
+        self::assertTrue($subject->isVeryVerbose());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isDebugReturnsTrueIfVerbosityLevelIsDebug(): void
     {
         $subject = new Verbosity(Verbosity::DEBUG);
 
-        static::assertTrue($subject->isDebug());
+        self::assertTrue($subject->isDebug());
     }
 
-    /**
-     * @dataProvider isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider')]
     public function isReturnsTrueIfGivenVerbosityEqualsVerbosity(int $verbosity): void
     {
         $subject = new Verbosity($verbosity);
 
-        static::assertTrue($subject->is($verbosity));
+        self::assertTrue($subject->is($verbosity));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getLevelReturnsVerbosityLevel(): void
     {
         $subject = new Verbosity(Verbosity::VERBOSE);
 
-        static::assertSame(Verbosity::VERBOSE, $subject->getLevel());
+        self::assertSame(Verbosity::VERBOSE, $subject->getLevel());
     }
 
     /**

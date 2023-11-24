@@ -28,6 +28,7 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * SecurityTest.
@@ -35,7 +36,7 @@ use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityTest extends AbstractTestCase
+final class SecurityTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
@@ -44,9 +45,7 @@ class SecurityTest extends AbstractTestCase
         $this->goToTestDirectory();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanReturnsSecurityVulnerabilities(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
@@ -54,13 +53,11 @@ class SecurityTest extends AbstractTestCase
 
         $scan = Security::scan([$securePackage, $insecurePackage]);
 
-        static::assertFalse($scan->isInsecure($securePackage));
-        static::assertTrue($scan->isInsecure($insecurePackage));
+        self::assertFalse($scan->isInsecure($securePackage));
+        self::assertTrue($scan->isInsecure($insecurePackage));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scanAndOverlayResultsAppliesInsecureFlagsToInsecureOutdatedPackages(): void
     {
         $securePackage = new OutdatedPackage('symfony/console', '4.4.0', '4.4.18');
@@ -69,8 +66,8 @@ class SecurityTest extends AbstractTestCase
 
         Security::scanAndOverlayResult($result);
 
-        static::assertFalse($securePackage->isInsecure());
-        static::assertTrue($insecurePackage->isInsecure());
+        self::assertFalse($securePackage->isInsecure());
+        self::assertTrue($insecurePackage->isInsecure());
     }
 
     protected function tearDown(): void

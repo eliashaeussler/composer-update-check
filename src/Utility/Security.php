@@ -34,7 +34,7 @@ use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Security
+final class Security
 {
     /**
      * @param OutdatedPackage[] $outdatedPackages
@@ -49,7 +49,7 @@ class Security
     public static function scanAndOverlayResult(UpdateCheckResult $result): UpdateCheckResult
     {
         $outdatedPackages = $result->getOutdatedPackages();
-        $scanResult = static::scan($outdatedPackages);
+        $scanResult = self::scan($outdatedPackages);
         foreach ($outdatedPackages as $outdatedPackage) {
             if ($scanResult->isInsecure($outdatedPackage)) {
                 $outdatedPackage->setInsecure(true);

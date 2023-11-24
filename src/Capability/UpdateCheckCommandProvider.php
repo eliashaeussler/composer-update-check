@@ -34,7 +34,7 @@ use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
  *
  * @codeCoverageIgnore
  */
-class UpdateCheckCommandProvider implements CommandProvider
+final class UpdateCheckCommandProvider implements CommandProvider
 {
     public function getCommands(): array
     {

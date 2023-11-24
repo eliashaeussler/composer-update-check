@@ -38,10 +38,7 @@ use Composer\IO\BufferIO;
  */
 final class Installer
 {
-    /**
-     * @var BufferIO|null
-     */
-    private static $io;
+    private static ?BufferIO $io = null;
 
     public static function runInstall(Composer $composer): int
     {

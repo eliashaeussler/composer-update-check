@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Security\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * InsecurePackageTest.
@@ -32,49 +33,38 @@ use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class InsecurePackageTest extends AbstractTestCase
+final class InsecurePackageTest extends AbstractTestCase
 {
-    /**
-     * @var InsecurePackage
-     */
-    protected $subject;
+    private InsecurePackage $subject;
 
     protected function setUp(): void
     {
         $this->subject = new InsecurePackage('foo', ['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getNameReturnsInsecurePackageName(): void
     {
-        static::assertSame('foo', $this->subject->getName());
+        self::assertSame('foo', $this->subject->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getNameSetsNameOfInsecurePackage(): void
     {
         $this->subject->setName('baz');
-        static::assertSame('baz', $this->subject->getName());
+        self::assertSame('baz', $this->subject->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getAffectedVersionsReturnsAffectedVersionsOfInsecurePackage(): void
     {
-        static::assertSame(['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0'], $this->subject->getAffectedVersions());
+        self::assertSame(['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0'], $this->subject->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function setAffectedVersionsSetsAffectedVersionsOfInsecurePackage(): void
     {
         $this->subject->setAffectedVersions(['3.0.0']);
-        static::assertSame(['3.0.0'], $this->subject->getAffectedVersions());
+        self::assertSame(['3.0.0'], $this->subject->getAffectedVersions());
     }
 }

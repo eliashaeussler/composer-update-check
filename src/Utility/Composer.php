@@ -43,16 +43,12 @@ final class Composer
         $platformVersion = PluginInterface::PLUGIN_API_VERSION;
         $versionComponents = explode('.', $platformVersion);
 
-        switch ($versionType) {
-            case self::VERSION_FULL:
-                return $platformVersion;
-            case self::VERSION_MAJOR:
-                return $versionComponents[0];
-            case self::VERSION_BRANCH:
-                return $versionComponents[0].'.'.$versionComponents[1];
-            default:
-                throw new InvalidArgumentException('The given version type is not supported.', 1603794822);
-        }
+        return match ($versionType) {
+            self::VERSION_FULL => $platformVersion,
+            self::VERSION_MAJOR => $versionComponents[0],
+            self::VERSION_BRANCH => $versionComponents[0].'.'.$versionComponents[1],
+            default => throw new InvalidArgumentException('The given version type is not supported.', 1603794822),
+        };
     }
 
     public static function getMajorVersion(): int

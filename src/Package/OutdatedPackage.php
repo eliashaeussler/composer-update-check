@@ -32,41 +32,18 @@ use Psr\Http\Message\UriInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class OutdatedPackage
+final class OutdatedPackage
 {
     private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
 
-    /**
-     * @var string
-     */
-    private $name;
+    private UriInterface $providerLink;
 
-    /**
-     * @var string
-     */
-    private $outdatedVersion;
-
-    /**
-     * @var string
-     */
-    private $newVersion;
-
-    /**
-     * @var bool
-     */
-    private $insecure;
-
-    /**
-     * @var UriInterface
-     */
-    private $providerLink;
-
-    public function __construct(string $name, string $outdatedVersion, string $newVersion, bool $insecure = false)
-    {
-        $this->name = $name;
-        $this->outdatedVersion = $outdatedVersion;
-        $this->newVersion = $newVersion;
-        $this->insecure = $insecure;
+    public function __construct(
+        private string $name,
+        private string $outdatedVersion,
+        private string $newVersion,
+        private bool $insecure = false,
+    ) {
         $this->providerLink = $this->generateProviderLink();
     }
 

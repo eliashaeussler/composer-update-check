@@ -39,34 +39,18 @@ use Spatie\Emoji\Emoji;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateChecker
+final class UpdateChecker
 {
-    /**
-     * @var Composer
-     */
-    private $composer;
-
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
-
-    /**
-     * @var Options
-     */
-    private $options;
-
     /**
      * @var string[]
      */
-    private $packageBlacklist = [];
+    private array $packageBlacklist = [];
 
-    public function __construct(Composer $composer, OutputBehavior $behavior, Options $options)
-    {
-        $this->composer = $composer;
-        $this->behavior = $behavior;
-        $this->options = $options;
-    }
+    public function __construct(
+        private readonly Composer $composer,
+        private readonly OutputBehavior $behavior,
+        private readonly Options $options,
+    ) {}
 
     public function run(): UpdateCheckResult
     {

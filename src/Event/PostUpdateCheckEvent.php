@@ -36,40 +36,22 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
  *
  * @codeCoverageIgnore
  */
-class PostUpdateCheckEvent extends Event
+final class PostUpdateCheckEvent extends Event
 {
     public const NAME = 'post-update-check';
-
-    /**
-     * @var UpdateCheckResult
-     */
-    private $updateCheckResult;
-
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
-
-    /**
-     * @var Options
-     */
-    private $options;
 
     /**
      * @param string[] $args
      * @param string[] $flags
      */
     public function __construct(
-        UpdateCheckResult $updateCheckResult,
-        OutputBehavior $behavior,
-        Options $options,
+        private readonly UpdateCheckResult $updateCheckResult,
+        private readonly OutputBehavior $behavior,
+        private readonly Options $options,
         array $args = [],
         array $flags = [],
     ) {
         parent::__construct(self::NAME, $args, $flags);
-        $this->updateCheckResult = $updateCheckResult;
-        $this->behavior = $behavior;
-        $this->options = $options;
     }
 
     public function getUpdateCheckResult(): UpdateCheckResult

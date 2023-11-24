@@ -29,7 +29,6 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use RuntimeException;
 use Symfony\Component\HttpClient\Psr18Client;
 
@@ -39,19 +38,12 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityScanner
+final class SecurityScanner
 {
     public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
 
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
+    private readonly Psr17Factory $requestFactory;
+    private readonly ClientInterface $client;
 
     public function __construct(ClientInterface $client = null)
     {

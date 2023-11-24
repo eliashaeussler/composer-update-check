@@ -31,9 +31,9 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckResult
+final class UpdateCheckResult
 {
-    protected const COMMAND_OUTPUT_PATTERN =
+    private const COMMAND_OUTPUT_PATTERN =
         '#^'.
             '\\s*- Upgrading '.
             '(?P<name>\\S+) \\('.
@@ -42,7 +42,7 @@ class UpdateCheckResult
                 '(?P<new>dev-\S+ \S+|(?!dev-)\S+)'.
             '\\)'.
         '$#';
-    protected const LEGACY_COMMAND_OUTPUT_PATTERN =
+    private const LEGACY_COMMAND_OUTPUT_PATTERN =
         '#^'.
             '\\s*- Updating '.
             '(?P<name>dev-\\S+ \\S+|(?!dev-)\\S+) \\('.
@@ -55,16 +55,15 @@ class UpdateCheckResult
     /**
      * @var OutdatedPackage[]
      */
-    private $outdatedPackages;
+    private readonly array $outdatedPackages;
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
      */
     public function __construct(array $outdatedPackages)
     {
-        $this->outdatedPackages = $outdatedPackages;
-        $this->validateOutdatedPackages();
-        $this->sortPackages($this->outdatedPackages);
+        $this->validateOutdatedPackages($outdatedPackages);
+        $this->outdatedPackages = $this->sortPackages($outdatedPackages);
     }
 
     /**
@@ -83,7 +82,7 @@ class UpdateCheckResult
         $outputParts = explode(PHP_EOL, $output);
         $packages = array_unique(
             array_filter(
-                array_map([static::class, 'parseCommandOutput'], $outputParts),
+                array_map([self::class, 'parseCommandOutput'], $outputParts),
                 function (?OutdatedPackage $outdatedPackage) use ($allowedPackages) {
                     if (null === $outdatedPackage) {
                         return false;
@@ -101,8 +100,8 @@ class UpdateCheckResult
     public static function parseCommandOutput(string $output): ?OutdatedPackage
     {
         if (
-            !preg_match(static::COMMAND_OUTPUT_PATTERN, $output, $matches)
-            && !preg_match(static::LEGACY_COMMAND_OUTPUT_PATTERN, $output, $matches)
+            !preg_match(self::COMMAND_OUTPUT_PATTERN, $output, $matches)
+            && !preg_match(self::LEGACY_COMMAND_OUTPUT_PATTERN, $output, $matches)
         ) {
             return null;
         }
@@ -115,17 +114,22 @@ class UpdateCheckResult
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
+     *
+     * @return OutdatedPackage[]
      */
-    private function sortPackages(array &$outdatedPackages): void
+    private function sortPackages(array $outdatedPackages): array
     {
-        usort($outdatedPackages, function (OutdatedPackage $a, OutdatedPackage $b) {
-            return strcmp($a->getName(), $b->getName());
-        });
+        usort($outdatedPackages, fn (OutdatedPackage $a, OutdatedPackage $b) => strcmp($a->getName(), $b->getName()));
+
+        return $outdatedPackages;
     }
 
-    private function validateOutdatedPackages(): void
+    /**
+     * @param OutdatedPackage[] $outdatedPackages
+     */
+    private function validateOutdatedPackages(array $outdatedPackages): void
     {
-        foreach ($this->outdatedPackages as $key => $outdatedPackage) {
+        foreach ($outdatedPackages as $key => $outdatedPackage) {
             if (!($outdatedPackage instanceof OutdatedPackage)) {
                 throw new InvalidArgumentException(sprintf('Outdated package #%s must be an instance of "%s".', $key, OutdatedPackage::class), 1600276584);
             }

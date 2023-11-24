@@ -34,6 +34,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * UpdateCheckerTest.
@@ -41,29 +42,14 @@ use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckerTest extends AbstractTestCase
+final class UpdateCheckerTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
-    /**
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
-     * @var OutputBehavior
-     */
-    protected $behavior;
-
-    /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
-     * @var UpdateChecker
-     */
-    protected $subject;
+    private Composer $composer;
+    private OutputBehavior $behavior;
+    private Options $options;
+    private UpdateChecker $subject;
 
     /**
      * @throws JsonValidationException
@@ -79,10 +65,9 @@ class UpdateCheckerTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     *
      * @throws JsonValidationException
      */
+    #[Test]
     public function runReturnsEmptyUpdateCheckResultIfNoPackagesAreRequired(): void
     {
         $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
@@ -90,24 +75,20 @@ class UpdateCheckerTest extends AbstractTestCase
         $subject = new UpdateChecker($this->getComposer(), $this->behavior, $this->options);
 
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $subject->run());
+        self::assertEquals($expected, $subject->run());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
     {
         $this->options->setIgnorePackages(['symfony/*']);
         $this->options->setIncludeDevPackages(false);
 
         $expected = new UpdateCheckResult([]);
-        static::assertEquals($expected, $this->subject->run());
+        self::assertEquals($expected, $this->subject->run());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultWithoutDevRequirements(): void
     {
         $this->options->setIncludeDevPackages(false);
@@ -116,20 +97,18 @@ class UpdateCheckerTest extends AbstractTestCase
         $firstOutdatedPackage = reset($outdatedPackages);
         $secondOutdatedPackage = next($outdatedPackages);
 
-        static::assertCount(2, $outdatedPackages);
+        self::assertCount(2, $outdatedPackages);
 
-        static::assertSame('symfony/console', $firstOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $firstOutdatedPackage->getNewVersion());
+        self::assertSame('symfony/console', $firstOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $firstOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $firstOutdatedPackage->getNewVersion());
 
-        static::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultWithoutSkippedPackages(): void
     {
         $this->options->setIgnorePackages(['symfony/console']);
@@ -138,20 +117,18 @@ class UpdateCheckerTest extends AbstractTestCase
         $firstOutdatedPackage = reset($outdatedPackages);
         $secondOutdatedPackage = next($outdatedPackages);
 
-        static::assertCount(2, $outdatedPackages);
+        self::assertCount(2, $outdatedPackages);
 
-        static::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
-        static::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
+        self::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
+        self::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
 
-        static::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('symfony/http-kernel', $secondOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultListOfOutdatedPackages(): void
     {
         $outdatedPackages = $this->subject->run()->getOutdatedPackages();
@@ -159,24 +136,22 @@ class UpdateCheckerTest extends AbstractTestCase
         $secondOutdatedPackage = next($outdatedPackages);
         $thirdOutdatedPackage = next($outdatedPackages);
 
-        static::assertCount(3, $outdatedPackages);
+        self::assertCount(3, $outdatedPackages);
 
-        static::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
-        static::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
+        self::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
+        self::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
 
-        static::assertSame('symfony/console', $secondOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertSame('symfony/console', $secondOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
 
-        static::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $thirdOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $thirdOutdatedPackage->getNewVersion());
+        self::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $thirdOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $thirdOutdatedPackage->getNewVersion());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runReturnsUpdateCheckResultListOfOutdatedPackagesAndFlagsInsecurePackages(): void
     {
         $this->options->setPerformSecurityScan(true);
@@ -186,41 +161,39 @@ class UpdateCheckerTest extends AbstractTestCase
         $secondOutdatedPackage = next($outdatedPackages);
         $thirdOutdatedPackage = next($outdatedPackages);
 
-        static::assertCount(3, $outdatedPackages);
+        self::assertCount(3, $outdatedPackages);
 
-        static::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
-        static::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
-        static::assertTrue($firstOutdatedPackage->isInsecure());
+        self::assertSame('codeception/codeception', $firstOutdatedPackage->getName());
+        self::assertSame('4.1.9', $firstOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('4.1.9', $firstOutdatedPackage->getNewVersion());
+        self::assertTrue($firstOutdatedPackage->isInsecure());
 
-        static::assertSame('symfony/console', $secondOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
-        static::assertFalse($secondOutdatedPackage->isInsecure());
+        self::assertSame('symfony/console', $secondOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $secondOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $secondOutdatedPackage->getNewVersion());
+        self::assertFalse($secondOutdatedPackage->isInsecure());
 
-        static::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
-        static::assertSame('v4.4.9', $thirdOutdatedPackage->getOutdatedVersion());
-        static::assertNotSame('v4.4.9', $thirdOutdatedPackage->getNewVersion());
-        static::assertTrue($thirdOutdatedPackage->isInsecure());
+        self::assertSame('symfony/http-kernel', $thirdOutdatedPackage->getName());
+        self::assertSame('v4.4.9', $thirdOutdatedPackage->getOutdatedVersion());
+        self::assertNotSame('v4.4.9', $thirdOutdatedPackage->getNewVersion());
+        self::assertTrue($thirdOutdatedPackage->isInsecure());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function runDispatchesPostUpdateCheckEvent(): void
     {
         $listener = function (PostUpdateCheckEvent $event) {
             $outdatedPackages = $event->getUpdateCheckResult()->getOutdatedPackages();
 
-            static::assertSame($this->behavior, $event->getBehavior());
-            static::assertSame($this->options, $event->getOptions());
+            self::assertSame($this->behavior, $event->getBehavior());
+            self::assertSame($this->options, $event->getOptions());
 
             $outdatedPackage = reset($outdatedPackages);
 
-            static::assertCount(1, $outdatedPackages);
-            static::assertSame('symfony/http-kernel', $outdatedPackage->getName());
-            static::assertSame('v4.4.9', $outdatedPackage->getOutdatedVersion());
-            static::assertNotSame('v4.4.9', $outdatedPackage->getNewVersion());
+            self::assertCount(1, $outdatedPackages);
+            self::assertSame('symfony/http-kernel', $outdatedPackage->getName());
+            self::assertSame('v4.4.9', $outdatedPackage->getOutdatedVersion());
+            self::assertNotSame('v4.4.9', $outdatedPackage->getNewVersion());
         };
 
         $this->options->setIgnorePackages(['symfony/console']);

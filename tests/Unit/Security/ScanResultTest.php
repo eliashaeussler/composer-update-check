@@ -29,6 +29,8 @@ use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ScanResultTest.
@@ -36,11 +38,9 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ScanResultTest extends AbstractTestCase
+final class ScanResultTest extends AbstractTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function constructorThrowsExceptionIfGivenInsecurePackagesAreInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -52,20 +52,16 @@ class ScanResultTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     *
-     * @dataProvider fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider
-     *
      * @param array<string, mixed> $apiResult
      */
+    #[Test]
+    #[DataProvider('fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvidedDataProvider')]
     public function fromApiResultReturnsEmptyScanResultObjectIfNoSecurityAdvisoriesWereProvided(array $apiResult): void
     {
-        static::assertSame([], ScanResult::fromApiResult($apiResult)->getInsecurePackages());
+        self::assertSame([], ScanResult::fromApiResult($apiResult)->getInsecurePackages());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function fromApiResultReturnsScanResultObjectWithInsecurePackages(): void
     {
         $apiResult = [
@@ -89,16 +85,14 @@ class ScanResultTest extends AbstractTestCase
         $subject = ScanResult::fromApiResult($apiResult);
         $insecurePackages = $subject->getInsecurePackages();
 
-        static::assertCount(2, $insecurePackages);
-        static::assertSame('foo', $insecurePackages[0]->getName());
-        static::assertSame(['>=1.0.0,<1.1.0', '2.0.0'], $insecurePackages[0]->getAffectedVersions());
-        static::assertSame('baz', $insecurePackages[1]->getName());
-        static::assertSame(['1.0.0-alpha-1'], $insecurePackages[1]->getAffectedVersions());
+        self::assertCount(2, $insecurePackages);
+        self::assertSame('foo', $insecurePackages[0]->getName());
+        self::assertSame(['>=1.0.0,<1.1.0', '2.0.0'], $insecurePackages[0]->getAffectedVersions());
+        self::assertSame('baz', $insecurePackages[1]->getName());
+        self::assertSame(['1.0.0-alpha-1'], $insecurePackages[1]->getAffectedVersions());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getInsecurePackagesReturnsInsecurePackagesFromScanResult(): void
     {
         $insecurePackages = [
@@ -107,15 +101,12 @@ class ScanResultTest extends AbstractTestCase
         ];
         $subject = new ScanResult($insecurePackages);
 
-        static::assertCount(2, $subject->getInsecurePackages());
-        static::assertSame($insecurePackages, $subject->getInsecurePackages());
+        self::assertCount(2, $subject->getInsecurePackages());
+        self::assertSame($insecurePackages, $subject->getInsecurePackages());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider isInsecureReturnsSecurityStateOfGivenPackageDataProvider
-     */
+    #[Test]
+    #[DataProvider('isInsecureReturnsSecurityStateOfGivenPackageDataProvider')]
     public function isInsecureReturnsSecurityStateOfGivenPackage(OutdatedPackage $outdatedPackage, bool $expected): void
     {
         $insecurePackages = [
@@ -124,7 +115,7 @@ class ScanResultTest extends AbstractTestCase
         ];
         $subject = new ScanResult($insecurePackages);
 
-        static::assertSame($expected, $subject->isInsecure($outdatedPackage));
+        self::assertSame($expected, $subject->isInsecure($outdatedPackage));
     }
 
     /**
