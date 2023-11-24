@@ -11,5 +11,5 @@
 /composer.lock
 /Dockerfile
 /mkdocs.yml
-/phpstan.neon
+/phpstan.php
 /phpunit.xml
