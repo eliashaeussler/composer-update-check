@@ -2,6 +2,25 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Composer package "eliashaeussler/composer-update-check".
+ *
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\IO;
 
 /*
@@ -25,6 +44,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\IO;
 
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use Generator;
+use InvalidArgumentException;
 
 /**
  * VerbosityTest.
@@ -39,7 +60,7 @@ class VerbosityTest extends AbstractTestCase
      */
     public function constructorThrowsExceptionIfGivenVerbosityIsNotSupported(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1617549839);
 
         new Verbosity(-1);
@@ -131,9 +152,9 @@ class VerbosityTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array{int}>
+     * @return Generator<string, array{int}>
      */
-    public static function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): \Generator
+    public static function isReturnsTrueIfGivenVerbosityEqualsVerbosityDataProvider(): Generator
     {
         yield 'quiet level' => [Verbosity::QUIET];
         yield 'normal level' => [Verbosity::NORMAL];

@@ -2,6 +2,25 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Composer package "eliashaeussler/composer-update-check".
+ *
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
 
 /*
@@ -27,6 +46,8 @@ use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
+use Generator;
+use InvalidArgumentException;
 
 /**
  * UpdateCheckResultTest.
@@ -43,7 +64,7 @@ class UpdateCheckResultTest extends AbstractTestCase
      */
     public function constructorThrowsExceptionIfOutdatedPackagesAreInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1600276584);
 
         /* @noinspection PhpParamsInspection */
@@ -73,7 +94,7 @@ class UpdateCheckResultTest extends AbstractTestCase
      */
     public function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackages(
         string $commandOutput,
-        array $expected
+        array $expected,
     ): void {
         $subject = UpdateCheckResult::fromCommandOutput($commandOutput, ['dummy/package', 'foo/baz']);
         $outdatedPackages = $subject->getOutdatedPackages();
@@ -122,9 +143,9 @@ class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array{string, array<OutdatedPackage>}>
+     * @return Generator<string, array{string, array<OutdatedPackage>}>
      */
-    public static function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): \Generator
+    public static function fromCommandOutputReturnsInstanceWithListOfCorrectlyParsedOutdatedPackagesDataProvider(): Generator
     {
         yield 'no output' => [
             '',
@@ -151,9 +172,9 @@ class UpdateCheckResultTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array{string, OutdatedPackage|null}>
+     * @return Generator<string, array{string, OutdatedPackage|null}>
      */
-    public static function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): \Generator
+    public static function parseCommandOutputParsesCommandOutputCorrectlyDataProvider(): Generator
     {
         yield 'no output' => [
             '',

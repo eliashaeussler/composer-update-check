@@ -2,6 +2,25 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Composer package "eliashaeussler/composer-update-check".
+ *
+ * Copyright (C) 2023 Elias Häußler <elias@haeussler.dev>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 /*
@@ -65,25 +84,25 @@ class UpdateCheckCommand extends BaseCommand
             'i',
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
             'Packages to ignore when checking for available updates',
-            []
+            [],
         );
         $this->addOption(
             'no-dev',
             null,
             InputOption::VALUE_NONE,
-            'Disables update check of require-dev packages.'
+            'Disables update check of require-dev packages.',
         );
         $this->addOption(
             'security-scan',
             's',
             InputOption::VALUE_NONE,
-            'Run security scan for all outdated packages'
+            'Run security scan for all outdated packages',
         );
         $this->addOption(
             'json',
             'j',
             InputOption::VALUE_NONE,
-            'Format update check as JSON'
+            'Format update check as JSON',
         );
     }
 
@@ -124,7 +143,7 @@ class UpdateCheckCommand extends BaseCommand
             $countSkipped = count($ignoredPackages);
             $message = sprintf(
                 'All packages are up to date%s.',
-                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : ''
+                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : '',
             );
             if ($this->behavior->style->isJson()) {
                 $this->buildJsonReport(['status' => $message], $ignoredPackages);
