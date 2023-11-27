@@ -31,7 +31,6 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
 use RuntimeException;
-use Spatie\Emoji\Emoji;
 
 /**
  * UpdateChecker.
@@ -55,7 +54,7 @@ final class UpdateChecker
     public function run(): UpdateCheckResult
     {
         // Resolve packages to be checked
-        $this->behavior->io->write(Emoji::package().' Resolving packages...', true, IOInterface::VERBOSE);
+        $this->behavior->io->write('📦 Resolving packages...', true, IOInterface::VERBOSE);
         $packages = $this->resolvePackagesForUpdateCheck();
 
         // Run update check
@@ -63,7 +62,7 @@ final class UpdateChecker
 
         // Overlay security scan
         if ($this->options->isPerformingSecurityScan() && [] !== $result->getOutdatedPackages()) {
-            $this->behavior->io->write(Emoji::policeCarLight().' Checking for insecure packages...', true, IOInterface::VERBOSE);
+            $this->behavior->io->write('🚨 Checking for insecure packages...', true, IOInterface::VERBOSE);
             $result = Security::scanAndOverlayResult($result);
         }
 
@@ -87,7 +86,7 @@ final class UpdateChecker
         $this->installDependencies();
 
         // Run Composer installer
-        $this->behavior->io->write(Emoji::hourglassNotDone().' Checking for outdated packages...', true, IOInterface::VERBOSE);
+        $this->behavior->io->write('⏳ Checking for outdated packages...', true, IOInterface::VERBOSE);
         $result = Installer::runUpdate($packages, $this->composer);
 
         // Handle installer failures
@@ -125,7 +124,7 @@ final class UpdateChecker
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
         } else {
             $this->packageBlacklist = array_merge($this->packageBlacklist, $requiredDevPackages);
-            $this->behavior->io->write(Emoji::prohibited().' Skipped dev-requirements', true, IOInterface::VERBOSE);
+            $this->behavior->io->write('🚫 Skipped dev-requirements', true, IOInterface::VERBOSE);
         }
 
         // Remove blacklisted packages
@@ -147,7 +146,7 @@ final class UpdateChecker
             if (!fnmatch($pattern, $package)) {
                 return true;
             }
-            $this->behavior->io->write(sprintf('%s Skipped "%s"', Emoji::prohibited(), $package), true, IOInterface::VERBOSE);
+            $this->behavior->io->write(sprintf('🚫 Skipped "%s"', $package), true, IOInterface::VERBOSE);
             $this->packageBlacklist[] = $package;
 
             return false;

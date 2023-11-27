@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "589ea1dd2476547caa86af42ebbe561e",
+    "content-hash": "8ba30970b992bf163ef5c442b8fea10f",
     "packages": [
         {
             "name": "nyholm/psr7",
@@ -346,72 +346,6 @@
                 "source": "https://github.com/php-fig/log/tree/3.0.0"
             },
             "time": "2021-07-14T16:46:02+00:00"
-        },
-        {
-            "name": "spatie/emoji",
-            "version": "4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/emoji.git",
-                "reference": "aa9b01775ad3ff825914dab77f10fb8aa9aa297e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/emoji/zipball/aa9b01775ad3ff825914dab77f10fb8aa9aa297e",
-                "reference": "aa9b01775ad3ff825914dab77f10fb8aa9aa297e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "ext-iconv": "*",
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.0",
-                "phpunit/phpunit": "^9.4",
-                "symfony/console": "^4.2",
-                "twig/twig": "^2.7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\Emoji\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Display emoji characters",
-            "homepage": "https://github.com/spatie/emoji",
-            "keywords": [
-                "emoji",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/emoji/issues",
-                "source": "https://github.com/spatie/emoji/tree/4.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-09-22T07:46:11+00:00"
         },
         {
             "name": "symfony/console",
@@ -6451,5 +6385,5 @@
         "composer-plugin-api": "^2.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
