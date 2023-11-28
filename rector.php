@@ -37,7 +37,6 @@ return static function (RectorConfig $rectorConfig): void {
         ->skip(
             AnnotationToAttributeRector::class,
             [
-                __DIR__.'/src/Capability/UpdateCheckCommandProvider.php',
                 __DIR__.'/src/Event/PostUpdateCheckEvent.php',
                 __DIR__.'/src/Plugin.php',
             ],

@@ -28,7 +28,6 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
 
 /**
  * Plugin.
@@ -38,7 +37,7 @@ use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
  *
  * @codeCoverageIgnore
  */
-final class Plugin implements PluginInterface, Capable
+final class Plugin implements PluginInterface, Capable, CommandProvider
 {
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -58,7 +57,14 @@ final class Plugin implements PluginInterface, Capable
     public function getCapabilities(): array
     {
         return [
-            CommandProvider::class => UpdateCheckCommandProvider::class,
+            CommandProvider::class => self::class,
+        ];
+    }
+
+    public function getCommands(): array
+    {
+        return [
+            new Command\UpdateCheckCommand(),
         ];
     }
 }
