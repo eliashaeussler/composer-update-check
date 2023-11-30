@@ -34,14 +34,14 @@ use function realpath;
 use function sprintf;
 
 /**
- * GitHubActionsFormatter.
+ * GitHubFormatter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class GitHubActionsFormatter implements Formatter
+final class GitHubFormatter implements Formatter
 {
-    public const FORMAT = 'github-actions';
+    public const FORMAT = 'github';
 
     public function __construct(
         private (OutputInterface&StyleInterface)|null $io = null,
