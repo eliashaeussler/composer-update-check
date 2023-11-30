@@ -27,7 +27,7 @@ use Composer\Composer;
 use Composer\DependencyResolver\Request;
 use Composer\Installer;
 use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 
 use function array_map;
 

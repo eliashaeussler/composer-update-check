@@ -21,29 +21,54 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Package;
-
-use Stringable;
+namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
 
 /**
- * Version.
+ * InsecurePackage.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class Version implements Stringable
+final readonly class InsecurePackage implements Package
 {
+    /**
+     * @param non-empty-string       $name
+     * @param list<non-empty-string> $affectedVersions
+     */
     public function __construct(
-        private string $version,
+        private string $name,
+        private array $affectedVersions,
     ) {}
 
-    public function get(): string
+    public function getName(): string
     {
-        return $this->version;
+        return $this->name;
+    }
+
+    /**
+     * @return list<non-empty-string>
+     */
+    public function getAffectedVersions(): array
+    {
+        return $this->affectedVersions;
+    }
+
+    /**
+     * @return array{
+     *     name: non-empty-string,
+     *     affectedVersions: list<non-empty-string>,
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'affectedVersions' => $this->affectedVersions,
+        ];
     }
 
     public function __toString(): string
     {
-        return $this->version;
+        return $this->name;
     }
 }

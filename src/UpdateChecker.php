@@ -32,8 +32,8 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePatte
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerInstallFailed;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerUpdateFailed;
-use EliasHaeussler\ComposerUpdateCheck\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Package\InstalledPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InstalledPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 use function array_map;

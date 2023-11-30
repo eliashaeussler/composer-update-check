@@ -21,8 +21,9 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Package;
+namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
 
+use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 

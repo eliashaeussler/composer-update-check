@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;

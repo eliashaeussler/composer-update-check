@@ -21,38 +21,21 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Package;
+namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
+
+use JsonSerializable;
+use Stringable;
 
 /**
- * InstalledPackage.
+ * Package.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class InstalledPackage implements Package
+interface Package extends JsonSerializable, Stringable
 {
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(
-        private string $name,
-    ) {}
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     /**
      * @return non-empty-string
      */
-    public function jsonSerialize(): string
-    {
-        return $this->name;
-    }
-
-    public function __toString(): string
-    {
-        return $this->name;
-    }
+    public function getName(): string;
 }

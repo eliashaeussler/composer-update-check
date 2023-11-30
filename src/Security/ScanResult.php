@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 use Composer\Semver\Semver;
-use EliasHaeussler\ComposerUpdateCheck\Package\InsecurePackage;
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InsecurePackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use InvalidArgumentException;
 
 /**
