@@ -24,17 +24,22 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 use Composer\Command\BaseCommand;
+use CuyZ\Valinor\Mapper\Tree\Message\Messages;
+use CuyZ\Valinor\Mapper\Tree\Message\NodeMessage;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ChainedConfigAdapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\CommandInputConfigAdapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ConfigAdapterFactory;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
 use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function array_map;
+use function sprintf;
 
 /**
  * UpdateCheckCommand.
@@ -44,6 +49,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class UpdateCheckCommand extends BaseCommand
 {
+    private SymfonyStyle $io;
+
     public function __construct(
         private readonly FormatterFactory $formatterFactory,
         private readonly UpdateChecker $updateChecker,
@@ -89,18 +96,25 @@ final class UpdateCheckCommand extends BaseCommand
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->formatterFactory->setIO(new SymfonyStyle($input, $output));
+        $this->io = new SymfonyStyle($input, $output);
+        $this->formatterFactory->setIO($this->io);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $config = $this->resolveConfiguration($input);
-        $result = $this->updateChecker->run($config);
+        try {
+            $config = $this->resolveConfiguration($input);
+        } catch (ConfigFileHasErrors $exception) {
+            $this->displayMappingErrors($exception);
+
+            return self::FAILURE;
+        }
 
         $formatter = $this->formatterFactory->make($config->getFormat());
+        $result = $this->updateChecker->run($config);
         $formatter->formatResult($result);
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     private function resolveConfiguration(InputInterface $input): ComposerUpdateCheckConfig
@@ -117,5 +131,21 @@ final class UpdateCheckCommand extends BaseCommand
         }
 
         return $configAdapter->resolve();
+    }
+
+    private function displayMappingErrors(ConfigFileHasErrors $exception): void
+    {
+        $errors = Messages::flattenFromNode($exception->error->node())->errors();
+
+        $this->io->error($exception->getMessage());
+        $this->io->writeln('The following errors occurred:');
+        $this->io->listing(
+            array_map($this->formatErrorMessage(...), $errors->toArray()),
+        );
+    }
+
+    private function formatErrorMessage(NodeMessage $message): string
+    {
+        return sprintf('<comment>%s</comment>: %s', $message->node()->path(), $message->toString());
     }
 }

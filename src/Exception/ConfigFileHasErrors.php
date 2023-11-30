@@ -21,33 +21,27 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
 use CuyZ\Valinor\Mapper\MappingError;
-use CuyZ\Valinor\Mapper\Source\Source;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
-use SplFileObject;
+
+use function sprintf;
 
 /**
- * JsonConfigAdapter.
+ * ConfigFileIsInvalid.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class JsonConfigAdapter extends FileBasedConfigAdapter
+final class ConfigFileHasErrors extends Exception
 {
-    /**
-     * @throws ConfigFileHasErrors
-     */
-    public function resolve(): ComposerUpdateCheckConfig
-    {
-        $source = Source::file(new SplFileObject($this->filename));
-
-        try {
-            return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
-        } catch (MappingError $error) {
-            throw new ConfigFileHasErrors($this->filename, $error);
-        }
+    public function __construct(
+        string $filename,
+        public readonly MappingError $error,
+    ) {
+        parent::__construct(
+            sprintf('The file "%s" has errors and cannot be mapped.', $filename),
+            1701204777,
+        );
     }
 }

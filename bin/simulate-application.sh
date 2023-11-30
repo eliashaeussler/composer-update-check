@@ -21,6 +21,7 @@ function cleanup() {
 trap cleanup INT ERR EXIT
 
 # Prepare temporary application
+rm -rf "${TEMP_PATH}"
 cp -r "${APP_PATH}" "${TEMP_PATH}"
 rm -rf "${TEMP_PATH}/vendor"
 composer config --working-dir "${TEMP_PATH}" repositories.local path "${ROOT_PATH}"

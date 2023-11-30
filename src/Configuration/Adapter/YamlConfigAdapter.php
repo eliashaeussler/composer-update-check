@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 use CuyZ\Valinor\Mapper\MappingError;
 use CuyZ\Valinor\Mapper\Source\Source;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsInvalid;
 use Symfony\Component\Yaml\Yaml;
 
@@ -40,8 +41,8 @@ use function is_iterable;
 final readonly class YamlConfigAdapter extends FileBasedConfigAdapter
 {
     /**
+     * @throws ConfigFileHasErrors
      * @throws ConfigFileIsInvalid
-     * @throws MappingError
      */
     public function resolve(): ComposerUpdateCheckConfig
     {
@@ -53,6 +54,10 @@ final readonly class YamlConfigAdapter extends FileBasedConfigAdapter
 
         $source = Source::iterable($yaml);
 
-        return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
+        try {
+            return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
+        } catch (MappingError $error) {
+            throw new ConfigFileHasErrors($this->filename, $error);
+        }
     }
 }
