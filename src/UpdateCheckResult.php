@@ -115,7 +115,11 @@ final class UpdateCheckResult
             return null;
         }
 
-        return new Package\OutdatedPackage($matches['name'], $matches['outdated'], $matches['new']);
+        return new Package\OutdatedPackage(
+            $matches['name'],
+            new Package\Version($matches['outdated']),
+            new Package\Version($matches['new']),
+        );
     }
 
     /**

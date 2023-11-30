@@ -92,7 +92,7 @@ final readonly class ScanResult
             if ($insecurePackage->getName() === $outdatedPackage->getName()) {
                 $insecureVersions = implode('|', $insecurePackage->getAffectedVersions());
 
-                return Semver::satisfies($outdatedPackage->getOutdatedVersion(), $insecureVersions);
+                return Semver::satisfies($outdatedPackage->getOutdatedVersion()->get(), $insecureVersions);
             }
         }
 

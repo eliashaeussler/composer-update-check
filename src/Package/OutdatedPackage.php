@@ -43,8 +43,8 @@ final class OutdatedPackage implements Package
      */
     public function __construct(
         private readonly string $name,
-        private readonly string $outdatedVersion,
-        private readonly string $newVersion,
+        private readonly Version $outdatedVersion,
+        private readonly Version $newVersion,
         private bool $insecure = false,
     ) {
         $this->providerLink = $this->generateProviderLink();
@@ -55,12 +55,12 @@ final class OutdatedPackage implements Package
         return $this->name;
     }
 
-    public function getOutdatedVersion(): string
+    public function getOutdatedVersion(): Version
     {
         return $this->outdatedVersion;
     }
 
-    public function getNewVersion(): string
+    public function getNewVersion(): Version
     {
         return $this->newVersion;
     }
@@ -102,8 +102,8 @@ final class OutdatedPackage implements Package
     {
         return [
             'name' => $this->name,
-            'outdatedVersion' => $this->outdatedVersion,
-            'newVersion' => $this->newVersion,
+            'outdatedVersion' => (string) $this->outdatedVersion,
+            'newVersion' => (string) $this->newVersion,
             'insecure' => $this->insecure,
             'providerLink' => (string) $this->providerLink,
         ];
@@ -116,7 +116,7 @@ final class OutdatedPackage implements Package
 
     private function generateProviderLink(): UriInterface
     {
-        $versionHash = explode(' ', $this->newVersion, 2)[0];
+        $versionHash = explode(' ', $this->newVersion->get(), 2)[0];
         $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
 
         return new Uri($uri);
