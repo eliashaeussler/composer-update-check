@@ -21,38 +21,48 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Utility;
+namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Options;
 
-use Composer\Plugin\PluginInterface;
-use InvalidArgumentException;
+use function fnmatch;
+use function preg_match;
 
 /**
- * Composer.
+ * PackageExcludePattern.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class Composer
+final class PackageExcludePattern
 {
-    public const VERSION_FULL = 0;
-    public const VERSION_MAJOR = 1;
-    public const VERSION_BRANCH = 2;
+    /**
+     * @var callable(string): bool
+     */
+    private $matchFunction;
 
-    public static function getPlatformVersion(int $versionType = self::VERSION_FULL): string
+    /**
+     * @param callable(string): bool $matchFunction
+     */
+    private function __construct(callable $matchFunction)
     {
-        $platformVersion = PluginInterface::PLUGIN_API_VERSION;
-        $versionComponents = explode('.', $platformVersion);
-
-        return match ($versionType) {
-            self::VERSION_FULL => $platformVersion,
-            self::VERSION_MAJOR => $versionComponents[0],
-            self::VERSION_BRANCH => $versionComponents[0].'.'.$versionComponents[1],
-            default => throw new InvalidArgumentException('The given version type is not supported.', 1603794822),
-        };
+        $this->matchFunction = $matchFunction;
     }
 
-    public static function getMajorVersion(): int
+    public static function name(string $name): self
     {
-        return (int) self::getPlatformVersion(self::VERSION_MAJOR);
+        return new self(
+            static fn (string $packageName) => fnmatch($name, $packageName),
+        );
+    }
+
+    public static function regex(string $regex): self
+    {
+        return new self(
+            static fn (string $packageName) => 1 === preg_match($regex, $packageName),
+        );
+    }
+
+    public function matches(string $packageName): bool
+    {
+        return ($this->matchFunction)($packageName);
     }
 }

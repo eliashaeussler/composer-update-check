@@ -21,21 +21,23 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\IO;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use Composer\IO\IOInterface;
+use function sprintf;
 
 /**
- * OutputBehavior.
+ * FileDoesNotExist.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class OutputBehavior
+final class FileDoesNotExist extends Exception
 {
-    public function __construct(
-        public readonly Style $style,
-        public readonly Verbosity $verbosity,
-        public readonly IOInterface $io,
-    ) {}
+    public function __construct(string $filename)
+    {
+        parent::__construct(
+            sprintf('The file "%s" does not exist.', $filename),
+            1701204856,
+        );
+    }
 }

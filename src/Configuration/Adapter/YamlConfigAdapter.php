@@ -21,37 +21,38 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+
+use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor\Mapper\Source\Source;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsInvalid;
+use Symfony\Component\Yaml\Yaml;
+
+use function is_iterable;
 
 /**
- * ExpectedCommandOutputTrait.
+ * YamlConfigAdapter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-trait ExpectedCommandOutputTrait
+final readonly class YamlConfigAdapter extends FileBasedConfigAdapter
 {
-    private static function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
+    /**
+     * @throws ConfigFileIsInvalid
+     * @throws MappingError
+     */
+    public function resolve(): ComposerUpdateCheckConfig
     {
-        $output = ' - Upgrading';
+        $yaml = Yaml::parseFile($this->filename);
 
-        // Early return if no package is specified
-        if (null === $package) {
-            return $output;
+        if (!is_iterable($yaml)) {
+            throw new ConfigFileIsInvalid($this->filename);
         }
 
-        $output .= ' '.$package;
+        $source = Source::iterable($yaml);
 
-        // Early return if package versions are not completely specified
-        if (null === $outdated || null === $new || '' === trim($outdated) || '' === trim($new)) {
-            return $output;
-        }
-
-        // Build expected command output
-        if ($isLegacyPlatform) {
-            return sprintf('%s (%s) to %s (%s)', $output, $outdated, $package, $new);
-        }
-
-        return sprintf('%s (%s => %s)', $output, $outdated, $new);
+        return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
     }
 }

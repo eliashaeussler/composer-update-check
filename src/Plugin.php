@@ -28,6 +28,8 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use EliasHaeussler\ComposerUpdateCheck\DependencyInjection\ContainerFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin.
@@ -39,9 +41,13 @@ use Composer\Plugin\PluginInterface;
  */
 final class Plugin implements PluginInterface, Capable, CommandProvider
 {
+    private static ?ContainerInterface $container = null;
+
     public function activate(Composer $composer, IOInterface $io): void
     {
-        // Nothing to do here. Just go ahead :)
+        self::$container = (new ContainerFactory())->make();
+        self::$container->set(Composer::class, $composer);
+        self::$container->set(IOInterface::class, $io);
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
@@ -64,7 +70,7 @@ final class Plugin implements PluginInterface, Capable, CommandProvider
     public function getCommands(): array
     {
         return [
-            new Command\UpdateCheckCommand(),
+            self::$container->get(Command\UpdateCheckCommand::class),
         ];
     }
 }

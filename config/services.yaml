@@ -1,0 +1,32 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  EliasHaeussler\ComposerUpdateCheck\:
+    resource: '../src/*'
+    exclude:
+      - '../src/DependencyInjection/*'
+      - '../src/Event/*'
+      - '../src/Exception/*'
+      - '../src/Package/*'
+      - '../src/Plugin.php'
+      - '../src/UpdateCheckResult.php'
+
+  _instanceof:
+    EliasHaeussler\ComposerUpdateCheck\IO\Formatter\Formatter:
+      tags: ['io.formatter']
+
+  EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory:
+    arguments:
+      $formatters: !tagged_locator { tag: 'io.formatter', default_index_method: 'getFormat' }
+
+  EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand:
+    public: true
+
+  # Synthetic services (set when the container is built on runtime)
+  Composer\Composer:
+    synthetic: true
+  Composer\IO\IOInterface:
+    synthetic: true

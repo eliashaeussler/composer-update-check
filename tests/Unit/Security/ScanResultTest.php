@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
+use EliasHaeussler\ComposerUpdateCheck\Package\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Security\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;

@@ -32,16 +32,19 @@ use Psr\Http\Message\UriInterface;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class OutdatedPackage
+final class OutdatedPackage implements Package
 {
     private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
 
     private UriInterface $providerLink;
 
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
-        private string $name,
-        private string $outdatedVersion,
-        private string $newVersion,
+        private readonly string $name,
+        private readonly string $outdatedVersion,
+        private readonly string $newVersion,
         private bool $insecure = false,
     ) {
         $this->providerLink = $this->generateProviderLink();
@@ -52,35 +55,14 @@ final class OutdatedPackage
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getOutdatedVersion(): string
     {
         return $this->outdatedVersion;
     }
 
-    public function setOutdatedVersion(string $outdatedVersion): self
-    {
-        $this->outdatedVersion = $outdatedVersion;
-
-        return $this;
-    }
-
     public function getNewVersion(): string
     {
         return $this->newVersion;
-    }
-
-    public function setNewVersion(string $newVersion): self
-    {
-        $this->newVersion = $newVersion;
-
-        return $this;
     }
 
     public function isInsecure(): bool
@@ -100,11 +82,36 @@ final class OutdatedPackage
         return $this->providerLink;
     }
 
-    public function setProviderLink(Uri $providerLink): self
+    public function setProviderLink(UriInterface $providerLink): self
     {
         $this->providerLink = $providerLink;
 
         return $this;
+    }
+
+    /**
+     * @return array{
+     *     name: non-empty-string,
+     *     outdatedVersion: string,
+     *     newVersion: string,
+     *     insecure: bool,
+     *     providerLink: string,
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'outdatedVersion' => $this->outdatedVersion,
+            'newVersion' => $this->newVersion,
+            'insecure' => $this->insecure,
+            'providerLink' => (string) $this->providerLink,
+        ];
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 
     private function generateProviderLink(): UriInterface

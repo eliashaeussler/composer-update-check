@@ -21,19 +21,23 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
-use Composer\Composer;
-use Composer\IO;
-use Symfony\Component\Console;
+use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
 
-require_once __DIR__.'/../../../vendor/autoload.php';
+/**
+ * Formatter.
+ *
+ * @author Elias Häußler <elias@haeussler.dev>
+ * @license GPL-3.0-or-later
+ */
+interface Formatter
+{
+    public function formatResult(UpdateCheckResult $result): void;
 
-$container = (new DependencyInjection\ContainerFactory())->make();
-$container->set(Composer::class, new Composer());
-$container->set(IO\IOInterface::class, new IO\NullIO());
+    public function setIO(OutputInterface&StyleInterface $io): void;
 
-$application = new Console\Application();
-$application->add($container->get(Command\UpdateCheckCommand::class));
-
-return $application;
+    public static function getFormat(): string;
+}

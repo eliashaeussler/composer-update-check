@@ -1,10 +1,9 @@
 {
 	"require": {
-		"symfony/console": "^4.4",
-		"symfony/http-kernel": "^4.4"
+		"symfony/http-kernel": "^5.4"
 	},
 	"require-dev": {
-		"codeception/codeception": "^4.1"
+		"doctrine/dbal": "^3.1"
 	},
 	"config": {
 		"allow-plugins": {

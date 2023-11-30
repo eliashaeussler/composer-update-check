@@ -21,19 +21,17 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use Composer\Composer;
-use Composer\IO;
-use Symfony\Component\Console;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
 
-require_once __DIR__.'/../../../vendor/autoload.php';
-
-$container = (new DependencyInjection\ContainerFactory())->make();
-$container->set(Composer::class, new Composer());
-$container->set(IO\IOInterface::class, new IO\NullIO());
-
-$application = new Console\Application();
-$application->add($container->get(Command\UpdateCheckCommand::class));
-
-return $application;
+/**
+ * ConfigAdapter.
+ *
+ * @author Elias Häußler <elias@haeussler.dev>
+ * @license GPL-3.0-or-later
+ */
+interface ConfigAdapter
+{
+    public function resolve(): ComposerUpdateCheckConfig;
+}

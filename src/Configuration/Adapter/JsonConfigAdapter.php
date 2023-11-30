@@ -21,19 +21,28 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use Composer\Composer;
-use Composer\IO;
-use Symfony\Component\Console;
+use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor\Mapper\Source\Source;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use SplFileObject;
 
-require_once __DIR__.'/../../../vendor/autoload.php';
+/**
+ * JsonConfigAdapter.
+ *
+ * @author Elias Häußler <elias@haeussler.dev>
+ * @license GPL-3.0-or-later
+ */
+final readonly class JsonConfigAdapter extends FileBasedConfigAdapter
+{
+    /**
+     * @throws MappingError
+     */
+    public function resolve(): ComposerUpdateCheckConfig
+    {
+        $source = Source::file(new SplFileObject($this->filename));
 
-$container = (new DependencyInjection\ContainerFactory())->make();
-$container->set(Composer::class, new Composer());
-$container->set(IO\IOInterface::class, new IO\NullIO());
-
-$application = new Console\Application();
-$application->add($container->get(Command\UpdateCheckCommand::class));
-
-return $application;
+        return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
+    }
+}

@@ -21,51 +21,49 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Security;
+namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
+
+use EliasHaeussler\ComposerUpdateCheck\Exception\FormatterIsNotSupported;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
- * InsecurePackage.
+ * FormatterFactory.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class InsecurePackage
+final class FormatterFactory
 {
     /**
-     * @param string[] $affectedVersions
+     * @param ServiceLocator<Formatter> $formatters
      */
     public function __construct(
-        private string $name,
-        private array $affectedVersions,
+        private readonly ServiceLocator $formatters,
+        private (OutputInterface&StyleInterface)|null $io = null,
     ) {}
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     /**
-     * @return string[]
+     * @throws FormatterIsNotSupported
      */
-    public function getAffectedVersions(): array
+    public function make(string $format): Formatter
     {
-        return $this->affectedVersions;
+        if (!$this->formatters->has($format)) {
+            throw new FormatterIsNotSupported($format);
+        }
+
+        $formatter = $this->formatters->get($format);
+
+        if (null !== $this->io) {
+            $formatter->setIO($this->io);
+        }
+
+        return $formatter;
     }
 
-    /**
-     * @param string[] $affectedVersions
-     */
-    public function setAffectedVersions(array $affectedVersions): self
+    public function setIO(OutputInterface&StyleInterface $io): void
     {
-        $this->affectedVersions = $affectedVersions;
-
-        return $this;
+        $this->io = $io;
     }
 }

@@ -21,56 +21,38 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\IO;
-
-use InvalidArgumentException;
+namespace EliasHaeussler\ComposerUpdateCheck\Package;
 
 /**
- * Style.
+ * RequiredPackage.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class Style
+final readonly class RequiredPackage implements Package
 {
-    public const NORMAL = 'normal';
-    public const JSON = 'json';
-
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
-        private readonly string $style = self::NORMAL,
-    ) {
-        $this->validate();
+        private string $name,
+    ) {}
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
-    public static function isSupported(string $style): bool
+    /**
+     * @return non-empty-string
+     */
+    public function jsonSerialize(): string
     {
-        return in_array($style, [self::NORMAL, self::JSON], true);
+        return $this->name;
     }
 
-    public function isNormal(): bool
+    public function __toString(): string
     {
-        return $this->is(self::NORMAL);
-    }
-
-    public function isJson(): bool
-    {
-        return $this->is(self::JSON);
-    }
-
-    public function is(string $style): bool
-    {
-        return $this->style === $style;
-    }
-
-    public function getStyle(): string
-    {
-        return $this->style;
-    }
-
-    private function validate(): void
-    {
-        if (!static::isSupported($this->style)) {
-            throw new InvalidArgumentException('The given style is not supported.', 1617549657);
-        }
+        return $this->name;
     }
 }

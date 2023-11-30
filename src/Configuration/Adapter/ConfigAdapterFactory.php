@@ -21,37 +21,31 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+
+use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsNotSupported;
+use EliasHaeussler\ComposerUpdateCheck\Exception\FileDoesNotExist;
+use Symfony\Component\Filesystem\Path;
 
 /**
- * ExpectedCommandOutputTrait.
+ * ConfigAdapterFactory.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-trait ExpectedCommandOutputTrait
+final readonly class ConfigAdapterFactory
 {
-    private static function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
+    /**
+     * @throws ConfigFileIsNotSupported
+     * @throws FileDoesNotExist
+     */
+    public function make(string $filename): ConfigAdapter
     {
-        $output = ' - Upgrading';
-
-        // Early return if no package is specified
-        if (null === $package) {
-            return $output;
-        }
-
-        $output .= ' '.$package;
-
-        // Early return if package versions are not completely specified
-        if (null === $outdated || null === $new || '' === trim($outdated) || '' === trim($new)) {
-            return $output;
-        }
-
-        // Build expected command output
-        if ($isLegacyPlatform) {
-            return sprintf('%s (%s) to %s (%s)', $output, $outdated, $package, $new);
-        }
-
-        return sprintf('%s (%s => %s)', $output, $outdated, $new);
+        return match (Path::getExtension($filename, true)) {
+            'json' => new JsonConfigAdapter($filename),
+            'php' => new PhpConfigAdapter($filename),
+            'yaml', 'yml' => new YamlConfigAdapter($filename),
+            default => throw new ConfigFileIsNotSupported($filename),
+        };
     }
 }

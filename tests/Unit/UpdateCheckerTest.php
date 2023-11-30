@@ -32,8 +32,8 @@ use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
 use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
+use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

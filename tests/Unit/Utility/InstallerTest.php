@@ -25,11 +25,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
+use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
-use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
-use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -62,12 +61,9 @@ final class InstallerTest extends AbstractTestCase
     public function runInstallInstallsComposerDependencies(): void
     {
         $expected = 'Installing dependencies from lock file (including require-dev)';
-        if (Composer::getMajorVersion() < 2) {
-            $expected = 'Installing dependencies (including require-dev) from lock file';
-        }
 
-        self::assertSame(0, Installer::runInstall($this->composer));
-        self::assertStringContainsString($expected, Installer::getLastOutput());
+        self::assertSame(0, ComposerInstaller::runInstall());
+        self::assertStringContainsString($expected, ComposerInstaller::getLastOutput());
     }
 
     /**
@@ -78,12 +74,12 @@ final class InstallerTest extends AbstractTestCase
     public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, string $notExpected = null): void
     {
         // Ensure dependencies are installed
-        Installer::runInstall($this->composer);
+        ComposerInstaller::runInstall();
 
-        self::assertSame(0, Installer::runUpdate($packages, $this->composer));
-        self::assertStringContainsString($expected, Installer::getLastOutput());
+        self::assertSame(0, ComposerInstaller::runUpdate($packages));
+        self::assertStringContainsString($expected, ComposerInstaller::getLastOutput());
         if (null !== $notExpected) {
-            self::assertStringNotContainsString($notExpected, Installer::getLastOutput());
+            self::assertStringNotContainsString($notExpected, ComposerInstaller::getLastOutput());
         }
     }
 

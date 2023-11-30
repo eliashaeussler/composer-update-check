@@ -24,13 +24,20 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck;
 
 use Composer\Composer;
+use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
+use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
-use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Utility\Installer;
-use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
-use RuntimeException;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerInstallFailed;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerUpdateFailed;
+use EliasHaeussler\ComposerUpdateCheck\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Package\RequiredPackage;
+use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
+
+use function array_map;
+use function array_merge;
 
 /**
  * UpdateChecker.
@@ -38,32 +45,24 @@ use RuntimeException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class UpdateChecker
+final readonly class UpdateChecker
 {
-    /**
-     * @var string[]
-     */
-    private array $packageBlacklist = [];
-
     public function __construct(
-        private readonly Composer $composer,
-        private readonly OutputBehavior $behavior,
-        private readonly Options $options,
+        private Composer $composer,
+        private ComposerInstaller $installer,
+        private IOInterface $io,
+        private SecurityScanner $securityScanner,
     ) {}
 
-    public function run(): UpdateCheckResult
+    public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult
     {
-        // Resolve packages to be checked
-        $this->behavior->io->write('📦 Resolving packages...', true, IOInterface::VERBOSE);
-        $packages = $this->resolvePackagesForUpdateCheck();
-
-        // Run update check
-        $result = $this->runUpdateCheck($packages);
+        [$packages, $excludedPackages] = $this->resolvePackagesForUpdateCheck($config);
+        $result = $this->runUpdateCheck($packages, $excludedPackages);
 
         // Overlay security scan
-        if ($this->options->isPerformingSecurityScan() && [] !== $result->getOutdatedPackages()) {
-            $this->behavior->io->write('🚨 Checking for insecure packages...', true, IOInterface::VERBOSE);
-            $result = Security::scanAndOverlayResult($result);
+        if ($config->shouldPerformSecurityScan() && [] !== $result->getOutdatedPackages()) {
+            $this->io->writeError('🚨 Checking for insecure packages...', true, IOInterface::VERBOSE);
+            $this->securityScanner->scanAndOverlayResult($result);
         }
 
         // Dispatch event
@@ -73,9 +72,13 @@ final class UpdateChecker
     }
 
     /**
-     * @param string[] $packages
+     * @param list<Package> $packages
+     * @param list<Package> $excludedPackages
+     *
+     * @throws ComposerInstallFailed
+     * @throws ComposerUpdateFailed
      */
-    private function runUpdateCheck(array $packages): UpdateCheckResult
+    private function runUpdateCheck(array $packages, array $excludedPackages): UpdateCheckResult
     {
         // Early return if no packages are listed for update check
         if ([] === $packages) {
@@ -85,85 +88,117 @@ final class UpdateChecker
         // Ensure dependencies are installed
         $this->installDependencies();
 
+        // Show progress
+        $this->io->writeError('⏳ Checking for outdated packages...', true, IOInterface::VERBOSE);
+
         // Run Composer installer
-        $this->behavior->io->write('⏳ Checking for outdated packages...', true, IOInterface::VERBOSE);
-        $result = Installer::runUpdate($packages, $this->composer);
+        $io = new BufferIO();
+        $exitCode = $this->installer->runUpdate($packages, $io);
 
         // Handle installer failures
-        if ($result > 0) {
-            $this->behavior->io->writeError(Installer::getLastOutput());
-            throw new RuntimeException(sprintf('Error during update check. Exit code from Composer installer: %d', $result), 1600278536);
+        if ($exitCode > 0) {
+            $this->io->writeError($io->getOutput());
+
+            throw new ComposerUpdateFailed($exitCode);
         }
 
-        return UpdateCheckResult::fromCommandOutput(Installer::getLastOutput(), $packages);
+        return UpdateCheckResult::fromCommandOutput($io->getOutput(), $packages, $excludedPackages);
     }
 
+    /**
+     * @throws ComposerInstallFailed
+     */
     private function installDependencies(): void
     {
         // Run Composer installer
-        $result = Installer::runInstall($this->composer);
+        $io = new BufferIO();
+        $exitCode = $this->installer->runInstall($io);
 
         // Handle installer failures
-        if ($result > 0) {
-            $this->behavior->io->writeError(Installer::getLastOutput());
-            throw new RuntimeException(sprintf('Error during dependency install. Exit code from Composer installer: %d', $result), 1600614218);
+        if ($exitCode > 0) {
+            $this->io->writeError($io->getOutput());
+
+            throw new ComposerInstallFailed($exitCode);
         }
     }
 
     /**
-     * @return string[]
+     * @return array{list<Package>, list<Package>}
      */
-    private function resolvePackagesForUpdateCheck(): array
+    private function resolvePackagesForUpdateCheck(ComposerUpdateCheckConfig $config): array
     {
+        $this->io->writeError('📦 Resolving packages...', true, IOInterface::VERBOSE);
+
         $rootPackage = $this->composer->getPackage();
         $requiredPackages = array_keys($rootPackage->getRequires());
         $requiredDevPackages = array_keys($rootPackage->getDevRequires());
+        $excludedPackages = [];
 
         // Handle dev-packages
-        if ($this->options->isIncludingDevPackages()) {
+        if ($config->areDevPackagesIncluded()) {
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
         } else {
-            $this->packageBlacklist = array_merge($this->packageBlacklist, $requiredDevPackages);
-            $this->behavior->io->write('🚫 Skipped dev-requirements', true, IOInterface::VERBOSE);
+            $excludedPackages = $requiredDevPackages;
+
+            $this->io->writeError('🚫 Skipped dev-requirements', true, IOInterface::VERBOSE);
         }
 
-        // Remove blacklisted packages
-        foreach ($this->options->getIgnorePackages() as $ignoredPackage) {
-            $requiredPackages = $this->removeByIgnorePattern($ignoredPackage, $requiredPackages);
-        }
+        // Remove packages by exclude patterns
+        $excludedPackages = array_merge(
+            $excludedPackages,
+            $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns()),
+        );
 
-        return $requiredPackages;
+        return [
+            $this->mapPackageNamesToPackage($requiredPackages),
+            $this->mapPackageNamesToPackage($excludedPackages),
+        ];
     }
 
     /**
-     * @param string[] $packages
+     * @param string[]                    $packages
+     * @param list<PackageExcludePattern> $excludePatterns
      *
      * @return string[]
      */
-    private function removeByIgnorePattern(string $pattern, array $packages): array
+    private function removeByExcludePatterns(array &$packages, array $excludePatterns): array
     {
-        return array_filter($packages, function (string $package) use ($pattern) {
-            if (!fnmatch($pattern, $package)) {
-                return true;
-            }
-            $this->behavior->io->write(sprintf('🚫 Skipped "%s"', $package), true, IOInterface::VERBOSE);
-            $this->packageBlacklist[] = $package;
+        $excludedPackages = [];
 
-            return false;
+        $packages = array_filter($packages, function (string $package) use (&$excludedPackages, $excludePatterns) {
+            foreach ($excludePatterns as $excludePattern) {
+                if ($excludePattern->matches($package)) {
+                    $excludedPackages[] = $package;
+
+                    $this->io->writeError(sprintf('🚫 Skipped "%s"', $package), true, IOInterface::VERBOSE);
+
+                    return false;
+                }
+            }
+
+            return true;
         });
+
+        return $excludedPackages;
+    }
+
+    /**
+     * @param array<string> $packageNames
+     *
+     * @return array<Package>
+     */
+    private function mapPackageNamesToPackage(array $packageNames): array
+    {
+        return array_map(
+            static fn (string $packageName) => new RequiredPackage($packageName),
+            $packageNames,
+        );
     }
 
     private function dispatchPostUpdateCheckEvent(UpdateCheckResult $result): void
     {
-        $commandEvent = new PostUpdateCheckEvent($result, $this->behavior, $this->options);
-        $this->composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
-    }
+        $event = new PostUpdateCheckEvent($result);
 
-    /**
-     * @return string[]
-     */
-    public function getPackageBlacklist(): array
-    {
-        return $this->packageBlacklist;
+        $this->composer->getEventDispatcher()->dispatch($event->getName(), $event);
     }
 }

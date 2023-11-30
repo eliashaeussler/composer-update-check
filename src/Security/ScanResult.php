@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 use Composer\Semver\Semver;
+use EliasHaeussler\ComposerUpdateCheck\Package\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use InvalidArgumentException;
 
@@ -33,13 +34,13 @@ use InvalidArgumentException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class ScanResult
+final readonly class ScanResult
 {
     /**
      * @param InsecurePackage[] $insecurePackages
      */
     public function __construct(
-        private readonly array $insecurePackages,
+        private array $insecurePackages,
     ) {
         $this->validateInsecurePackages();
     }

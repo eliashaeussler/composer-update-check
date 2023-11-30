@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use JsonException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
@@ -52,7 +53,7 @@ final class SecurityScanner
     }
 
     /**
-     * @param OutdatedPackage[] $packages
+     * @param list<OutdatedPackage> $packages
      */
     public function scan(array $packages): ScanResult
     {
@@ -81,6 +82,18 @@ final class SecurityScanner
             return ScanResult::fromApiResult(json_decode($apiResult, true, 512, JSON_THROW_ON_ERROR));
         } catch (ClientExceptionInterface|JsonException $e) {
             throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
+        }
+    }
+
+    public function scanAndOverlayResult(UpdateCheckResult $result): void
+    {
+        $outdatedPackages = $result->getOutdatedPackages();
+        $scanResult = $this->scan($outdatedPackages);
+
+        foreach ($outdatedPackages as $outdatedPackage) {
+            if ($scanResult->isInsecure($outdatedPackage)) {
+                $outdatedPackage->setInsecure(true);
+            }
         }
     }
 }

@@ -24,14 +24,13 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 use Composer\Command\BaseCommand;
-use Composer\Factory;
-use Composer\IO\BufferIO;
-use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
-use EliasHaeussler\ComposerUpdateCheck\IO\Style;
-use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
-use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ChainedConfigAdapter;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\CommandInputConfigAdapter;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ConfigAdapterFactory;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,21 +44,28 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class UpdateCheckCommand extends BaseCommand
 {
-    private ?SymfonyStyle $symfonyStyle = null;
-
-    private ?OutputBehavior $behavior = null;
+    public function __construct(
+        private readonly FormatterFactory $formatterFactory,
+        private readonly UpdateChecker $updateChecker,
+    ) {
+        parent::__construct('update-check');
+    }
 
     protected function configure(): void
     {
-        $this->setName('update-check');
         $this->setDescription('Checks your root requirements for available updates.');
 
         $this->addOption(
+            'config',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'Path to configuration file, can be in JSON, PHP oder YAML format',
+        );
+        $this->addOption(
             'ignore-packages',
             'i',
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Packages to ignore when checking for available updates',
-            [],
         );
         $this->addOption(
             'no-dev',
@@ -74,112 +80,42 @@ final class UpdateCheckCommand extends BaseCommand
             'Run security scan for all outdated packages',
         );
         $this->addOption(
-            'json',
-            'j',
-            InputOption::VALUE_NONE,
-            'Format update check as JSON',
+            'format',
+            'f',
+            InputOption::VALUE_REQUIRED,
+            'Format to display update check results',
         );
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->formatterFactory->setIO(new SymfonyStyle($input, $output));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->symfonyStyle = new SymfonyStyle($input, $output);
+        $config = $this->resolveConfiguration($input);
+        $result = $this->updateChecker->run($config);
 
-        // Prepare command options
-        $json = $input->getOption('json');
-        $securityScan = $input->getOption('security-scan');
+        $formatter = $this->formatterFactory->make($config->getFormat());
+        $formatter->formatResult($result);
 
-        // Initialize IO
-        $style = new Style($json ? Style::JSON : Style::NORMAL);
-        $verbosity = new Verbosity($style->isJson() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
-        $this->behavior = new OutputBehavior($style, $verbosity, $this->getIO());
-        $output->setVerbosity($verbosity->getLevel());
-
-        // Run update check
-        $composer = Factory::create(new BufferIO());
-        $updateChecker = new UpdateChecker($composer, $this->behavior, Options::fromInput($input));
-        $result = $updateChecker->run();
-
-        // Decorate update check result
-        $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $securityScan);
-
-        return 0;
+        return Command::SUCCESS;
     }
 
-    /**
-     * @param string[] $ignoredPackages
-     */
-    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
+    private function resolveConfiguration(InputInterface $input): ComposerUpdateCheckConfig
     {
-        $outdatedPackages = $result->getOutdatedPackages();
+        $filename = $input->getOption('config');
+        $configAdapter = new CommandInputConfigAdapter($input);
 
-        // Print message if no packages are outdated
-        if ([] === $outdatedPackages) {
-            $countSkipped = count($ignoredPackages);
-            $message = sprintf(
-                'All packages are up to date%s.',
-                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : '',
-            );
-            if ($this->behavior->style->isJson()) {
-                $this->buildJsonReport(['status' => $message], $ignoredPackages);
-            } else {
-                $this->symfonyStyle->success($message);
-            }
-
-            return;
+        if (null !== $filename && '' !== $filename) {
+            $configAdapterFactory = new ConfigAdapterFactory();
+            $configAdapter = new ChainedConfigAdapter([
+                $configAdapterFactory->make($filename),
+                $configAdapter,
+            ]);
         }
 
-        // Print header
-        $statusLabel = 1 === count($outdatedPackages)
-            ? '1 package is outdated.'
-            : sprintf('%d packages are outdated.', count($outdatedPackages));
-        if (!$this->behavior->style->isJson()) {
-            $this->symfonyStyle->warning($statusLabel);
-        }
-
-        // Parse table rows
-        $tableRows = [];
-        foreach ($outdatedPackages as $outdatedPackage) {
-            $report = [
-                $outdatedPackage->getName(),
-                $outdatedPackage->getOutdatedVersion(),
-                $outdatedPackage->getNewVersion(),
-            ];
-            if ($flagInsecurePackages) {
-                if (!$this->behavior->style->isJson() && $outdatedPackage->isInsecure()) {
-                    $report[1] .= ' <fg=red;options=bold>insecure</>';
-                } elseif ($this->behavior->style->isJson()) {
-                    $report[] = $outdatedPackage->isInsecure();
-                }
-            }
-            $tableRows[] = $report;
-        }
-
-        // Print table
-        $tableHeader = ['Package', 'Outdated version', 'New version'];
-        if (!$this->behavior->style->isJson()) {
-            $this->symfonyStyle->table($tableHeader, $tableRows);
-        } else {
-            $result = [];
-            if ($flagInsecurePackages) {
-                $tableHeader[] = 'Insecure';
-            }
-            foreach ($tableRows as $tableRow) {
-                $result[] = array_combine($tableHeader, $tableRow);
-            }
-            $this->buildJsonReport(['status' => $statusLabel, 'result' => $result], $ignoredPackages);
-        }
-    }
-
-    /**
-     * @param array{status: string, result?: array<int, array<string, mixed>>} $report
-     * @param string[]                                                         $ignoredPackages
-     */
-    private function buildJsonReport(array $report, array $ignoredPackages = []): void
-    {
-        if ([] !== $ignoredPackages) {
-            $report['skipped'] = $ignoredPackages;
-        }
-        $this->symfonyStyle->writeln(json_encode($report));
+        return $configAdapter->resolve();
     }
 }

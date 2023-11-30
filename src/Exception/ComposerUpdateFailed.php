@@ -21,19 +21,23 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use Composer\Composer;
-use Composer\IO;
-use Symfony\Component\Console;
+use function sprintf;
 
-require_once __DIR__.'/../../../vendor/autoload.php';
-
-$container = (new DependencyInjection\ContainerFactory())->make();
-$container->set(Composer::class, new Composer());
-$container->set(IO\IOInterface::class, new IO\NullIO());
-
-$application = new Console\Application();
-$application->add($container->get(Command\UpdateCheckCommand::class));
-
-return $application;
+/**
+ * ComposerUpdateFailed.
+ *
+ * @author Elias Häußler <elias@haeussler.dev>
+ * @license GPL-3.0-or-later
+ */
+final class ComposerUpdateFailed extends Exception
+{
+    public function __construct(int $exitCode)
+    {
+        parent::__construct(
+            sprintf('Error during update check. Exit code from Composer installer: %d', $exitCode),
+            1600278536,
+        );
+    }
+}

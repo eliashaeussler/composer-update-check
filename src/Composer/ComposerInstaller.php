@@ -21,74 +21,71 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Utility;
+namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
-use Composer\Installer as ComposerInstaller;
-use Composer\IO\BufferIO;
+use Composer\Installer;
+use Composer\IO\IOInterface;
+use EliasHaeussler\ComposerUpdateCheck\Package\Package;
+
+use function array_map;
 
 /**
- * Installer.
+ * ComposerInstaller.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  *
  * @internal
  */
-final class Installer
+final readonly class ComposerInstaller
 {
-    private static ?BufferIO $io = null;
+    public function __construct(
+        private Composer $composer,
+        private IOInterface $io,
+    ) {}
 
-    public static function runInstall(Composer $composer): int
+    public function runInstall(IOInterface $io = null): int
     {
-        self::$io = new BufferIO();
-        $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $eventDispatcher = $composer->getEventDispatcher();
+        $io ??= $this->io;
 
-        $installer = ComposerInstaller::create(self::$io, $composer)
+        $preferredInstall = $this->composer->getConfig()->get('preferred-install');
+        $installer = Installer::create($io, $this->composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
-            ->setDevMode(true);
+            ->setDevMode()
+        ;
 
-        if (method_exists($eventDispatcher, 'setRunScripts')) {
-            // Composer >= 2.1.2
-            $eventDispatcher->setRunScripts(false);
-        } else {
-            // Composer < 2.1.2
-            $installer->setRunScripts(false);
-        }
+        $eventDispatcher = $this->composer->getEventDispatcher();
+        $eventDispatcher->setRunScripts(false);
 
         return $installer->run();
     }
 
     /**
-     * @param string[] $packages
+     * @param list<Package> $packages
      */
-    public static function runUpdate(array $packages, Composer $composer): int
+    public function runUpdate(array $packages, IOInterface $io = null): int
     {
-        self::$io = new BufferIO();
-        $preferredInstall = $composer->getConfig()->get('preferred-install');
+        $io ??= $this->io;
 
-        $installer = ComposerInstaller::create(self::$io, $composer)
-            ->setDryRun(true)
+        $preferredInstall = $this->composer->getConfig()->get('preferred-install');
+        $installer = Installer::create($io, $this->composer)
+            ->setDryRun()
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
-            ->setDevMode(true)
+            ->setDevMode()
             ->setUpdate(true)
-            ->setUpdateAllowList($packages)
+            ->setUpdateAllowList(
+                array_map(
+                    static fn (Package $package) => $package->getName(),
+                    $packages,
+                ),
+            )
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
 
         return $installer->run();
-    }
-
-    public static function getLastOutput(): ?string
-    {
-        if (self::$io instanceof BufferIO) {
-            return self::$io->getOutput();
-        }
-
-        return null;
     }
 }
