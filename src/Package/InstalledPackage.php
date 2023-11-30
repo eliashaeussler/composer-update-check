@@ -24,12 +24,12 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Package;
 
 /**
- * RequiredPackage.
+ * InstalledPackage.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class RequiredPackage implements Package
+final readonly class InstalledPackage implements Package
 {
     /**
      * @param non-empty-string $name

@@ -33,7 +33,7 @@ use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerInstallFailed;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerUpdateFailed;
 use EliasHaeussler\ComposerUpdateCheck\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Package\RequiredPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\InstalledPackage;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 use function array_map;
@@ -190,7 +190,7 @@ final readonly class UpdateChecker
     private function mapPackageNamesToPackage(array $packageNames): array
     {
         return array_map(
-            static fn (string $packageName) => new RequiredPackage($packageName),
+            static fn (string $packageName) => new InstalledPackage($packageName),
             $packageNames,
         );
     }
