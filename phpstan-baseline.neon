@@ -1,6 +1,11 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Call to function method_exists\\(\\) with Composer\\\\Installer and 'setAudit' will always evaluate to true\\.$#"
+			count: 2
+			path: src/Composer/ComposerInstaller.php
+
+		-
 			message: "#^Instanceof between EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\InsecurePackage and EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\InsecurePackage will always evaluate to true\\.$#"
 			count: 1
 			path: src/Security/ScanResult.php

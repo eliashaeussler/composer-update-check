@@ -30,6 +30,7 @@ use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 
 use function array_map;
+use function method_exists;
 
 /**
  * ComposerInstaller.
@@ -56,6 +57,10 @@ final readonly class ComposerInstaller
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode()
         ;
+
+        if (method_exists($installer, 'setAudit')) {
+            $installer->setAudit(false);
+        }
 
         $eventDispatcher = $this->composer->getEventDispatcher();
         $eventDispatcher->setRunScripts(false);
@@ -85,6 +90,10 @@ final readonly class ComposerInstaller
             )
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
+
+        if (method_exists($installer, 'setAudit')) {
+            $installer->setAudit(false);
+        }
 
         return $installer->run();
     }
