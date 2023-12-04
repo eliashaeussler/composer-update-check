@@ -30,3 +30,8 @@ services:
     synthetic: true
   Composer\IO\IOInterface:
     synthetic: true
+
+  # External services
+  GuzzleHttp\Client:
+  Spatie\Packagist\PackagistClient:
+  Spatie\Packagist\PackagistUrlGenerator:

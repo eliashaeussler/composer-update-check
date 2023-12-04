@@ -24,9 +24,9 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Security;
 use PHPUnit\Framework\Attributes\Test;
 

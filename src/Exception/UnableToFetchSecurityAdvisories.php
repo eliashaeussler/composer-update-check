@@ -21,23 +21,36 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+
+use function sprintf;
 
 /**
- * Formatter.
+ * UnableToFetchSecurityAdvisories.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-interface Formatter
+final class UnableToFetchSecurityAdvisories extends Exception
 {
-    public function formatResult(UpdateCheckResult $result): void;
+    public function __construct(GuzzleException $exception)
+    {
+        if ($exception instanceof RequestException && ($response = $exception->getResponse()) !== null) {
+            $message = (string) $response->getBody();
+        } else {
+            $message = $exception->getMessage();
+        }
 
-    public function setIO(OutputInterface&StyleInterface $io): void;
-
-    public static function getFormat(): string;
+        parent::__construct(
+            sprintf(
+                'There was an error while fetching security advisories from Packagist API: %s',
+                $message,
+            ),
+            1610706128,
+            $exception,
+        );
+    }
 }

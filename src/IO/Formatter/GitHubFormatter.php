@@ -25,7 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use Composer\Factory;
 use Composer\Util\Platform;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Filesystem\Path;

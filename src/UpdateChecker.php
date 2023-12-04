@@ -29,11 +29,12 @@ use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InstalledPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerInstallFailed;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerUpdateFailed;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InstalledPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 use function array_map;

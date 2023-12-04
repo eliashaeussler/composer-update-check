@@ -21,31 +21,44 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Event;
+namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
-use Composer\EventDispatcher\Event;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 
 /**
- * PostUpdateCheckEvent.
+ * ScanResult.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
- *
- * @codeCoverageIgnore
  */
-final class PostUpdateCheckEvent extends Event
+final readonly class ScanResult
 {
-    public const NAME = 'post-update-check';
-
+    /**
+     * @param array<string, list<SecurityAdvisory>> $securityAdvisories
+     */
     public function __construct(
-        private readonly UpdateCheckResult $updateCheckResult,
-    ) {
-        parent::__construct(self::NAME);
+        private array $securityAdvisories,
+    ) {}
+
+    /**
+     * @return array<string, list<SecurityAdvisory>>
+     */
+    public function getSecurityAdvisories(): array
+    {
+        return $this->securityAdvisories;
     }
 
-    public function getUpdateCheckResult(): UpdateCheckResult
+    /**
+     * @return list<SecurityAdvisory>
+     */
+    public function getSecurityAdvisoriesForPackage(Package $package): array
     {
-        return $this->updateCheckResult;
+        return $this->securityAdvisories[$package->getName()] ?? [];
+    }
+
+    public function isInsecure(Package $package): bool
+    {
+        return [] !== $this->getSecurityAdvisoriesForPackage($package);
     }
 }

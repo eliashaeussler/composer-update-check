@@ -21,54 +21,24 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
+
+use CuyZ\Valinor\Mapper\MappingError;
 
 /**
- * InsecurePackage.
+ * PackagistResponseHasErrors.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class InsecurePackage implements Package
+final class PackagistResponseHasErrors extends Exception
 {
-    /**
-     * @param non-empty-string       $name
-     * @param list<non-empty-string> $affectedVersions
-     */
     public function __construct(
-        private string $name,
-        private array $affectedVersions,
-    ) {}
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return list<non-empty-string>
-     */
-    public function getAffectedVersions(): array
-    {
-        return $this->affectedVersions;
-    }
-
-    /**
-     * @return array{
-     *     name: non-empty-string,
-     *     affectedVersions: list<non-empty-string>,
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'name' => $this->name,
-            'affectedVersions' => $this->affectedVersions,
-        ];
-    }
-
-    public function __toString(): string
-    {
-        return $this->name;
+        public readonly MappingError $error,
+    ) {
+        parent::__construct(
+            'Packagist API response with security advisories is invalid and cannot be mapped.',
+            1701723100,
+        );
     }
 }

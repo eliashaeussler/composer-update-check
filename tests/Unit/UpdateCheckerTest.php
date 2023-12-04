@@ -27,13 +27,13 @@ use Composer\Composer;
 use Composer\Console\Application;
 use Composer\IO\NullIO;
 use Composer\Json\JsonValidationException;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
 use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

@@ -23,8 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
 
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
-use Nyholm\Psr7\Uri;
+use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -40,13 +41,14 @@ final class OutdatedPackage implements Package
     private UriInterface $providerLink;
 
     /**
-     * @param non-empty-string $name
+     * @param non-empty-string       $name
+     * @param list<SecurityAdvisory> $securityAdvisories
      */
     public function __construct(
         private readonly string $name,
         private readonly Version $outdatedVersion,
         private readonly Version $newVersion,
-        private bool $insecure = false,
+        private array $securityAdvisories = [],
     ) {
         $this->providerLink = $this->generateProviderLink();
     }
@@ -66,16 +68,27 @@ final class OutdatedPackage implements Package
         return $this->newVersion;
     }
 
-    public function isInsecure(): bool
+    /**
+     * @return list<SecurityAdvisory>
+     */
+    public function getSecurityAdvisories(): array
     {
-        return $this->insecure;
+        return $this->securityAdvisories;
     }
 
-    public function setInsecure(bool $insecure): self
+    /**
+     * @param list<SecurityAdvisory> $securityAdvisories
+     */
+    public function setSecurityAdvisories(array $securityAdvisories): self
     {
-        $this->insecure = $insecure;
+        $this->securityAdvisories = $securityAdvisories;
 
         return $this;
+    }
+
+    public function isInsecure(): bool
+    {
+        return [] !== $this->securityAdvisories;
     }
 
     public function getProviderLink(): UriInterface
@@ -95,7 +108,7 @@ final class OutdatedPackage implements Package
      *     name: non-empty-string,
      *     outdatedVersion: string,
      *     newVersion: string,
-     *     insecure: bool,
+     *     securityAdvisories: list<SecurityAdvisory>,
      *     providerLink: string,
      * }
      */
@@ -105,7 +118,7 @@ final class OutdatedPackage implements Package
             'name' => $this->name,
             'outdatedVersion' => (string) $this->outdatedVersion,
             'newVersion' => (string) $this->newVersion,
-            'insecure' => $this->insecure,
+            'securityAdvisories' => $this->securityAdvisories,
             'providerLink' => (string) $this->providerLink,
         ];
     }

@@ -6,11 +6,6 @@ parameters:
 			path: src/Composer/ComposerInstaller.php
 
 		-
-			message: "#^Instanceof between EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\InsecurePackage and EliasHaeussler\\\\ComposerUpdateCheck\\\\Package\\\\InsecurePackage will always evaluate to true\\.$#"
-			count: 1
-			path: src/Security/ScanResult.php
-
-		-
 			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Tests\\\\Unit\\\\AbstractTestCase\\)\\.$#"
 			count: 1
 			path: tests/Unit/AbstractTestCase.php

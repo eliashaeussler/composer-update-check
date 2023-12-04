@@ -23,9 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InsecurePackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Generator;
 use InvalidArgumentException;
@@ -96,13 +96,13 @@ final class ScanResultTest extends AbstractTestCase
     public function getInsecurePackagesReturnsInsecurePackagesFromScanResult(): void
     {
         $insecurePackages = [
-            new InsecurePackage('foo', ['1.0.0']),
-            new InsecurePackage('baz', ['2.0.0']),
+            new SecurityAdvisory('foo', ['1.0.0']),
+            new SecurityAdvisory('baz', ['2.0.0']),
         ];
         $subject = new ScanResult($insecurePackages);
 
-        self::assertCount(2, $subject->getInsecurePackages());
-        self::assertSame($insecurePackages, $subject->getInsecurePackages());
+        self::assertCount(2, $subject->getSecurityAdvisories());
+        self::assertSame($insecurePackages, $subject->getSecurityAdvisories());
     }
 
     #[Test]
@@ -110,8 +110,8 @@ final class ScanResultTest extends AbstractTestCase
     public function isInsecureReturnsSecurityStateOfGivenPackage(OutdatedPackage $outdatedPackage, bool $expected): void
     {
         $insecurePackages = [
-            new InsecurePackage('foo', ['>=1.0.0,<1.5.0', '2.0.0']),
-            new InsecurePackage('baz', ['1.0.0-alpha-1']),
+            new SecurityAdvisory('foo', ['>=1.0.0,<1.5.0', '2.0.0']),
+            new SecurityAdvisory('baz', ['1.0.0-alpha-1']),
         ];
         $subject = new ScanResult($insecurePackages);
 

@@ -25,7 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 

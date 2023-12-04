@@ -21,7 +21,11 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck;
+namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
+
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
 
 /**
  * UpdateCheckResult.
@@ -42,18 +46,18 @@ final class UpdateCheckResult
         '$#';
 
     /**
-     * @var list<Entity\Package\OutdatedPackage>
+     * @var list<OutdatedPackage>
      */
     private readonly array $outdatedPackages;
 
     /**
-     * @var list<Entity\Package\Package>
+     * @var list<Package>
      */
     private readonly array $excludedPackages;
 
     /**
-     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
-     * @param list<Entity\Package\Package>         $excludedPackages
+     * @param list<OutdatedPackage> $outdatedPackages
+     * @param list<Package>         $excludedPackages
      */
     public function __construct(array $outdatedPackages, array $excludedPackages = [])
     {
@@ -62,8 +66,8 @@ final class UpdateCheckResult
     }
 
     /**
-     * @param list<Entity\Package\Package> $allowedPackages
-     * @param list<Entity\Package\Package> $excludedPackages
+     * @param list<Package> $allowedPackages
+     * @param list<Package> $excludedPackages
      */
     public static function fromCommandOutput(
         string $output,
@@ -71,7 +75,7 @@ final class UpdateCheckResult
         array $excludedPackages = [],
     ): self {
         $allowedPackageNames = array_map(
-            static fn (Entity\Package\Package $package) => $package->getName(),
+            static fn (Package $package) => $package->getName(),
             $allowedPackages,
         );
 
@@ -79,7 +83,7 @@ final class UpdateCheckResult
         $outdatedPackages = array_unique(
             array_filter(
                 array_map(self::parseCommandOutput(...), $outputParts),
-                static function (?Entity\Package\OutdatedPackage $outdatedPackage) use ($allowedPackageNames) {
+                static function (?OutdatedPackage $outdatedPackage) use ($allowedPackageNames) {
                     if (null === $outdatedPackage) {
                         return false;
                     }
@@ -94,7 +98,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<Entity\Package\OutdatedPackage>
+     * @return list<OutdatedPackage>
      */
     public function getOutdatedPackages(): array
     {
@@ -102,28 +106,28 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<Entity\Package\Package>
+     * @return list<Package>
      */
     public function getExcludedPackages(): array
     {
         return $this->excludedPackages;
     }
 
-    private static function parseCommandOutput(string $output): ?Entity\Package\OutdatedPackage
+    private static function parseCommandOutput(string $output): ?OutdatedPackage
     {
         if (1 !== preg_match(self::COMMAND_OUTPUT_PATTERN, $output, $matches)) {
             return null;
         }
 
-        return new Entity\Package\OutdatedPackage(
+        return new OutdatedPackage(
             $matches['name'],
-            new Entity\Version($matches['outdated']),
-            new Entity\Version($matches['new']),
+            new Version($matches['outdated']),
+            new Version($matches['new']),
         );
     }
 
     /**
-     * @template T of Entity\Package\Package
+     * @template T of Package
      *
      * @param list<T> $packages
      *
@@ -131,7 +135,10 @@ final class UpdateCheckResult
      */
     private function sortPackages(array $packages): array
     {
-        usort($packages, static fn (Entity\Package\Package $a, Entity\Package\Package $b) => strcmp($a->getName(), $b->getName()));
+        usort(
+            $packages,
+            static fn (Package $a, Package $b) => strcmp($a->getName(), $b->getName()),
+        );
 
         return $packages;
     }

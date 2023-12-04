@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InsecurePackage;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -35,24 +35,24 @@ use PHPUnit\Framework\Attributes\Test;
  */
 final class InsecurePackageTest extends AbstractTestCase
 {
-    private InsecurePackage $subject;
+    private SecurityAdvisory $subject;
 
     protected function setUp(): void
     {
-        $this->subject = new InsecurePackage('foo', ['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0']);
+        $this->subject = new SecurityAdvisory('foo', ['>=1.0.0,<1.0.5', '>=2.5.0,<2.6.0']);
     }
 
     #[Test]
     public function getNameReturnsInsecurePackageName(): void
     {
-        self::assertSame('foo', $this->subject->getName());
+        self::assertSame('foo', $this->subject->getPackageName());
     }
 
     #[Test]
     public function getNameSetsNameOfInsecurePackage(): void
     {
         $this->subject->setName('baz');
-        self::assertSame('baz', $this->subject->getName());
+        self::assertSame('baz', $this->subject->getPackageName());
     }
 
     #[Test]

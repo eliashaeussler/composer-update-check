@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Security\ScanResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
 use Http\Client\Exception\TransferException;
@@ -82,15 +82,15 @@ final class SecurityScannerTest extends AbstractTestCase
         $scanResult = $this->subject->scan($packages);
 
         self::assertInstanceOf(ScanResult::class, $scanResult);
-        self::assertCount(1, $scanResult->getInsecurePackages());
-        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertCount(1, $scanResult->getSecurityAdvisories());
+        self::assertSame('foo', $scanResult->getSecurityAdvisories()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getSecurityAdvisories()[0]->getAffectedVersions());
     }
 
     #[Test]
     public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
     {
-        self::assertSame([], $this->subject->scan([])->getInsecurePackages());
+        self::assertSame([], $this->subject->scan([])->getSecurityAdvisories());
     }
 
     #[Test]
@@ -123,9 +123,9 @@ final class SecurityScannerTest extends AbstractTestCase
         $scanResult = $this->subject->scan($packages);
 
         self::assertInstanceOf(ScanResult::class, $scanResult);
-        self::assertCount(1, $scanResult->getInsecurePackages());
-        self::assertSame('foo', $scanResult->getInsecurePackages()[0]->getName());
-        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getInsecurePackages()[0]->getAffectedVersions());
+        self::assertCount(1, $scanResult->getSecurityAdvisories());
+        self::assertSame('foo', $scanResult->getSecurityAdvisories()[0]->getName());
+        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getSecurityAdvisories()[0]->getAffectedVersions());
     }
 
     #[Test]

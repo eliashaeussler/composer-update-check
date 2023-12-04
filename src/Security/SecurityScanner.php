@@ -23,15 +23,19 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
+use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor\Mapper\Source\Source;
+use CuyZ\Valinor\Mapper\TreeMapper;
+use CuyZ\Valinor\MapperBuilder;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
-use JsonException;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Uri;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use RuntimeException;
-use Symfony\Component\HttpClient\Psr18Client;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Exception\PackagistResponseHasErrors;
+use EliasHaeussler\ComposerUpdateCheck\Exception\UnableToFetchSecurityAdvisories;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Uri;
+use Psr\Http\Message\UriInterface;
+use Spatie\Packagist\PackagistClient;
 
 /**
  * SecurityScanner.
@@ -39,52 +43,51 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SecurityScanner
+final readonly class SecurityScanner
 {
-    public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
+    private TreeMapper $mapper;
 
-    private readonly Psr17Factory $requestFactory;
-    private readonly ClientInterface $client;
-
-    public function __construct(ClientInterface $client = null)
-    {
-        $this->requestFactory = new Psr17Factory();
-        $this->client = $client ?? new Psr18Client();
+    public function __construct(
+        private PackagistClient $client,
+    ) {
+        $this->mapper = $this->createMapper();
     }
 
     /**
      * @param list<OutdatedPackage> $packages
+     *
+     * @throws PackagistResponseHasErrors
+     * @throws UnableToFetchSecurityAdvisories
      */
     public function scan(array $packages): ScanResult
     {
+        $packagesToScan = [];
+
         // Early return if no packages are requested to be scanned
         if ([] === $packages) {
             return new ScanResult([]);
         }
 
-        // Parse package names
-        $packagesToScan = [];
         foreach ($packages as $package) {
-            $packagesToScan[] = $package->getName();
+            $packagesToScan[$package->getName()] = $package->getOutdatedVersion()->get();
         }
 
-        // Build API request
-        $query = http_build_query(['packages' => $packagesToScan]);
-        $requestUri = new Uri(self::API_ENDPOINT);
-        $requestUri = $requestUri->withQuery($query);
-        $request = $this->requestFactory->createRequest('GET', $requestUri)->withHeader('Accept', 'application/json');
-
-        // Send API request and evaluate response
         try {
-            $response = $this->client->sendRequest($request);
-            $apiResult = $response->getBody()->__toString();
+            $advisories = $this->client->getAdvisoriesAffectingVersions($packagesToScan);
+            $source = Source::array(['securityAdvisories' => $advisories]);
 
-            return ScanResult::fromApiResult(json_decode($apiResult, true, 512, JSON_THROW_ON_ERROR));
-        } catch (ClientExceptionInterface|JsonException $e) {
-            throw new RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
+            return $this->mapper->map(ScanResult::class, $source);
+        } catch (GuzzleException $exception) {
+            throw new UnableToFetchSecurityAdvisories($exception);
+        } catch (MappingError $error) {
+            throw new PackagistResponseHasErrors($error);
         }
     }
 
+    /**
+     * @throws PackagistResponseHasErrors
+     * @throws UnableToFetchSecurityAdvisories
+     */
     public function scanAndOverlayResult(UpdateCheckResult $result): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
@@ -92,8 +95,20 @@ final class SecurityScanner
 
         foreach ($outdatedPackages as $outdatedPackage) {
             if ($scanResult->isInsecure($outdatedPackage)) {
-                $outdatedPackage->setInsecure(true);
+                $outdatedPackage->setSecurityAdvisories(
+                    $scanResult->getSecurityAdvisoriesForPackage($outdatedPackage),
+                );
             }
         }
+    }
+
+    private function createMapper(): TreeMapper
+    {
+        return (new MapperBuilder())
+            ->allowSuperfluousKeys()
+            ->infer(UriInterface::class, static fn () => Uri::class)
+            ->supportDateFormats('Y-m-d H:i:s')
+            ->mapper()
+        ;
     }
 }
