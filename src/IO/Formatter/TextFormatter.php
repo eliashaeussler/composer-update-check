@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function count;
@@ -73,6 +74,7 @@ final class TextFormatter implements Formatter
         }
 
         $this->renderTable($outdatedPackages);
+        $this->renderSecurityAdvisories($outdatedPackages);
     }
 
     /**
@@ -121,6 +123,46 @@ final class TextFormatter implements Formatter
 
         // Print table
         $this->io->table(['Package', 'Outdated version', 'New version'], $tableRows);
+    }
+
+    /**
+     * @param list<OutdatedPackage> $outdatedPackages
+     */
+    private function renderSecurityAdvisories(array $outdatedPackages): void
+    {
+        if (!$this->io->isVerbose()) {
+            return;
+        }
+
+        foreach ($outdatedPackages as $outdatedPackage) {
+            if (!$outdatedPackage->isInsecure()) {
+                continue;
+            }
+
+            $this->io->title(
+                sprintf('Security advisories for "%s"', $outdatedPackage->getName()),
+            );
+
+            foreach ($outdatedPackage->getSecurityAdvisories() as $securityAdvisory) {
+                $link = $securityAdvisory->getLink();
+
+                $this->io->section($securityAdvisory->getTitle());
+
+                $definitionList = [
+                    ['ID' => $securityAdvisory->getAdvisoryId()],
+                    ['Reported at' => $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s')],
+                    ['Severity' => $securityAdvisory->getSeverity()],
+                    ['CVE' => $securityAdvisory->getCVE() ?? '<fg=gray>Unknown</>'],
+                ];
+
+                if (null !== $link) {
+                    $definitionList[] = new TableSeparator();
+                    $definitionList[] = ['Read more' => (string) $link];
+                }
+
+                $this->io->definitionList(...$definitionList);
+            }
+        }
     }
 
     public function setIO(SymfonyStyle $io): void

@@ -63,7 +63,14 @@ final class JsonFormatter implements Formatter
             return;
         }
 
-        $this->renderTable($outdatedPackages, $excludedPackages);
+        $json = $this->renderTable($outdatedPackages, $excludedPackages);
+        $securityAdvisories = $this->renderSecurityAdvisories($outdatedPackages);
+
+        if ([] !== $securityAdvisories) {
+            $json['securityAdvisories'] = $securityAdvisories;
+        }
+
+        $this->renderJson($json);
     }
 
     /**
@@ -97,8 +104,19 @@ final class JsonFormatter implements Formatter
     /**
      * @param list<OutdatedPackage> $outdatedPackages
      * @param list<Package>         $excludedPackages
+     *
+     * @return array{
+     *     status: string,
+     *     outdatedPackages: list<array{
+     *         name: non-empty-string,
+     *         outdatedVersion: string,
+     *         newVersion: string,
+     *         insecure?: bool,
+     *     }>,
+     *     excludedPackages: list<Package>,
+     * }
      */
-    private function renderTable(array $outdatedPackages, array $excludedPackages): void
+    private function renderTable(array $outdatedPackages, array $excludedPackages): array
     {
         $numberOfOutdatedPackages = count($outdatedPackages);
         $hasInsecurePackages = false;
@@ -132,7 +150,7 @@ final class JsonFormatter implements Formatter
             $json['excludedPackages'] = $excludedPackages;
         }
 
-        $this->renderJson($json);
+        return $json;
     }
 
     /**
@@ -160,6 +178,55 @@ final class JsonFormatter implements Formatter
         }
 
         return $tableRows;
+    }
+
+    /**
+     * @param list<OutdatedPackage> $outdatedPackages
+     *
+     * @return array<string, list<array{
+     *     title: string,
+     *     advisoryId: string,
+     *     reportedAt: string,
+     *     severity: string,
+     *     cve: string|null,
+     *     link?: string,
+     * }>>
+     */
+    private function renderSecurityAdvisories(array $outdatedPackages): array
+    {
+        if (!$this->io->isVerbose()) {
+            return [];
+        }
+
+        $securityAdvisories = [];
+
+        foreach ($outdatedPackages as $outdatedPackage) {
+            if (!$outdatedPackage->isInsecure()) {
+                continue;
+            }
+
+            $securityAdvisories[$outdatedPackage->getName()] = [];
+
+            foreach ($outdatedPackage->getSecurityAdvisories() as $securityAdvisory) {
+                $link = $securityAdvisory->getLink();
+
+                $json = [
+                    'title' => $securityAdvisory->getTitle(),
+                    'advisoryId' => $securityAdvisory->getAdvisoryId(),
+                    'reportedAt' => $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s'),
+                    'severity' => $securityAdvisory->getSeverity(),
+                    'cve' => $securityAdvisory->getCVE(),
+                ];
+
+                if (null !== $link) {
+                    $json['link'] = (string) $link;
+                }
+
+                $securityAdvisories[$outdatedPackage->getName()][] = $json;
+            }
+        }
+
+        return $securityAdvisories;
     }
 
     /**
