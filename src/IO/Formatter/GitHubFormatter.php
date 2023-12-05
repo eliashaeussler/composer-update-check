@@ -71,7 +71,7 @@ final class GitHubFormatter implements Formatter
                     'Outdated version: %s%%0ANew version: %s%s',
                     $outdatedPackage->getOutdatedVersion(),
                     $outdatedPackage->getNewVersion(),
-                    $outdatedPackage->isInsecure() ? '%0APackage is insecure' : '',
+                    $outdatedPackage->isInsecure() ? '%0A🚨 Package is insecure' : '',
                 ),
                 'warning',
             );
