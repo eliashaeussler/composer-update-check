@@ -46,13 +46,13 @@ use function array_merge;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class UpdateChecker
+final class UpdateChecker
 {
     public function __construct(
-        private Composer $composer,
-        private ComposerInstaller $installer,
-        private IOInterface $io,
-        private SecurityScanner $securityScanner,
+        private readonly Composer $composer,
+        private readonly ComposerInstaller $installer,
+        private readonly IOInterface $io,
+        private readonly SecurityScanner $securityScanner,
     ) {}
 
     public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult

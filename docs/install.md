@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* PHP >= 8.2
+* PHP >= 8.1
 * Composer >= 2.1
 
 ## Installation

@@ -44,12 +44,12 @@ use function in_array;
  *
  * @internal
  */
-final readonly class ContainerFactory
+final class ContainerFactory
 {
     /**
      * @var list<string>
      */
-    private array $configs;
+    private readonly array $configs;
 
     /**
      * @param list<string> $configs

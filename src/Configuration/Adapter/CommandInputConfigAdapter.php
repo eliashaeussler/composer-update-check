@@ -36,10 +36,10 @@ use function str_starts_with;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class CommandInputConfigAdapter implements ConfigAdapter
+final class CommandInputConfigAdapter implements ConfigAdapter
 {
     public function __construct(
-        private InputInterface $input,
+        private readonly InputInterface $input,
     ) {}
 
     public function resolve(): ComposerUpdateCheckConfig

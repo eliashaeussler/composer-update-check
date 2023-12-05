@@ -37,10 +37,10 @@ use function getcwd;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-abstract readonly class FileBasedConfigAdapter implements ConfigAdapter
+abstract class FileBasedConfigAdapter implements ConfigAdapter
 {
-    protected string $filename;
-    protected TreeMapper $mapper;
+    protected readonly string $filename;
+    protected readonly TreeMapper $mapper;
 
     /**
      * @throws FileDoesNotExist

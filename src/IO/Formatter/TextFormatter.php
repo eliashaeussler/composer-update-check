@@ -26,8 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function count;
 use function sprintf;
@@ -43,7 +42,7 @@ final class TextFormatter implements Formatter
     public const FORMAT = 'text';
 
     public function __construct(
-        private (OutputInterface&StyleInterface)|null $io = null,
+        private ?SymfonyStyle $io = null,
     ) {}
 
     public function formatResult(UpdateCheckResult $result): void
@@ -124,7 +123,7 @@ final class TextFormatter implements Formatter
         $this->io->table(['Package', 'Outdated version', 'New version'], $tableRows);
     }
 
-    public function setIO(OutputInterface&StyleInterface $io): void
+    public function setIO(SymfonyStyle $io): void
     {
         $this->io = $io;
     }

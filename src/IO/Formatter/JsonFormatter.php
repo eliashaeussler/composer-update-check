@@ -26,8 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function count;
 use function json_encode;
@@ -44,7 +43,7 @@ final class JsonFormatter implements Formatter
     public const FORMAT = 'json';
 
     public function __construct(
-        private (OutputInterface&StyleInterface)|null $io = null,
+        private ?SymfonyStyle $io = null,
     ) {}
 
     public function formatResult(UpdateCheckResult $result): void
@@ -183,7 +182,7 @@ final class JsonFormatter implements Formatter
         $this->io->writeln(json_encode($json, $flags));
     }
 
-    public function setIO(OutputInterface&StyleInterface $io): void
+    public function setIO(SymfonyStyle $io): void
     {
         $this->io = $io;
     }

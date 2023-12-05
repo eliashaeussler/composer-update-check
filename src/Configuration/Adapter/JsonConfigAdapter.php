@@ -35,7 +35,7 @@ use SplFileObject;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class JsonConfigAdapter extends FileBasedConfigAdapter
+final class JsonConfigAdapter extends FileBasedConfigAdapter
 {
     /**
      * @throws ConfigFileHasErrors

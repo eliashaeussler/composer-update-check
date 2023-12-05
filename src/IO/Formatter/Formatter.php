@@ -24,8 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Formatter.
@@ -37,7 +36,7 @@ interface Formatter
 {
     public function formatResult(UpdateCheckResult $result): void;
 
-    public function setIO(OutputInterface&StyleInterface $io): void;
+    public function setIO(SymfonyStyle $io): void;
 
     public static function getFormat(): string;
 }

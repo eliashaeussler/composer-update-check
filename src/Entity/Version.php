@@ -31,10 +31,10 @@ use Stringable;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class Version implements Stringable
+final class Version implements Stringable
 {
     public function __construct(
-        private string $version,
+        private readonly string $version,
     ) {}
 
     public function get(): string

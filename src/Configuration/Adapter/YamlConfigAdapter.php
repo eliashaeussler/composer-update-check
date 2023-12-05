@@ -38,7 +38,7 @@ use function is_iterable;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class YamlConfigAdapter extends FileBasedConfigAdapter
+final class YamlConfigAdapter extends FileBasedConfigAdapter
 {
     /**
      * @throws ConfigFileHasErrors

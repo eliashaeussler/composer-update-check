@@ -40,11 +40,11 @@ use function method_exists;
  *
  * @internal
  */
-final readonly class ComposerInstaller
+final class ComposerInstaller
 {
     public function __construct(
-        private Composer $composer,
-        private IOInterface $io,
+        private readonly Composer $composer,
+        private readonly IOInterface $io,
     ) {}
 
     public function runInstall(IOInterface $io = null): int

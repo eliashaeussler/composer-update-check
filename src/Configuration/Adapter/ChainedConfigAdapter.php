@@ -32,13 +32,13 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\TextFormatter;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class ChainedConfigAdapter implements ConfigAdapter
+final class ChainedConfigAdapter implements ConfigAdapter
 {
     /**
      * @param list<ConfigAdapter> $adapters
      */
     public function __construct(
-        private array $adapters,
+        private readonly array $adapters,
     ) {}
 
     public function resolve(): ComposerUpdateCheckConfig

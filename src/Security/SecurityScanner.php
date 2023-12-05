@@ -43,12 +43,12 @@ use Spatie\Packagist\PackagistClient;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class SecurityScanner
+final class SecurityScanner
 {
-    private TreeMapper $mapper;
+    private readonly TreeMapper $mapper;
 
     public function __construct(
-        private PackagistClient $client,
+        private readonly PackagistClient $client,
     ) {
         $this->mapper = $this->createMapper();
     }

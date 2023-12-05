@@ -24,8 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use EliasHaeussler\ComposerUpdateCheck\Exception\FormatterIsNotSupported;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
@@ -41,7 +40,7 @@ final class FormatterFactory
      */
     public function __construct(
         private readonly ServiceLocator $formatters,
-        private (OutputInterface&StyleInterface)|null $io = null,
+        private ?SymfonyStyle $io = null,
     ) {}
 
     /**
@@ -62,7 +61,7 @@ final class FormatterFactory
         return $formatter;
     }
 
-    public function setIO(OutputInterface&StyleInterface $io): void
+    public function setIO(SymfonyStyle $io): void
     {
         $this->io = $io;
     }

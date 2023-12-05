@@ -31,7 +31,7 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final readonly class PhpConfigAdapter extends FileBasedConfigAdapter
+final class PhpConfigAdapter extends FileBasedConfigAdapter
 {
     public function resolve(): ComposerUpdateCheckConfig
     {
