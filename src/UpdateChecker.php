@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck;
 use Composer\Composer;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
+use EliasHaeussler\ComposerUpdateCheck\Composer\CommandResultParser;
 use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
@@ -49,6 +50,7 @@ use function array_merge;
 final class UpdateChecker
 {
     public function __construct(
+        private readonly CommandResultParser $commandResultParser,
         private readonly Composer $composer,
         private readonly ComposerInstaller $installer,
         private readonly IOInterface $io,
@@ -103,7 +105,9 @@ final class UpdateChecker
             throw new ComposerUpdateFailed($exitCode);
         }
 
-        return UpdateCheckResult::fromCommandOutput($io->getOutput(), $packages, $excludedPackages);
+        $outdatedPackages = $this->commandResultParser->parse($io->getOutput(), $packages);
+
+        return new UpdateCheckResult($outdatedPackages, $excludedPackages);
     }
 
     /**

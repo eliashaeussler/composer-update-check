@@ -25,7 +25,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
 
 /**
  * UpdateCheckResult.
@@ -35,16 +34,6 @@ use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
  */
 final class UpdateCheckResult
 {
-    private const COMMAND_OUTPUT_PATTERN =
-        '#^'.
-            '\\s*- Upgrading '.
-            '(?P<name>\\S+) \\('.
-                '(?P<outdated>dev-\\S+ \\S+|(?!dev-)\\S+)'.
-                ' => '.
-                '(?P<new>dev-\S+ \S+|(?!dev-)\S+)'.
-            '\\)'.
-        '$#';
-
     /**
      * @var list<OutdatedPackage>
      */
@@ -66,38 +55,6 @@ final class UpdateCheckResult
     }
 
     /**
-     * @param list<Package> $allowedPackages
-     * @param list<Package> $excludedPackages
-     */
-    public static function fromCommandOutput(
-        string $output,
-        array $allowedPackages,
-        array $excludedPackages = [],
-    ): self {
-        $allowedPackageNames = array_map(
-            static fn (Package $package) => $package->getName(),
-            $allowedPackages,
-        );
-
-        $outputParts = explode(PHP_EOL, $output);
-        $outdatedPackages = array_unique(
-            array_filter(
-                array_map(self::parseCommandOutput(...), $outputParts),
-                static function (?OutdatedPackage $outdatedPackage) use ($allowedPackageNames) {
-                    if (null === $outdatedPackage) {
-                        return false;
-                    }
-
-                    return in_array($outdatedPackage->getName(), $allowedPackageNames, true);
-                },
-            ),
-            SORT_REGULAR,
-        );
-
-        return new self($outdatedPackages, $excludedPackages);
-    }
-
-    /**
      * @return list<OutdatedPackage>
      */
     public function getOutdatedPackages(): array
@@ -111,19 +68,6 @@ final class UpdateCheckResult
     public function getExcludedPackages(): array
     {
         return $this->excludedPackages;
-    }
-
-    private static function parseCommandOutput(string $output): ?OutdatedPackage
-    {
-        if (1 !== preg_match(self::COMMAND_OUTPUT_PATTERN, $output, $matches)) {
-            return null;
-        }
-
-        return new OutdatedPackage(
-            $matches['name'],
-            new Version($matches['outdated']),
-            new Version($matches['new']),
-        );
     }
 
     /**
