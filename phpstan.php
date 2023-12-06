@@ -41,7 +41,7 @@ return PHPStanConfig\Config\Config::create(__DIR__)
         'tests/Build/*',
     )
     ->withBaseline()
-    ->level(7)
+    ->level(8)
     ->withSets($symfonySet)
     ->toArray()
 ;

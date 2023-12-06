@@ -194,7 +194,7 @@ final class JsonFormatter implements Formatter
      */
     private function renderSecurityAdvisories(array $outdatedPackages): array
     {
-        if (!$this->io->isVerbose()) {
+        if (true !== $this->io?->isVerbose()) {
             return [];
         }
 
@@ -235,7 +235,7 @@ final class JsonFormatter implements Formatter
     private function renderJson(array $json): void
     {
         // Early return if output is quiet
-        if ($this->io->isQuiet()) {
+        if (false !== $this->io?->isQuiet()) {
             return;
         }
 

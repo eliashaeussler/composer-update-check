@@ -41,11 +41,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class Plugin implements PluginInterface, Capable, CommandProvider
 {
-    private static ?ContainerInterface $container = null;
+    private static ContainerInterface $container;
+
+    public function __construct()
+    {
+        self::$container ??= (new ContainerFactory())->make();
+    }
 
     public function activate(Composer $composer, IOInterface $io): void
     {
-        self::$container = (new ContainerFactory())->make();
         self::$container->set(Composer::class, $composer);
         self::$container->set(IOInterface::class, $io);
     }

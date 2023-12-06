@@ -94,7 +94,7 @@ final class TextFormatter implements Formatter
             $additionalInformation = '';
         }
 
-        $this->io->success(
+        $this->io?->success(
             sprintf('All packages are up to date%s.', $additionalInformation),
         );
     }
@@ -122,7 +122,7 @@ final class TextFormatter implements Formatter
         }
 
         // Print table
-        $this->io->table(['Package', 'Outdated version', 'New version'], $tableRows);
+        $this->io?->table(['Package', 'Outdated version', 'New version'], $tableRows);
     }
 
     /**
@@ -130,7 +130,7 @@ final class TextFormatter implements Formatter
      */
     private function renderSecurityAdvisories(array $outdatedPackages): void
     {
-        if (!$this->io->isVerbose()) {
+        if (true !== $this->io?->isVerbose()) {
             return;
         }
 
