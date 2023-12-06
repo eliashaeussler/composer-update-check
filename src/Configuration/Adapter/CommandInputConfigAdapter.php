@@ -47,7 +47,10 @@ final class CommandInputConfigAdapter implements ConfigAdapter
         $config = new ComposerUpdateCheckConfig();
 
         if ($this->input->hasOption('ignore-packages')) {
-            foreach ($this->input->getOption('ignore-packages') as $pattern) {
+            /** @var array<string> $excludePatterns */
+            $excludePatterns = $this->input->getOption('ignore-packages');
+
+            foreach ($excludePatterns as $pattern) {
                 $excludePattern = $this->resolveExcludePattern($pattern);
                 $config->excludePackageByPattern($excludePattern);
             }
