@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 
+use EliasHaeussler\ComposerUpdateCheck\DependencyInjection\CompilerPass\ContainerBuilderDebugDumpPass;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsNotSupported;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -34,7 +35,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Filesystem\Path;
 
 use function dirname;
+use function file_exists;
 use function in_array;
+use function sys_get_temp_dir;
+use function uniqid;
 
 /**
  * ContainerFactory.
@@ -71,13 +75,18 @@ final class ContainerFactory
     /**
      * @throws ConfigFileIsNotSupported
      */
-    public function make(): ContainerInterface
+    public function make(bool $debug = false): ContainerInterface
     {
         $container = new ContainerBuilder();
 
         foreach ($this->configs as $config) {
             $loader = $this->createLoader($config, $container);
             $loader->load($config);
+        }
+
+        if ($debug) {
+            $containerXmlFilename = $this->buildContainerXmlFilename($container);
+            $container->addCompilerPass(new ContainerBuilderDebugDumpPass($containerXmlFilename));
         }
 
         $container->compile();
@@ -103,5 +112,18 @@ final class ContainerFactory
     private function getDefaultConfigurationFile(): string
     {
         return dirname(__DIR__, 2).'/config/services.yaml';
+    }
+
+    private function buildContainerXmlFilename(ContainerBuilder $container): string
+    {
+        $tempDir = sys_get_temp_dir();
+
+        do {
+            $filename = Path::join($tempDir, uniqid('ComposerUpdateCheck_')).'.xml';
+        } while (file_exists($filename));
+
+        $container->setParameter('debug.container_xml_filename', $filename);
+
+        return $filename;
     }
 }

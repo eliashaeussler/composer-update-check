@@ -21,10 +21,15 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 use EliasHaeussler\PHPStanConfig;
+
+$container = (new DependencyInjection\ContainerFactory())->make(true);
+$containerXmlFile = $container->getParameter('debug.container_xml_filename');
 
 $symfonySet = PHPStanConfig\Set\SymfonySet::create()
     ->withConsoleApplicationLoader('Tests/Build/phpstan/console-application.php')
+    ->withContainerXmlPath($containerXmlFile)
 ;
 
 return PHPStanConfig\Config\Config::create(__DIR__)
@@ -36,7 +41,7 @@ return PHPStanConfig\Config\Config::create(__DIR__)
         'tests/Build/*',
     )
     ->withBaseline()
-    ->level(6)
+    ->level(7)
     ->withSets($symfonySet)
     ->toArray()
 ;

@@ -55,7 +55,7 @@ final class GitHubFormatter implements Formatter
 
         // Resolve path to composer.json file
         $composerFile = Path::makeRelative(
-            realpath(Factory::getComposerFile()),
+            (string) realpath(Factory::getComposerFile()),
             Platform::getCwd(),
         );
 

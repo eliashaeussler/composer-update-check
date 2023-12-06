@@ -135,7 +135,9 @@ final class UpdateChecker
         $this->io->writeError('📦 Resolving packages...', true, IOInterface::VERBOSE);
 
         $rootPackage = $this->composer->getPackage();
+        /** @var array<non-empty-string> $requiredPackages */
         $requiredPackages = array_keys($rootPackage->getRequires());
+        /** @var array<non-empty-string> $requiredDevPackages */
         $requiredDevPackages = array_keys($rootPackage->getDevRequires());
         $excludedPackages = [];
 
@@ -161,10 +163,10 @@ final class UpdateChecker
     }
 
     /**
-     * @param string[]                    $packages
+     * @param array<non-empty-string>     $packages
      * @param list<PackageExcludePattern> $excludePatterns
      *
-     * @return string[]
+     * @return array<non-empty-string>
      */
     private function removeByExcludePatterns(array &$packages, array $excludePatterns): array
     {
@@ -188,7 +190,7 @@ final class UpdateChecker
     }
 
     /**
-     * @param array<string> $packageNames
+     * @param array<non-empty-string> $packageNames
      *
      * @return array<Package>
      */

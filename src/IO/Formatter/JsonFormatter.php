@@ -113,7 +113,7 @@ final class JsonFormatter implements Formatter
      *         newVersion: string,
      *         insecure?: bool,
      *     }>,
-     *     excludedPackages: list<Package>,
+     *     excludedPackages?: list<Package>,
      * }
      */
     private function renderTable(array $outdatedPackages, array $excludedPackages): array
