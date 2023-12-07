@@ -25,7 +25,6 @@ use EliasHaeussler\RectorConfig\Config\Config;
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
-use Rector\Privatization\Rector\Class_\FinalizeClassesWithoutChildrenRector;
 
 return static function (RectorConfig $rectorConfig): void {
     Config::create($rectorConfig, PhpVersion::PHP_81)
@@ -37,20 +36,11 @@ return static function (RectorConfig $rectorConfig): void {
         ->skip(
             AnnotationToAttributeRector::class,
             [
+                __DIR__.'/src/DependencyInjection/CompilerPass/ContainerBuilderDebugDumpPass.php',
                 __DIR__.'/src/Event/PostUpdateCheckEvent.php',
                 __DIR__.'/src/Plugin.php',
             ],
         )
-//        ->skip(
-//            FinalizeClassesWithoutChildrenRector::class,
-//            [
-//                __DIR__.'/src/Sitemap/Sitemap.php',
-//                __DIR__.'/src/Sitemap/Url.php',
-//                // For some reason Rector does not recognize child classes
-//                // of this fixture class, therefore we need to skip it here
-//                __DIR__.'/tests/src/Fixtures/Classes/DummyCrawler.php',
-//            ],
-//        )
         ->apply()
     ;
 };
