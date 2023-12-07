@@ -73,8 +73,15 @@ final class UpdateChecker
 
         // Overlay security scan
         if ($config->shouldPerformSecurityScan() && [] !== $result->getOutdatedPackages()) {
-            $this->io->writeError('🚨 Checking for insecure packages...', true, IOInterface::VERBOSE);
-            $this->securityScanner->scanAndOverlayResult($result);
+            try {
+                $this->io->writeError('🚨 Checking for insecure packages... ', false, IOInterface::VERBOSE);
+                $this->securityScanner->scanAndOverlayResult($result);
+                $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
+            } catch (Exception\PackagistResponseHasErrors|Exception\UnableToFetchSecurityAdvisories $exception) {
+                $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
+
+                throw $exception;
+            }
         }
 
         // Dispatch event
@@ -107,7 +114,7 @@ final class UpdateChecker
         $this->installDependencies();
 
         // Show progress
-        $this->io->writeError('⏳ Checking for outdated packages...', true, IOInterface::VERBOSE);
+        $this->io->writeError('⏳ Checking for outdated packages... ', false, IOInterface::VERBOSE);
 
         // Run Composer installer
         $io = new BufferIO();
@@ -115,10 +122,13 @@ final class UpdateChecker
 
         // Handle installer failures
         if ($exitCode > 0) {
+            $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
             $this->io->writeError($io->getOutput());
 
             throw new Exception\ComposerUpdateFailed($exitCode);
         }
+
+        $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
 
         $outdatedPackages = $this->commandResultParser->parse($io->getOutput(), $packages);
 

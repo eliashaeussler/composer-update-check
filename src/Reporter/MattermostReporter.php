@@ -68,16 +68,23 @@ final class MattermostReporter implements Reporter
 
         // Send report
         try {
-            $this->io->write('📤 Sending report to Mattermost...', true, IOInterface::VERBOSE);
+            $this->io->writeError('📤 Sending report to Mattermost... ', false, IOInterface::VERBOSE);
 
             $response = $this->client->post($url, [
                 RequestOptions::JSON => $report,
             ]);
+            $successful = 200 === $response->getStatusCode();
         } catch (GuzzleException) {
-            return false;
+            $successful = false;
         }
 
-        return 200 === $response->getStatusCode();
+        if ($successful) {
+            $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
+        } else {
+            $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
+        }
+
+        return $successful;
     }
 
     public static function getName(): string
