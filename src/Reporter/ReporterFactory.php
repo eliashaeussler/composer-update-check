@@ -42,19 +42,14 @@ final class ReporterFactory
     ) {}
 
     /**
-     * @param array<string, mixed> $options
-     *
      * @throws ReporterIsNotSupported
      */
-    public function make(string $name, array $options = []): Reporter
+    public function make(string $name): Reporter
     {
         if (!$this->reporters->has($name)) {
             throw new ReporterIsNotSupported($name);
         }
 
-        $reporter = $this->reporters->get($name);
-        $reporter->setOptions($options);
-
-        return $reporter;
+        return $this->reporters->get($name);
     }
 }

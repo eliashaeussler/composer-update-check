@@ -62,17 +62,11 @@ final class UpdateChecker
      * @throws Exception\ComposerUpdateFailed
      * @throws Exception\PackagistResponseHasErrors
      * @throws Exception\ReporterIsNotSupported
+     * @throws Exception\ReporterOptionsAreInvalid
      * @throws Exception\UnableToFetchSecurityAdvisories
      */
     public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult
     {
-        $reporters = [];
-
-        // Resolve reporters
-        foreach ($config->getReporters() as $name => $options) {
-            $reporters[] = $this->reporterFactory->make($name, $options);
-        }
-
         // Run update check
         [$packages, $excludedPackages] = $this->resolvePackagesForUpdateCheck($config);
         $result = $this->runUpdateCheck($packages, $excludedPackages);
@@ -87,8 +81,9 @@ final class UpdateChecker
         $this->dispatchPostUpdateCheckEvent($result);
 
         // Report update check result
-        foreach ($reporters as $reporter) {
-            $reporter->report($result);
+        foreach ($config->getReporters() as $name => $options) {
+            $reporter = $this->reporterFactory->make($name);
+            $reporter->report($result, $options);
         }
 
         return $result;

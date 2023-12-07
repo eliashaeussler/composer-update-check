@@ -27,12 +27,10 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Report\MattermostReport;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ReporterOptionsAreInvalid;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\UriInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -46,9 +44,6 @@ final class MattermostReporter implements Reporter
     public const NAME = 'mattermost';
 
     private readonly OptionsResolver $resolver;
-    private ?UriInterface $url = null;
-    private ?string $channel = null;
-    private ?string $username = null;
 
     public function __construct(
         private readonly Client $client,
@@ -58,15 +53,9 @@ final class MattermostReporter implements Reporter
         $this->resolver = $this->createOptionsResolver();
     }
 
-    /**
-     * @throws ReporterOptionsAreInvalid
-     */
-    public function report(UpdateCheckResult $result): bool
+    public function report(UpdateCheckResult $result, array $options): bool
     {
-        // Validate options
-        if (null === $this->url || null === $this->channel) {
-            throw new ReporterOptionsAreInvalid(self::NAME);
-        }
+        ['url' => $url, 'channel' => $channel, 'username' => $username] = $this->resolver->resolve($options);
 
         // Resolve root package name from composer.json
         $rootPackageName = $this->composer->getPackage()->getName();
@@ -75,13 +64,13 @@ final class MattermostReporter implements Reporter
         }
 
         // Create report
-        $report = MattermostReport::create($this->channel, $this->username, $result, $rootPackageName);
+        $report = MattermostReport::create($channel, $username, $result, $rootPackageName);
 
         // Send report
         try {
             $this->io->write('📤 Sending report to Mattermost...', true, IOInterface::VERBOSE);
 
-            $response = $this->client->post($this->url, [
+            $response = $this->client->post($url, [
                 RequestOptions::JSON => $report,
             ]);
         } catch (GuzzleException) {
@@ -89,11 +78,6 @@ final class MattermostReporter implements Reporter
         }
 
         return 200 === $response->getStatusCode();
-    }
-
-    public function setOptions(array $options): void
-    {
-        ['url' => $this->url, 'channel' => $this->channel, 'username' => $this->username] = $this->resolver->resolve($options);
     }
 
     public static function getName(): string
