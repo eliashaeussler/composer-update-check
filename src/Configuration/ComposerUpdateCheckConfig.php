@@ -35,13 +35,15 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\TextFormatter;
 final class ComposerUpdateCheckConfig
 {
     /**
-     * @param list<PackageExcludePattern> $excludePatterns
+     * @param list<PackageExcludePattern>         $excludePatterns
+     * @param array<string, array<string, mixed>> $reporters
      */
     public function __construct(
         private array $excludePatterns = [],
         private bool $includeDevPackages = true,
         private bool $performSecurityScan = false,
         private string $format = TextFormatter::FORMAT,
+        private array $reporters = [],
     ) {}
 
     public function excludePackageByName(string $name): self
@@ -121,5 +123,30 @@ final class ComposerUpdateCheckConfig
     public function getFormat(): string
     {
         return $this->format;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function enableReporter(string $name, array $options = []): self
+    {
+        $this->reporters[$name] = $options;
+
+        return $this;
+    }
+
+    public function disableReporter(string $name): self
+    {
+        unset($this->reporters[$name]);
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public function getReporters(): array
+    {
+        return $this->reporters;
     }
 }

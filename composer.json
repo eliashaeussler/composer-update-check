@@ -33,6 +33,7 @@
 		"symfony/dependency-injection": "^5.4 || ^6.0",
 		"symfony/filesystem": "^5.4 || ^6.0",
 		"symfony/http-client": "^5.4 || ^6.0",
+		"symfony/options-resolver": "^5.4 || ^6.0",
 		"symfony/yaml": "^5.4 || ^6.0"
 	},
 	"require-dev": {

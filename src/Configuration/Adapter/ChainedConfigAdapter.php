@@ -69,5 +69,9 @@ final class ChainedConfigAdapter implements ConfigAdapter
         if (TextFormatter::FORMAT !== $other->getFormat()) {
             $config->setFormat($other->getFormat());
         }
+
+        foreach ($other->getReporters() as $name => $options) {
+            $config->enableReporter($name, $options);
+        }
     }
 }

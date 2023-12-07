@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 
 /**
  * UpdateCheckResult.
@@ -68,6 +69,43 @@ final class UpdateCheckResult
     public function getExcludedPackages(): array
     {
         return $this->excludedPackages;
+    }
+
+    /**
+     * @return list<SecurityAdvisory>
+     */
+    public function getSecurityAdvisories(): array
+    {
+        $securityAdvisories = [];
+
+        foreach ($this->outdatedPackages as $outdatedPackage) {
+            foreach ($outdatedPackage->getSecurityAdvisories() as $securityAdvisory) {
+                $securityAdvisories[] = $securityAdvisory;
+            }
+        }
+
+        return $securityAdvisories;
+    }
+
+    /**
+     * @return list<OutdatedPackage>
+     */
+    public function getInsecureOutdatedPackages(): array
+    {
+        $insecurePackages = [];
+
+        foreach ($this->outdatedPackages as $outdatedPackage) {
+            if ($outdatedPackage->isInsecure()) {
+                $insecurePackages[] = $outdatedPackage;
+            }
+        }
+
+        return $insecurePackages;
+    }
+
+    public function hasInsecureOutdatedPackages(): bool
+    {
+        return [] !== $this->getInsecureOutdatedPackages();
     }
 
     /**

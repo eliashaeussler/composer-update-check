@@ -34,8 +34,7 @@ use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InstalledPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerInstallFailed;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ComposerUpdateFailed;
+use EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
 use function array_map;
@@ -55,10 +54,26 @@ final class UpdateChecker
         private readonly ComposerInstaller $installer,
         private readonly IOInterface $io,
         private readonly SecurityScanner $securityScanner,
+        private readonly ReporterFactory $reporterFactory,
     ) {}
 
+    /**
+     * @throws Exception\ComposerInstallFailed
+     * @throws Exception\ComposerUpdateFailed
+     * @throws Exception\PackagistResponseHasErrors
+     * @throws Exception\ReporterIsNotSupported
+     * @throws Exception\UnableToFetchSecurityAdvisories
+     */
     public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult
     {
+        $reporters = [];
+
+        // Resolve reporters
+        foreach ($config->getReporters() as $name => $options) {
+            $reporters[] = $this->reporterFactory->make($name, $options);
+        }
+
+        // Run update check
         [$packages, $excludedPackages] = $this->resolvePackagesForUpdateCheck($config);
         $result = $this->runUpdateCheck($packages, $excludedPackages);
 
@@ -71,6 +86,11 @@ final class UpdateChecker
         // Dispatch event
         $this->dispatchPostUpdateCheckEvent($result);
 
+        // Report update check result
+        foreach ($reporters as $reporter) {
+            $reporter->report($result);
+        }
+
         return $result;
     }
 
@@ -78,8 +98,8 @@ final class UpdateChecker
      * @param list<Package> $packages
      * @param list<Package> $excludedPackages
      *
-     * @throws ComposerInstallFailed
-     * @throws ComposerUpdateFailed
+     * @throws Exception\ComposerInstallFailed
+     * @throws Exception\ComposerUpdateFailed
      */
     private function runUpdateCheck(array $packages, array $excludedPackages): UpdateCheckResult
     {
@@ -102,7 +122,7 @@ final class UpdateChecker
         if ($exitCode > 0) {
             $this->io->writeError($io->getOutput());
 
-            throw new ComposerUpdateFailed($exitCode);
+            throw new Exception\ComposerUpdateFailed($exitCode);
         }
 
         $outdatedPackages = $this->commandResultParser->parse($io->getOutput(), $packages);
@@ -111,7 +131,7 @@ final class UpdateChecker
     }
 
     /**
-     * @throws ComposerInstallFailed
+     * @throws Exception\ComposerInstallFailed
      */
     private function installDependencies(): void
     {
@@ -123,7 +143,7 @@ final class UpdateChecker
         if ($exitCode > 0) {
             $this->io->writeError($io->getOutput());
 
-            throw new ComposerInstallFailed($exitCode);
+            throw new Exception\ComposerInstallFailed($exitCode);
         }
     }
 

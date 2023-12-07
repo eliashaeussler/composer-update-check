@@ -34,9 +34,9 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Filesystem\Path;
 
+use function array_unique;
 use function dirname;
 use function file_exists;
-use function in_array;
 use function sys_get_temp_dir;
 use function uniqid;
 
@@ -60,16 +60,12 @@ final class ContainerFactory
      */
     public function __construct(array $configs = [])
     {
-        $defaultConfigurationFile = $this->getDefaultConfigurationFile();
+        $defaultConfigurationFiles = $this->getDefaultConfigurationFiles();
 
-        if (!in_array($defaultConfigurationFile, $configs, true)) {
-            $this->configs = [
-                $defaultConfigurationFile,
-                ...$configs,
-            ];
-        } else {
-            $this->configs = $configs;
-        }
+        $this->configs = array_unique([
+            ...$defaultConfigurationFiles,
+            ...$configs,
+        ]);
     }
 
     /**
@@ -109,9 +105,17 @@ final class ContainerFactory
         };
     }
 
-    private function getDefaultConfigurationFile(): string
+    /**
+     * @return list<non-empty-string>
+     */
+    private function getDefaultConfigurationFiles(): array
     {
-        return dirname(__DIR__, 2).'/config/services.yaml';
+        $configDir = dirname(__DIR__, 2).'/config';
+
+        return [
+            $configDir.'/services.php',
+            $configDir.'/services.yaml',
+        ];
     }
 
     private function buildContainerXmlFilename(ContainerBuilder $container): string

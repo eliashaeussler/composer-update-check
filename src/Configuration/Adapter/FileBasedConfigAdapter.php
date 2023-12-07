@@ -71,6 +71,7 @@ abstract class FileBasedConfigAdapter implements ConfigAdapter
     private function createMapper(): TreeMapper
     {
         return (new MapperBuilder())
+            ->allowPermissiveTypes()
             ->mapper()
         ;
     }
