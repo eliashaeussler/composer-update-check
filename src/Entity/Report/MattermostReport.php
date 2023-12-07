@@ -40,7 +40,7 @@ use function sprintf;
 final class MattermostReport implements JsonSerializable
 {
     /**
-     * @param list<Attachment\MattermostAttachment> $attachments
+     * @param list<Dto\MattermostAttachment> $attachments
      */
     private function __construct(
         public readonly string $channel,
@@ -88,7 +88,7 @@ final class MattermostReport implements JsonSerializable
     }
 
     /**
-     * @return list<Attachment\MattermostAttachment>
+     * @return list<Dto\MattermostAttachment>
      */
     private static function createAttachments(UpdateCheckResult $result, string $rootPackageName = null): array
     {
@@ -96,14 +96,14 @@ final class MattermostReport implements JsonSerializable
         $attachments = [];
 
         // Outdated packages
-        $attachments[] = new Attachment\MattermostAttachment(
+        $attachments[] = new Dto\MattermostAttachment(
             '#EE0000',
             self::renderOutdatedPackagesTable($result, $rootPackageName),
         );
 
         // Security advisories
         if ([] !== $securityAdvisories) {
-            $attachments[] = new Attachment\MattermostAttachment(
+            $attachments[] = new Dto\MattermostAttachment(
                 '#EE0000',
                 self::renderSecurityAdvisoriesTable($securityAdvisories),
             );
@@ -178,7 +178,7 @@ final class MattermostReport implements JsonSerializable
      * @return array{
      *     channel: string,
      *     text: string,
-     *     attachments: list<Attachment\MattermostAttachment>,
+     *     attachments: list<Dto\MattermostAttachment>,
      *     username?: string,
      * }
      */
