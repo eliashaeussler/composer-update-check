@@ -37,6 +37,7 @@ use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 use EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
 
+use function array_keys;
 use function array_map;
 use function array_merge;
 
@@ -67,6 +68,8 @@ final class UpdateChecker
      */
     public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult
     {
+        $this->validateReporters($config->getReporters());
+
         // Run update check
         [$packages, $excludedPackages] = $this->resolvePackagesForUpdateCheck($config);
         $result = $this->runUpdateCheck($packages, $excludedPackages);
@@ -212,6 +215,19 @@ final class UpdateChecker
         });
 
         return $excludedPackages;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $reporters
+     *
+     * @throws Exception\ReporterIsNotSupported
+     */
+    private function validateReporters(array $reporters): void
+    {
+        foreach (array_keys($reporters) as $name) {
+            // Will throw an exception if reporter is not supported
+            $this->reporterFactory->make($name);
+        }
     }
 
     /**
