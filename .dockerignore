@@ -14,3 +14,5 @@
 /phpstan.php
 /phpstan-baseline.neon
 /phpunit.xml
+/rector.php
+/renovate.json
