@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Options;
 
 use function fnmatch;
 use function preg_match;
+use function str_starts_with;
 
 /**
  * PackageExcludePattern.
@@ -45,6 +46,15 @@ final class PackageExcludePattern
     private function __construct(callable $matchFunction)
     {
         $this->matchFunction = $matchFunction;
+    }
+
+    public static function create(string $pattern): self
+    {
+        if (str_starts_with($pattern, '/') || str_starts_with($pattern, '#')) {
+            return self::byRegularExpression($pattern);
+        }
+
+        return self::byName($pattern);
     }
 
     public static function byName(string $name): self

@@ -28,7 +28,6 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePatte
 use Symfony\Component\Console\Input\InputInterface;
 
 use function is_string;
-use function str_starts_with;
 
 /**
  * CommandInputConfigAdapter.
@@ -51,7 +50,7 @@ final class CommandInputConfigAdapter implements ConfigAdapter
             $excludePatterns = $this->input->getOption('ignore-packages');
 
             foreach ($excludePatterns as $pattern) {
-                $excludePattern = $this->resolveExcludePattern($pattern);
+                $excludePattern = PackageExcludePattern::create($pattern);
                 $config->excludePackageByPattern($excludePattern);
             }
         }
@@ -69,14 +68,5 @@ final class CommandInputConfigAdapter implements ConfigAdapter
         }
 
         return $config;
-    }
-
-    private function resolveExcludePattern(string $pattern): PackageExcludePattern
-    {
-        if (str_starts_with($pattern, '/') || str_starts_with($pattern, '#')) {
-            return PackageExcludePattern::byRegularExpression($pattern);
-        }
-
-        return PackageExcludePattern::byName($pattern);
     }
 }

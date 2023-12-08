@@ -29,6 +29,7 @@ use CuyZ\Valinor\Mapper\Tree\Message\NodeMessage;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ChainedConfigAdapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\CommandInputConfigAdapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ConfigAdapterFactory;
+use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\EnvironmentVariablesConfigAdapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
 use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
 use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory;
@@ -39,6 +40,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function array_map;
+use function array_unshift;
 use function sprintf;
 
 /**
@@ -120,15 +122,18 @@ final class UpdateCheckCommand extends BaseCommand
     private function resolveConfiguration(InputInterface $input): ComposerUpdateCheckConfig
     {
         $filename = $input->getOption('config');
-        $configAdapter = new CommandInputConfigAdapter($input);
+        $adapters = [
+            new CommandInputConfigAdapter($input),
+            new EnvironmentVariablesConfigAdapter(),
+        ];
 
         if (null !== $filename && '' !== $filename) {
             $configAdapterFactory = new ConfigAdapterFactory();
-            $configAdapter = new ChainedConfigAdapter([
-                $configAdapterFactory->make($filename),
-                $configAdapter,
-            ]);
+
+            array_unshift($adapters, $configAdapterFactory->make($filename));
         }
+
+        $configAdapter = new ChainedConfigAdapter($adapters);
 
         return $configAdapter->resolve();
     }
