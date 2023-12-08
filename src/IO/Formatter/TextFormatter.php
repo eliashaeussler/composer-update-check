@@ -146,11 +146,11 @@ final class TextFormatter implements Formatter
             foreach ($outdatedPackage->getSecurityAdvisories() as $securityAdvisory) {
                 $link = $securityAdvisory->getLink();
 
-                $this->io->section($securityAdvisory->getTitle());
+                $this->io->section($securityAdvisory->getSanitizedTitle());
 
                 $definitionList = [
                     ['ID' => $securityAdvisory->getAdvisoryId()],
-                    ['Reported at' => $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s')],
+                    ['Reported at' => $securityAdvisory->getReportedAt()->format('Y-m-d')],
                     ['Severity' => $securityAdvisory->getSeverity()->value],
                     ['CVE' => $securityAdvisory->getCVE() ?? '<fg=gray>Unknown</>'],
                 ];
