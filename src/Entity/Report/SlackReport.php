@@ -208,7 +208,7 @@ final class SlackReport implements JsonSerializable
             SeverityLevel::Low => ':white_circle:',
             SeverityLevel::Medium => ':large_yellow_circle:',
             SeverityLevel::High => ':red_circle:',
-            SeverityLevel::Critical => ':large_purple_circle:',
+            SeverityLevel::Critical => ':black_circle:',
         };
     }
 
