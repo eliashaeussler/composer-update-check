@@ -21,14 +21,14 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Utility;
 
 use Composer\Console\Application;
 use Composer\Json\JsonValidationException;
 use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\ExpectedCommandOutputTrait;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
+use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\ExpectedCommandOutputTrait;
+use EliasHaeussler\ComposerUpdateCheck\Tests\TestApplicationTrait;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;

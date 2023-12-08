@@ -6,6 +6,6 @@ parameters:
 			path: src/Composer/ComposerInstaller.php
 
 		-
-			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Tests\\\\Unit\\\\AbstractTestCase\\)\\.$#"
+			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Tests\\\\AbstractTestCase\\)\\.$#"
 			count: 1
-			path: tests/Unit/AbstractTestCase.php
+			path: tests/src/AbstractTestCase.php

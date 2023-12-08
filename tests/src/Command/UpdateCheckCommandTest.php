@@ -21,12 +21,12 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Command;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Command;
 
 use Composer\Console\Application;
 use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\TestApplicationTrait;
+use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\TestApplicationTrait;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 

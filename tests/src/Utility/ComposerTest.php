@@ -21,10 +21,10 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Utility;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Utility;
 
 use Composer\Plugin\PluginInterface;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateCheck\Utility\Composer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;

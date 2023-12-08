@@ -3,8 +3,8 @@
 /.phpunit.result.cache
 /.build
 /docs/__pycache__
-/tests/Build/test-application/*/vendor
-/tests/Build/test-application-empty/composer.lock
-/tests/Build/test-application-empty/vendor
-/tests/Build/test-application-erroneous/vendor
+/tests/build/test-application/vendor
+/tests/build/test-application-empty/composer.lock
+/tests/build/test-application-empty/vendor
+/tests/build/test-application-erroneous/vendor
 /site

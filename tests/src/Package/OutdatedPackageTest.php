@@ -21,10 +21,10 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Package;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Package;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
 use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\Attributes\Test;
 

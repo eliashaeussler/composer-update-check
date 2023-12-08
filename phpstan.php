@@ -28,7 +28,7 @@ $container = (new DependencyInjection\ContainerFactory())->make(true);
 $containerXmlFile = $container->getParameter('debug.container_xml_filename');
 
 $symfonySet = PHPStanConfig\Set\SymfonySet::create()
-    ->withConsoleApplicationLoader('Tests/Build/phpstan/console-application.php')
+    ->withConsoleApplicationLoader('Tests/build/phpstan/console-application.php')
     ->withContainerXmlPath($containerXmlFile)
 ;
 
@@ -38,7 +38,7 @@ return PHPStanConfig\Config\Config::create(__DIR__)
         'tests',
     )
     ->not(
-        'tests/Build/*',
+        'tests/build/*',
     )
     ->withBaseline()
     ->maxLevel()

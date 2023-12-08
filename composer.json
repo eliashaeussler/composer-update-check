@@ -58,7 +58,7 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests"
+			"EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests/src"
 		}
 	},
 	"config": {
@@ -91,9 +91,9 @@
 		],
 		"fix:composer": [
 			"@composer normalize",
-			"@composer normalize tests/Build/test-application/composer.json",
-			"@composer normalize tests/Build/test-application-empty/composer.json",
-			"@composer normalize tests/Build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
+			"@composer normalize tests/build/test-application/composer.json",
+			"@composer normalize tests/build/test-application-empty/composer.json",
+			"@composer normalize tests/build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
 		],
 		"fix:editorconfig": "@lint:editorconfig --fix",
 		"fix:php": "php-cs-fixer fix",

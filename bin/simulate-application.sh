@@ -3,7 +3,7 @@ set -e
 
 # Resolve variables
 ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
-APP_PATH="${ROOT_PATH}/tests/Build/test-application"
+APP_PATH="${ROOT_PATH}/tests/build/test-application"
 TEMP_DIR="/tmp"
 
 # Check if temp directory is writeable

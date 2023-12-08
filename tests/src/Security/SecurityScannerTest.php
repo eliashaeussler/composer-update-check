@@ -21,12 +21,12 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit\Security;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Security;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
 use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
-use EliasHaeussler\ComposerUpdateCheck\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
 use Http\Client\Exception\TransferException;
 use Http\Message\RequestMatcher\CallbackRequestMatcher;
 use Http\Mock\Client;

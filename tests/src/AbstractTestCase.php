@@ -21,7 +21,7 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Unit;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -34,9 +34,9 @@ use ReflectionClass;
  */
 abstract class AbstractTestCase extends TestCase
 {
-    final public const TEST_APPLICATION_NORMAL = 'tests/Build/test-application';
-    final public const TEST_APPLICATION_EMPTY = 'tests/Build/test-application-empty';
-    final public const TEST_APPLICATION_ERRONEOUS = 'tests/Build/test-application-erroneous';
+    final public const TEST_APPLICATION_NORMAL = 'tests/build/test-application';
+    final public const TEST_APPLICATION_EMPTY = 'tests/build/test-application-empty';
+    final public const TEST_APPLICATION_ERRONEOUS = 'tests/build/test-application-erroneous';
 
     protected function tearDown(): void
     {
