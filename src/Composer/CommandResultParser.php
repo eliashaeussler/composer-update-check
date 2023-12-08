@@ -23,9 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 use function array_map;
 use function array_values;
@@ -51,15 +49,15 @@ final class CommandResultParser
         '$#m';
 
     /**
-     * @param list<Package> $packages
+     * @param list<Entity\Package\Package> $packages
      *
-     * @return list<OutdatedPackage>
+     * @return list<Entity\Package\OutdatedPackage>
      */
     public function parse(string $output, array $packages): array
     {
         $outdatedPackages = [];
         $allowedPackageNames = array_map(
-            static fn (Package $package) => $package->getName(),
+            static fn (Entity\Package\Package $package) => $package->getName(),
             $packages,
         );
 
@@ -74,10 +72,10 @@ final class CommandResultParser
             }
 
             if (!isset($outdatedPackages[$packageName])) {
-                $outdatedPackages[$packageName] = new OutdatedPackage(
+                $outdatedPackages[$packageName] = new Entity\Package\OutdatedPackage(
                     $packageName,
-                    new Version($outdatedVersion),
-                    new Version($newVersion),
+                    new Entity\Version($outdatedVersion),
+                    new Entity\Version($newVersion),
                 );
             }
         }

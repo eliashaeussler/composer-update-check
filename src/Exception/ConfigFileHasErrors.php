@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor;
 
 use function sprintf;
 
@@ -37,7 +37,7 @@ final class ConfigFileHasErrors extends Exception
 {
     public function __construct(
         string $filename,
-        public readonly MappingError $error,
+        public readonly Valinor\Mapper\MappingError $error,
     ) {
         parent::__construct(
             sprintf('The file "%s" has errors and cannot be mapped.', $filename),

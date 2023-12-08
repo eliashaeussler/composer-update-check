@@ -25,7 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Security;
 
 use DateTimeImmutable;
 use JsonSerializable;
-use Psr\Http\Message\UriInterface;
+use Psr\Http\Message;
 
 use function preg_quote;
 use function preg_replace;
@@ -47,7 +47,7 @@ final class SecurityAdvisory implements JsonSerializable
         private readonly DateTimeImmutable $reportedAt,
         private readonly SeverityLevel $severity,
         private readonly ?string $cve = null,
-        private readonly ?UriInterface $link = null,
+        private readonly ?Message\UriInterface $link = null,
     ) {}
 
     public function getPackageName(): string
@@ -104,7 +104,7 @@ final class SecurityAdvisory implements JsonSerializable
         return $this->cve;
     }
 
-    public function getLink(): ?UriInterface
+    public function getLink(): ?Message\UriInterface
     {
         return $this->link;
     }

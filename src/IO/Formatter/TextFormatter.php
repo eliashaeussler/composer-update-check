@@ -23,11 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use Symfony\Component\Console;
 
 use function count;
 use function sprintf;
@@ -43,10 +40,10 @@ final class TextFormatter implements Formatter
     public const FORMAT = 'text';
 
     public function __construct(
-        private ?SymfonyStyle $io = null,
+        private ?Console\Style\SymfonyStyle $io = null,
     ) {}
 
-    public function formatResult(UpdateCheckResult $result): void
+    public function formatResult(Entity\Result\UpdateCheckResult $result): void
     {
         // Early return if IO is missing
         if (null === $this->io) {
@@ -78,7 +75,7 @@ final class TextFormatter implements Formatter
     }
 
     /**
-     * @param list<Package> $excludedPackages
+     * @param list<Entity\Package\Package> $excludedPackages
      */
     private function renderUpToDateMessage(array $excludedPackages): void
     {
@@ -100,7 +97,7 @@ final class TextFormatter implements Formatter
     }
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      */
     private function renderTable(array $outdatedPackages): void
     {
@@ -126,7 +123,7 @@ final class TextFormatter implements Formatter
     }
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      */
     private function renderSecurityAdvisories(array $outdatedPackages): void
     {
@@ -156,7 +153,7 @@ final class TextFormatter implements Formatter
                 ];
 
                 if (null !== $link) {
-                    $definitionList[] = new TableSeparator();
+                    $definitionList[] = new Console\Helper\TableSeparator();
                     $definitionList[] = ['Read more' => (string) $link];
                 }
 
@@ -165,7 +162,7 @@ final class TextFormatter implements Formatter
         }
     }
 
-    public function setIO(SymfonyStyle $io): void
+    public function setIO(Console\Style\SymfonyStyle $io): void
     {
         $this->io = $io;
     }

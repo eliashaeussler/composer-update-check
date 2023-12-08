@@ -23,9 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsNotSupported;
-use EliasHaeussler\ComposerUpdateCheck\Exception\FileDoesNotExist;
-use Symfony\Component\Filesystem\Path;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\Filesystem;
 
 /**
  * ConfigAdapterFactory.
@@ -36,16 +35,16 @@ use Symfony\Component\Filesystem\Path;
 final class ConfigAdapterFactory
 {
     /**
-     * @throws ConfigFileIsNotSupported
-     * @throws FileDoesNotExist
+     * @throws Exception\ConfigFileIsNotSupported
+     * @throws Exception\FileDoesNotExist
      */
     public function make(string $filename): ConfigAdapter
     {
-        return match (Path::getExtension($filename, true)) {
+        return match (Filesystem\Path::getExtension($filename, true)) {
             'json' => new JsonConfigAdapter($filename),
             'php' => new PhpConfigAdapter($filename),
             'yaml', 'yml' => new YamlConfigAdapter($filename),
-            default => throw new ConfigFileIsNotSupported($filename),
+            default => throw new Exception\ConfigFileIsNotSupported($filename),
         };
     }
 }

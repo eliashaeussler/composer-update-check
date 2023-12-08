@@ -23,12 +23,10 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use CuyZ\Valinor\Mapper\MappingError;
-use CuyZ\Valinor\Mapper\Source\Source;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsInvalid;
-use Symfony\Component\Yaml\Yaml;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\Yaml;
 
 use function is_iterable;
 
@@ -41,23 +39,23 @@ use function is_iterable;
 final class YamlConfigAdapter extends FileBasedConfigAdapter
 {
     /**
-     * @throws ConfigFileHasErrors
-     * @throws ConfigFileIsInvalid
+     * @throws Exception\ConfigFileHasErrors
+     * @throws Exception\ConfigFileIsInvalid
      */
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $yaml = Yaml::parseFile($this->filename);
+        $yaml = Yaml\Yaml::parseFile($this->filename);
 
         if (!is_iterable($yaml)) {
-            throw new ConfigFileIsInvalid($this->filename);
+            throw new Exception\ConfigFileIsInvalid($this->filename);
         }
 
-        $source = Source::iterable($yaml);
+        $source = Valinor\Mapper\Source\Source::iterable($yaml);
 
         try {
-            return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
-        } catch (MappingError $error) {
-            throw new ConfigFileHasErrors($this->filename, $error);
+            return $this->mapper->map(Configuration\ComposerUpdateCheckConfig::class, $source);
+        } catch (Valinor\Mapper\MappingError $error) {
+            throw new Exception\ConfigFileHasErrors($this->filename, $error);
         }
     }
 }

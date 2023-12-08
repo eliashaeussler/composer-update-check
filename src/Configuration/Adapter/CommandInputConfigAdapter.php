@@ -23,11 +23,10 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ReporterOptionsAreInvalid;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
 use JsonException;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console;
 
 use function explode;
 use function is_array;
@@ -43,22 +42,22 @@ use function json_decode;
 final class CommandInputConfigAdapter implements ConfigAdapter
 {
     public function __construct(
-        private readonly InputInterface $input,
+        private readonly Console\Input\InputInterface $input,
     ) {}
 
     /**
-     * @throws ReporterOptionsAreInvalid
+     * @throws Exception\ReporterOptionsAreInvalid
      */
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $config = new ComposerUpdateCheckConfig();
+        $config = new Configuration\ComposerUpdateCheckConfig();
 
         if ($this->input->hasOption('exclude-packages')) {
             /** @var array<string> $excludePatterns */
             $excludePatterns = $this->input->getOption('exclude-packages');
 
             foreach ($excludePatterns as $pattern) {
-                $excludePattern = PackageExcludePattern::create($pattern);
+                $excludePattern = Configuration\Options\PackageExcludePattern::create($pattern);
                 $config->excludePackageByPattern($excludePattern);
             }
         }
@@ -91,9 +90,9 @@ final class CommandInputConfigAdapter implements ConfigAdapter
     /**
      * @param array<string> $reporters
      *
-     * @throws ReporterOptionsAreInvalid
+     * @throws Exception\ReporterOptionsAreInvalid
      */
-    private function enableReporters(ComposerUpdateCheckConfig $config, array $reporters): void
+    private function enableReporters(Configuration\ComposerUpdateCheckConfig $config, array $reporters): void
     {
         foreach ($reporters as $reporterConfig) {
             $configParts = explode(':', $reporterConfig, 2);
@@ -113,7 +112,7 @@ final class CommandInputConfigAdapter implements ConfigAdapter
     /**
      * @return array<string, mixed>
      *
-     * @throws ReporterOptionsAreInvalid
+     * @throws Exception\ReporterOptionsAreInvalid
      */
     private function parseReporterOptions(string $name, string $json): array
     {
@@ -121,12 +120,12 @@ final class CommandInputConfigAdapter implements ConfigAdapter
             $options = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
             if (!is_array($options)) {
-                throw new ReporterOptionsAreInvalid($name);
+                throw new Exception\ReporterOptionsAreInvalid($name);
             }
 
             return $options;
         } catch (JsonException) {
-            throw new ReporterOptionsAreInvalid($name);
+            throw new Exception\ReporterOptionsAreInvalid($name);
         }
     }
 }

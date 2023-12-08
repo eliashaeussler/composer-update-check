@@ -23,9 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 use JsonSerializable;
 
 use function count;
@@ -55,7 +53,7 @@ final class MattermostReport implements JsonSerializable
     public static function create(
         string $channel,
         ?string $username,
-        UpdateCheckResult $result,
+        Entity\Result\UpdateCheckResult $result,
         string $rootPackageName = null,
     ): self {
         return new self(
@@ -67,7 +65,7 @@ final class MattermostReport implements JsonSerializable
         );
     }
 
-    private static function createText(UpdateCheckResult $result, string $rootPackageName = null): string
+    private static function createText(Entity\Result\UpdateCheckResult $result, string $rootPackageName = null): string
     {
         $numberOfOutdatedPackages = 0;
         $numberOfInsecurePackages = 0;
@@ -104,7 +102,7 @@ final class MattermostReport implements JsonSerializable
     /**
      * @return list<Dto\MattermostAttachment>
      */
-    private static function createAttachments(UpdateCheckResult $result): array
+    private static function createAttachments(Entity\Result\UpdateCheckResult $result): array
     {
         $attachments = [];
 
@@ -118,8 +116,10 @@ final class MattermostReport implements JsonSerializable
         return $attachments;
     }
 
-    private static function renderOutdatedPackagesTable(UpdateCheckResult $result, string $rootPackageName = null): string
-    {
+    private static function renderOutdatedPackagesTable(
+        Entity\Result\UpdateCheckResult $result,
+        string $rootPackageName = null,
+    ): string {
         $numberOfExcludedPackages = count($result->getExcludedPackages());
         $textParts = [];
 
@@ -173,7 +173,7 @@ final class MattermostReport implements JsonSerializable
         return implode(PHP_EOL, $textParts);
     }
 
-    private static function renderSecurityAdvisoryTable(SecurityAdvisory $securityAdvisory): string
+    private static function renderSecurityAdvisoryTable(Entity\Security\SecurityAdvisory $securityAdvisory): string
     {
         $textParts = [
             sprintf('###### %s', $securityAdvisory->getSanitizedTitle()),
@@ -192,23 +192,23 @@ final class MattermostReport implements JsonSerializable
         return implode(PHP_EOL, $textParts);
     }
 
-    private static function getColorForSeverityLevel(SeverityLevel $severityLevel): string
+    private static function getColorForSeverityLevel(Entity\Security\SeverityLevel $severityLevel): string
     {
         return match ($severityLevel) {
-            SeverityLevel::Low => '#EEEEEE',
-            SeverityLevel::Medium => '#FFD966',
-            SeverityLevel::High => '#EE0000',
-            SeverityLevel::Critical => '#333333',
+            Entity\Security\SeverityLevel::Low => '#EEEEEE',
+            Entity\Security\SeverityLevel::Medium => '#FFD966',
+            Entity\Security\SeverityLevel::High => '#EE0000',
+            Entity\Security\SeverityLevel::Critical => '#333333',
         };
     }
 
-    private static function getEmojiForSeverityLevel(SeverityLevel $severityLevel): string
+    private static function getEmojiForSeverityLevel(Entity\Security\SeverityLevel $severityLevel): string
     {
         return match ($severityLevel) {
-            SeverityLevel::Low => ':white_circle:',
-            SeverityLevel::Medium => ':large_yellow_circle:',
-            SeverityLevel::High => ':red_circle:',
-            SeverityLevel::Critical => ':black_circle:',
+            Entity\Security\SeverityLevel::Low => ':white_circle:',
+            Entity\Security\SeverityLevel::Medium => ':large_yellow_circle:',
+            Entity\Security\SeverityLevel::High => ':red_circle:',
+            Entity\Security\SeverityLevel::Critical => ':black_circle:',
         };
     }
 

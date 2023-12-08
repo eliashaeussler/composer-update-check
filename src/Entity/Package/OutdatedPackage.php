@@ -23,11 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
-use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\UriInterface;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use GuzzleHttp\Psr7;
+use Psr\Http\Message;
 
 use function usort;
 
@@ -41,16 +39,16 @@ final class OutdatedPackage implements Package
 {
     private const PROVIDER_LINK_PATTERN = 'https://packagist.org/packages/%s#%s';
 
-    private UriInterface $providerLink;
+    private Message\UriInterface $providerLink;
 
     /**
-     * @param non-empty-string       $name
-     * @param list<SecurityAdvisory> $securityAdvisories
+     * @param non-empty-string                       $name
+     * @param list<Entity\Security\SecurityAdvisory> $securityAdvisories
      */
     public function __construct(
         private readonly string $name,
-        private readonly Version $outdatedVersion,
-        private readonly Version $newVersion,
+        private readonly Entity\Version $outdatedVersion,
+        private readonly Entity\Version $newVersion,
         private array $securityAdvisories = [],
     ) {
         $this->providerLink = $this->generateProviderLink();
@@ -61,25 +59,25 @@ final class OutdatedPackage implements Package
         return $this->name;
     }
 
-    public function getOutdatedVersion(): Version
+    public function getOutdatedVersion(): Entity\Version
     {
         return $this->outdatedVersion;
     }
 
-    public function getNewVersion(): Version
+    public function getNewVersion(): Entity\Version
     {
         return $this->newVersion;
     }
 
     /**
-     * @return list<SecurityAdvisory>
+     * @return list<Entity\Security\SecurityAdvisory>
      */
     public function getSecurityAdvisories(): array
     {
         return $this->securityAdvisories;
     }
 
-    public function getHighestSeverityLevel(): ?SeverityLevel
+    public function getHighestSeverityLevel(): ?Entity\Security\SeverityLevel
     {
         if ([] === $this->securityAdvisories) {
             return null;
@@ -89,14 +87,14 @@ final class OutdatedPackage implements Package
 
         usort(
             $securityAdvisories,
-            static fn (SecurityAdvisory $a, SecurityAdvisory $b) => $a->getSeverity()->compareTo($b->getSeverity()),
+            static fn (Entity\Security\SecurityAdvisory $a, Entity\Security\SecurityAdvisory $b) => $a->getSeverity()->compareTo($b->getSeverity()),
         );
 
         return array_pop($securityAdvisories)->getSeverity();
     }
 
     /**
-     * @param list<SecurityAdvisory> $securityAdvisories
+     * @param list<Entity\Security\SecurityAdvisory> $securityAdvisories
      */
     public function setSecurityAdvisories(array $securityAdvisories): self
     {
@@ -110,12 +108,12 @@ final class OutdatedPackage implements Package
         return [] !== $this->securityAdvisories;
     }
 
-    public function getProviderLink(): UriInterface
+    public function getProviderLink(): Message\UriInterface
     {
         return $this->providerLink;
     }
 
-    public function setProviderLink(UriInterface $providerLink): self
+    public function setProviderLink(Message\UriInterface $providerLink): self
     {
         $this->providerLink = $providerLink;
 
@@ -127,7 +125,7 @@ final class OutdatedPackage implements Package
      *     name: non-empty-string,
      *     outdatedVersion: string,
      *     newVersion: string,
-     *     securityAdvisories: list<SecurityAdvisory>,
+     *     securityAdvisories: list<Entity\Security\SecurityAdvisory>,
      *     providerLink: string,
      * }
      */
@@ -147,11 +145,11 @@ final class OutdatedPackage implements Package
         return $this->name;
     }
 
-    private function generateProviderLink(): UriInterface
+    private function generateProviderLink(): Message\UriInterface
     {
         $versionHash = explode(' ', $this->newVersion->get(), 2)[0];
         $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
 
-        return new Uri($uri);
+        return new Psr7\Uri($uri);
     }
 }

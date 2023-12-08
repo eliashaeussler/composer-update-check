@@ -23,10 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use CuyZ\Valinor\Mapper\MappingError;
-use CuyZ\Valinor\Mapper\Source\Source;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
 use SplFileObject;
 
 /**
@@ -38,16 +37,16 @@ use SplFileObject;
 final class JsonConfigAdapter extends FileBasedConfigAdapter
 {
     /**
-     * @throws ConfigFileHasErrors
+     * @throws Exception\ConfigFileHasErrors
      */
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $source = Source::file(new SplFileObject($this->filename));
+        $source = Valinor\Mapper\Source\Source::file(new SplFileObject($this->filename));
 
         try {
-            return $this->mapper->map(ComposerUpdateCheckConfig::class, $source);
-        } catch (MappingError $error) {
-            throw new ConfigFileHasErrors($this->filename, $error);
+            return $this->mapper->map(Configuration\ComposerUpdateCheckConfig::class, $source);
+        } catch (Valinor\Mapper\MappingError $error) {
+            throw new Exception\ConfigFileHasErrors($this->filename, $error);
         }
     }
 }

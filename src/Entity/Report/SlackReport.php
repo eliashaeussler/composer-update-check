@@ -23,10 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 use JsonSerializable;
 
 use function count;
@@ -51,7 +48,7 @@ final class SlackReport implements JsonSerializable
     ) {}
 
     public static function create(
-        UpdateCheckResult $result,
+        Entity\Result\UpdateCheckResult $result,
         string $rootPackageName = null,
     ): self {
         $remainingBlocks = self::MAX_BLOCKS;
@@ -104,7 +101,7 @@ final class SlackReport implements JsonSerializable
         return new self($blocks);
     }
 
-    private static function createHeaderBlock(UpdateCheckResult $result): Dto\SlackBlock
+    private static function createHeaderBlock(Entity\Result\UpdateCheckResult $result): Dto\SlackBlock
     {
         $numberOfOutdatedPackages = 0;
         $numberOfInsecurePackages = 0;
@@ -139,7 +136,7 @@ final class SlackReport implements JsonSerializable
         );
     }
 
-    private static function createOutdatedPackageBlock(OutdatedPackage $outdatedPackage): Dto\SlackBlock
+    private static function createOutdatedPackageBlock(Entity\Package\OutdatedPackage $outdatedPackage): Dto\SlackBlock
     {
         $highestSeverityLevel = $outdatedPackage->getHighestSeverityLevel();
 
@@ -151,8 +148,11 @@ final class SlackReport implements JsonSerializable
                         $outdatedPackage->getProviderLink(),
                         $outdatedPackage->getName(),
                         null !== $highestSeverityLevel
-                            ? sprintf("\n%s `%s`", self::getEmojiForSeverityLevel($highestSeverityLevel), $highestSeverityLevel->value)
-                            : '',
+                            ? sprintf(
+                                "\n%s `%s`",
+                                self::getEmojiForSeverityLevel($highestSeverityLevel),
+                                $highestSeverityLevel->value,
+                            ) : '',
                     ),
                 ),
                 Dto\SlackBlockElement::markdown(
@@ -166,8 +166,9 @@ final class SlackReport implements JsonSerializable
         );
     }
 
-    private static function createSecurityAdvisoryBlock(SecurityAdvisory $securityAdvisory): Dto\SlackBlock
-    {
+    private static function createSecurityAdvisoryBlock(
+        Entity\Security\SecurityAdvisory $securityAdvisory,
+    ): Dto\SlackBlock {
         $textParts = [
             sprintf('*%s*', $securityAdvisory->getSanitizedTitle()),
             sprintf('• Package: `%s`', $securityAdvisory->getPackageName()),
@@ -202,13 +203,13 @@ final class SlackReport implements JsonSerializable
         );
     }
 
-    private static function getEmojiForSeverityLevel(SeverityLevel $severityLevel): string
+    private static function getEmojiForSeverityLevel(Entity\Security\SeverityLevel $severityLevel): string
     {
         return match ($severityLevel) {
-            SeverityLevel::Low => ':white_circle:',
-            SeverityLevel::Medium => ':large_yellow_circle:',
-            SeverityLevel::High => ':red_circle:',
-            SeverityLevel::Critical => ':black_circle:',
+            Entity\Security\SeverityLevel::Low => ':white_circle:',
+            Entity\Security\SeverityLevel::Medium => ':large_yellow_circle:',
+            Entity\Security\SeverityLevel::High => ':red_circle:',
+            Entity\Security\SeverityLevel::Critical => ':black_circle:',
         };
     }
 

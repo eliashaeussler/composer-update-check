@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor;
 
 /**
  * PackagistResponseHasErrors.
@@ -34,7 +34,7 @@ use CuyZ\Valinor\Mapper\MappingError;
 final class PackagistResponseHasErrors extends Exception
 {
     public function __construct(
-        public readonly MappingError $error,
+        public readonly Valinor\Mapper\MappingError $error,
     ) {
         parent::__construct(
             'Packagist API response with security advisories is invalid and cannot be mapped.',

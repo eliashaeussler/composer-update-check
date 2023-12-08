@@ -24,10 +24,10 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
 use Composer\Composer;
-use Composer\DependencyResolver\Request;
+use Composer\DependencyResolver;
 use Composer\Installer;
-use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
+use Composer\IO;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 use function array_map;
 use function method_exists;
@@ -44,10 +44,10 @@ final class ComposerInstaller
 {
     public function __construct(
         private readonly Composer $composer,
-        private readonly IOInterface $io,
+        private readonly IO\IOInterface $io,
     ) {}
 
-    public function runInstall(IOInterface $io = null): int
+    public function runInstall(IO\IOInterface $io = null): int
     {
         $io ??= $this->io;
 
@@ -69,9 +69,9 @@ final class ComposerInstaller
     }
 
     /**
-     * @param list<Package> $packages
+     * @param list<Entity\Package\Package> $packages
      */
-    public function runUpdate(array $packages, IOInterface $io = null): int
+    public function runUpdate(array $packages, IO\IOInterface $io = null): int
     {
         $io ??= $this->io;
 
@@ -84,11 +84,11 @@ final class ComposerInstaller
             ->setUpdate(true)
             ->setUpdateAllowList(
                 array_map(
-                    static fn (Package $package) => $package->getName(),
+                    static fn (Entity\Package\Package $package) => $package->getName(),
                     $packages,
                 ),
             )
-            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
+            ->setUpdateAllowTransitiveDependencies(DependencyResolver\Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
 
         if (method_exists($installer, 'setAudit')) {

@@ -23,19 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck;
 
-use Composer\Composer;
-use Composer\IO\BufferIO;
-use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\Composer\CommandResultParser;
-use EliasHaeussler\ComposerUpdateCheck\Composer\ComposerInstaller;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\InstalledPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
-use EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory;
-use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
+use Composer\IO;
 
 use function array_keys;
 use function array_map;
@@ -50,12 +38,12 @@ use function array_merge;
 final class UpdateChecker
 {
     public function __construct(
-        private readonly CommandResultParser $commandResultParser,
-        private readonly Composer $composer,
-        private readonly ComposerInstaller $installer,
-        private readonly IOInterface $io,
-        private readonly SecurityScanner $securityScanner,
-        private readonly ReporterFactory $reporterFactory,
+        private readonly Composer\CommandResultParser $commandResultParser,
+        private readonly \Composer\Composer $composer,
+        private readonly Composer\ComposerInstaller $installer,
+        private readonly IO\IOInterface $io,
+        private readonly Security\SecurityScanner $securityScanner,
+        private readonly Reporter\ReporterFactory $reporterFactory,
     ) {}
 
     /**
@@ -66,7 +54,7 @@ final class UpdateChecker
      * @throws Exception\ReporterOptionsAreInvalid
      * @throws Exception\UnableToFetchSecurityAdvisories
      */
-    public function run(ComposerUpdateCheckConfig $config): UpdateCheckResult
+    public function run(Configuration\ComposerUpdateCheckConfig $config): Entity\Result\UpdateCheckResult
     {
         $this->validateReporters($config->getReporters());
 
@@ -77,11 +65,11 @@ final class UpdateChecker
         // Overlay security scan
         if ($config->shouldPerformSecurityScan() && [] !== $result->getOutdatedPackages()) {
             try {
-                $this->io->writeError('🚨 Checking for insecure packages... ', false, IOInterface::VERBOSE);
+                $this->io->writeError('🚨 Checking for insecure packages... ', false, IO\IOInterface::VERBOSE);
                 $this->securityScanner->scanAndOverlayResult($result);
-                $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
+                $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
             } catch (Exception\PackagistResponseHasErrors|Exception\UnableToFetchSecurityAdvisories $exception) {
-                $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
+                $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
 
                 throw $exception;
             }
@@ -100,42 +88,42 @@ final class UpdateChecker
     }
 
     /**
-     * @param list<Package> $packages
-     * @param list<Package> $excludedPackages
+     * @param list<Entity\Package\Package> $packages
+     * @param list<Entity\Package\Package> $excludedPackages
      *
      * @throws Exception\ComposerInstallFailed
      * @throws Exception\ComposerUpdateFailed
      */
-    private function runUpdateCheck(array $packages, array $excludedPackages): UpdateCheckResult
+    private function runUpdateCheck(array $packages, array $excludedPackages): Entity\Result\UpdateCheckResult
     {
         // Early return if no packages are listed for update check
         if ([] === $packages) {
-            return new UpdateCheckResult([]);
+            return new Entity\Result\UpdateCheckResult([]);
         }
 
         // Ensure dependencies are installed
         $this->installDependencies();
 
         // Show progress
-        $this->io->writeError('⏳ Checking for outdated packages... ', false, IOInterface::VERBOSE);
+        $this->io->writeError('⏳ Checking for outdated packages... ', false, IO\IOInterface::VERBOSE);
 
         // Run Composer installer
-        $io = new BufferIO();
+        $io = new IO\BufferIO();
         $exitCode = $this->installer->runUpdate($packages, $io);
 
         // Handle installer failures
         if ($exitCode > 0) {
-            $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
+            $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
             $this->io->writeError($io->getOutput());
 
             throw new Exception\ComposerUpdateFailed($exitCode);
         }
 
-        $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
+        $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
 
         $outdatedPackages = $this->commandResultParser->parse($io->getOutput(), $packages);
 
-        return new UpdateCheckResult($outdatedPackages, $excludedPackages);
+        return new Entity\Result\UpdateCheckResult($outdatedPackages, $excludedPackages);
     }
 
     /**
@@ -144,7 +132,7 @@ final class UpdateChecker
     private function installDependencies(): void
     {
         // Run Composer installer
-        $io = new BufferIO();
+        $io = new IO\BufferIO();
         $exitCode = $this->installer->runInstall($io);
 
         // Handle installer failures
@@ -156,11 +144,11 @@ final class UpdateChecker
     }
 
     /**
-     * @return array{list<Package>, list<Package>}
+     * @return array{list<Entity\Package\Package>, list<Entity\Package\Package>}
      */
-    private function resolvePackagesForUpdateCheck(ComposerUpdateCheckConfig $config): array
+    private function resolvePackagesForUpdateCheck(Configuration\ComposerUpdateCheckConfig $config): array
     {
-        $this->io->writeError('📦 Resolving packages...', true, IOInterface::VERBOSE);
+        $this->io->writeError('📦 Resolving packages...', true, IO\IOInterface::VERBOSE);
 
         $rootPackage = $this->composer->getPackage();
         /** @var array<non-empty-string> $requiredPackages */
@@ -175,7 +163,7 @@ final class UpdateChecker
         } else {
             $excludedPackages = $requiredDevPackages;
 
-            $this->io->writeError('🚫 Skipped dev-requirements', true, IOInterface::VERBOSE);
+            $this->io->writeError('🚫 Skipped dev-requirements', true, IO\IOInterface::VERBOSE);
         }
 
         // Remove packages by exclude patterns
@@ -191,8 +179,8 @@ final class UpdateChecker
     }
 
     /**
-     * @param array<non-empty-string>     $packages
-     * @param list<PackageExcludePattern> $excludePatterns
+     * @param array<non-empty-string>                           $packages
+     * @param list<Configuration\Options\PackageExcludePattern> $excludePatterns
      *
      * @return array<non-empty-string>
      */
@@ -205,7 +193,7 @@ final class UpdateChecker
                 if ($excludePattern->matches($package)) {
                     $excludedPackages[] = $package;
 
-                    $this->io->writeError(sprintf('🚫 Skipped "%s"', $package), true, IOInterface::VERBOSE);
+                    $this->io->writeError(sprintf('🚫 Skipped "%s"', $package), true, IO\IOInterface::VERBOSE);
 
                     return false;
                 }
@@ -233,19 +221,19 @@ final class UpdateChecker
     /**
      * @param array<non-empty-string> $packageNames
      *
-     * @return array<Package>
+     * @return array<Entity\Package\Package>
      */
     private function mapPackageNamesToPackage(array $packageNames): array
     {
         return array_map(
-            static fn (string $packageName) => new InstalledPackage($packageName),
+            static fn (string $packageName) => new Entity\Package\InstalledPackage($packageName),
             $packageNames,
         );
     }
 
-    private function dispatchPostUpdateCheckEvent(UpdateCheckResult $result): void
+    private function dispatchPostUpdateCheckEvent(Entity\Result\UpdateCheckResult $result): void
     {
-        $event = new PostUpdateCheckEvent($result);
+        $event = new Event\PostUpdateCheckEvent($result);
 
         $this->composer->getEventDispatcher()->dispatch($event->getName(), $event);
     }

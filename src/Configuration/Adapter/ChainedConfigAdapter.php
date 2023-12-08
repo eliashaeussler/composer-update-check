@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\TextFormatter;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\IO;
 
 /**
  * ChainedConfigAdapter.
@@ -41,9 +41,9 @@ final class ChainedConfigAdapter implements ConfigAdapter
         private readonly array $adapters,
     ) {}
 
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $config = new ComposerUpdateCheckConfig();
+        $config = new Configuration\ComposerUpdateCheckConfig();
 
         foreach ($this->adapters as $adapter) {
             $this->mergeConfigs($config, $adapter->resolve());
@@ -52,8 +52,10 @@ final class ChainedConfigAdapter implements ConfigAdapter
         return $config;
     }
 
-    private function mergeConfigs(ComposerUpdateCheckConfig $config, ComposerUpdateCheckConfig $other): void
-    {
+    private function mergeConfigs(
+        Configuration\ComposerUpdateCheckConfig $config,
+        Configuration\ComposerUpdateCheckConfig $other,
+    ): void {
         foreach ($other->getExcludePatterns() as $excludePattern) {
             $config->excludePackageByPattern($excludePattern);
         }
@@ -66,7 +68,7 @@ final class ChainedConfigAdapter implements ConfigAdapter
             $config->performSecurityScan();
         }
 
-        if (TextFormatter::FORMAT !== $other->getFormat()) {
+        if (IO\Formatter\TextFormatter::FORMAT !== $other->getFormat()) {
             $config->setFormat($other->getFormat());
         }
 

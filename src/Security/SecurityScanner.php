@@ -23,19 +23,13 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Security;
 
-use CuyZ\Valinor\Mapper\MappingError;
-use CuyZ\Valinor\Mapper\Source\Source;
-use CuyZ\Valinor\Mapper\TreeMapper;
-use CuyZ\Valinor\MapperBuilder;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Exception\PackagistResponseHasErrors;
-use EliasHaeussler\ComposerUpdateCheck\Exception\UnableToFetchSecurityAdvisories;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\UriInterface;
-use Spatie\Packagist\PackagistClient;
+use GuzzleHttp\Psr7;
+use Psr\Http\Message;
+use Spatie\Packagist;
 
 /**
  * SecurityScanner.
@@ -45,27 +39,27 @@ use Spatie\Packagist\PackagistClient;
  */
 final class SecurityScanner
 {
-    private readonly TreeMapper $mapper;
+    private readonly Valinor\Mapper\TreeMapper $mapper;
 
     public function __construct(
-        private readonly PackagistClient $client,
+        private readonly Packagist\PackagistClient $client,
     ) {
         $this->mapper = $this->createMapper();
     }
 
     /**
-     * @param list<OutdatedPackage> $packages
+     * @param list<Entity\Package\OutdatedPackage> $packages
      *
-     * @throws PackagistResponseHasErrors
-     * @throws UnableToFetchSecurityAdvisories
+     * @throws Exception\PackagistResponseHasErrors
+     * @throws Exception\UnableToFetchSecurityAdvisories
      */
-    public function scan(array $packages): ScanResult
+    public function scan(array $packages): Entity\Result\ScanResult
     {
         $packagesToScan = [];
 
         // Early return if no packages are requested to be scanned
         if ([] === $packages) {
-            return new ScanResult([]);
+            return new Entity\Result\ScanResult([]);
         }
 
         foreach ($packages as $package) {
@@ -74,21 +68,21 @@ final class SecurityScanner
 
         try {
             $advisories = $this->client->getAdvisoriesAffectingVersions($packagesToScan);
-            $source = Source::array(['securityAdvisories' => $advisories]);
+            $source = Valinor\Mapper\Source\Source::array(['securityAdvisories' => $advisories]);
 
-            return $this->mapper->map(ScanResult::class, $source);
+            return $this->mapper->map(Entity\Result\ScanResult::class, $source);
         } catch (GuzzleException $exception) {
-            throw new UnableToFetchSecurityAdvisories($exception);
-        } catch (MappingError $error) {
-            throw new PackagistResponseHasErrors($error);
+            throw new Exception\UnableToFetchSecurityAdvisories($exception);
+        } catch (Valinor\Mapper\MappingError $error) {
+            throw new Exception\PackagistResponseHasErrors($error);
         }
     }
 
     /**
-     * @throws PackagistResponseHasErrors
-     * @throws UnableToFetchSecurityAdvisories
+     * @throws Exception\PackagistResponseHasErrors
+     * @throws Exception\UnableToFetchSecurityAdvisories
      */
-    public function scanAndOverlayResult(UpdateCheckResult $result): void
+    public function scanAndOverlayResult(Entity\Result\UpdateCheckResult $result): void
     {
         $outdatedPackages = $result->getOutdatedPackages();
         $scanResult = $this->scan($outdatedPackages);
@@ -102,11 +96,11 @@ final class SecurityScanner
         }
     }
 
-    private function createMapper(): TreeMapper
+    private function createMapper(): Valinor\Mapper\TreeMapper
     {
-        return (new MapperBuilder())
+        return (new Valinor\MapperBuilder())
             ->allowSuperfluousKeys()
-            ->infer(UriInterface::class, static fn () => Uri::class)
+            ->infer(Message\UriInterface::class, static fn () => Psr7\Uri::class)
             ->supportDateFormats('Y-m-d H:i:s')
             ->mapper()
         ;

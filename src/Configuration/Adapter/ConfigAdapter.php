@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
 
 /**
  * ConfigAdapter.
@@ -33,5 +33,5 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
  */
 interface ConfigAdapter
 {
-    public function resolve(): ComposerUpdateCheckConfig;
+    public function resolve(): Configuration\ComposerUpdateCheckConfig;
 }

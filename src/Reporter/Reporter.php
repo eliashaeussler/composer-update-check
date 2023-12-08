@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ReporterOptionsAreInvalid;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
 
 /**
  * Reporter.
@@ -37,9 +37,9 @@ interface Reporter
     /**
      * @param array<string, mixed> $options
      *
-     * @throws ReporterOptionsAreInvalid
+     * @throws Exception\ReporterOptionsAreInvalid
      */
-    public function report(UpdateCheckResult $result, array $options): bool;
+    public function report(Entity\Result\UpdateCheckResult $result, array $options): bool;
 
     public static function getName(): string;
 }

@@ -24,10 +24,10 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use Composer\Factory;
-use Composer\Util\Platform;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Path;
+use Composer\Util;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use Symfony\Component\Console;
+use Symfony\Component\Filesystem;
 
 use function realpath;
 use function sprintf;
@@ -43,10 +43,10 @@ final class GitHubFormatter implements Formatter
     public const FORMAT = 'github';
 
     public function __construct(
-        private ?SymfonyStyle $io = null,
+        private ?Console\Style\SymfonyStyle $io = null,
     ) {}
 
-    public function formatResult(UpdateCheckResult $result): void
+    public function formatResult(Entity\Result\UpdateCheckResult $result): void
     {
         // Early return if IO is missing
         if (null === $this->io) {
@@ -54,9 +54,9 @@ final class GitHubFormatter implements Formatter
         }
 
         // Resolve path to composer.json file
-        $composerFile = Path::makeRelative(
+        $composerFile = Filesystem\Path::makeRelative(
             (string) realpath(Factory::getComposerFile()),
-            Platform::getCwd(),
+            Util\Platform::getCwd(),
         );
 
         $outdatedPackages = $result->getOutdatedPackages();
@@ -95,7 +95,7 @@ final class GitHubFormatter implements Formatter
         );
     }
 
-    public function setIO(SymfonyStyle $io): void
+    public function setIO(Console\Style\SymfonyStyle $io): void
     {
         $this->io = $io;
     }

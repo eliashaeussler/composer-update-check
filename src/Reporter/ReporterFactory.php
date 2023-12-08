@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
-use EliasHaeussler\ComposerUpdateCheck\Exception\ReporterIsNotSupported;
-use Symfony\Component\DependencyInjection\ServiceLocator;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\DependencyInjection;
 
 /**
  * ReporterFactory.
@@ -35,19 +35,19 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 final class ReporterFactory
 {
     /**
-     * @param ServiceLocator<Reporter> $reporters
+     * @param DependencyInjection\ServiceLocator<Reporter> $reporters
      */
     public function __construct(
-        private readonly ServiceLocator $reporters,
+        private readonly DependencyInjection\ServiceLocator $reporters,
     ) {}
 
     /**
-     * @throws ReporterIsNotSupported
+     * @throws Exception\ReporterIsNotSupported
      */
     public function make(string $name): Reporter
     {
         if (!$this->reporters->has($name)) {
-            throw new ReporterIsNotSupported($name);
+            throw new Exception\ReporterIsNotSupported($name);
         }
 
         return $this->reporters->get($name);

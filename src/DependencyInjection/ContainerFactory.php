@@ -23,16 +23,10 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 
-use EliasHaeussler\ComposerUpdateCheck\DependencyInjection\CompilerPass\ContainerBuilderDebugDumpPass;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileIsNotSupported;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\Filesystem\Path;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\Config;
+use Symfony\Component\DependencyInjection;
+use Symfony\Component\Filesystem;
 
 use function array_unique;
 use function dirname;
@@ -69,11 +63,11 @@ final class ContainerFactory
     }
 
     /**
-     * @throws ConfigFileIsNotSupported
+     * @throws Exception\ConfigFileIsNotSupported
      */
-    public function make(bool $debug = false): ContainerInterface
+    public function make(bool $debug = false): DependencyInjection\ContainerInterface
     {
-        $container = new ContainerBuilder();
+        $container = new DependencyInjection\ContainerBuilder();
 
         foreach ($this->configs as $config) {
             $loader = $this->createLoader($config, $container);
@@ -82,7 +76,7 @@ final class ContainerFactory
 
         if ($debug) {
             $containerXmlFilename = $this->buildContainerXmlFilename($container);
-            $container->addCompilerPass(new ContainerBuilderDebugDumpPass($containerXmlFilename));
+            $container->addCompilerPass(new CompilerPass\ContainerBuilderDebugDumpPass($containerXmlFilename));
         }
 
         $container->compile(true);
@@ -91,17 +85,19 @@ final class ContainerFactory
     }
 
     /**
-     * @throws ConfigFileIsNotSupported
+     * @throws Exception\ConfigFileIsNotSupported
      */
-    private function createLoader(string $filename, ContainerBuilder $container): LoaderInterface
-    {
-        $locator = new FileLocator($filename);
+    private function createLoader(
+        string $filename,
+        DependencyInjection\ContainerBuilder $container,
+    ): Config\Loader\LoaderInterface {
+        $locator = new Config\FileLocator($filename);
 
-        return match (Path::getExtension($filename, true)) {
-            'php' => new PhpFileLoader($container, $locator),
-            'yaml', 'yml' => new YamlFileLoader($container, $locator),
-            'xml' => new XmlFileLoader($container, $locator),
-            default => throw new ConfigFileIsNotSupported($filename),
+        return match (Filesystem\Path::getExtension($filename, true)) {
+            'php' => new DependencyInjection\Loader\PhpFileLoader($container, $locator),
+            'yaml', 'yml' => new DependencyInjection\Loader\YamlFileLoader($container, $locator),
+            'xml' => new DependencyInjection\Loader\XmlFileLoader($container, $locator),
+            default => throw new Exception\ConfigFileIsNotSupported($filename),
         };
     }
 
@@ -118,12 +114,12 @@ final class ContainerFactory
         ];
     }
 
-    private function buildContainerXmlFilename(ContainerBuilder $container): string
+    private function buildContainerXmlFilename(DependencyInjection\ContainerBuilder $container): string
     {
         $tempDir = sys_get_temp_dir();
 
         do {
-            $filename = Path::join($tempDir, uniqid('ComposerUpdateCheck_')).'.xml';
+            $filename = Filesystem\Path::join($tempDir, uniqid('ComposerUpdateCheck_')).'.xml';
         } while (file_exists($filename));
 
         $container->setParameter('debug.container_xml_filename', $filename);

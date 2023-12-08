@@ -23,9 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 /**
  * UpdateCheckResult.
@@ -36,18 +34,18 @@ use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 final class UpdateCheckResult
 {
     /**
-     * @var list<OutdatedPackage>
+     * @var list<Entity\Package\OutdatedPackage>
      */
     private readonly array $outdatedPackages;
 
     /**
-     * @var list<Package>
+     * @var list<Entity\Package\Package>
      */
     private readonly array $excludedPackages;
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
-     * @param list<Package>         $excludedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\Package>         $excludedPackages
      */
     public function __construct(array $outdatedPackages, array $excludedPackages = [])
     {
@@ -56,7 +54,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<OutdatedPackage>
+     * @return list<Entity\Package\OutdatedPackage>
      */
     public function getOutdatedPackages(): array
     {
@@ -64,7 +62,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<Package>
+     * @return list<Entity\Package\Package>
      */
     public function getExcludedPackages(): array
     {
@@ -72,7 +70,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<SecurityAdvisory>
+     * @return list<Entity\Security\SecurityAdvisory>
      */
     public function getSecurityAdvisories(): array
     {
@@ -88,7 +86,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<OutdatedPackage>
+     * @return list<Entity\Package\OutdatedPackage>
      */
     public function getInsecureOutdatedPackages(): array
     {
@@ -109,7 +107,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @template T of Package
+     * @template T of Entity\Package\Package
      *
      * @param list<T> $packages
      *
@@ -119,7 +117,7 @@ final class UpdateCheckResult
     {
         usort(
             $packages,
-            static fn (Package $a, Package $b) => strcmp($a->getName(), $b->getName()),
+            static fn (Entity\Package\Package $a, Entity\Package\Package $b) => strcmp($a->getName(), $b->getName()),
         );
 
         return $packages;

@@ -23,8 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
 use Generator;
 
 use function array_filter;
@@ -46,14 +45,14 @@ final class EnvironmentVariablesConfigAdapter implements ConfigAdapter
 {
     private const ENV_VAR_PREFIX = 'COMPOSER_UPDATE_CHECK_';
 
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $config = new ComposerUpdateCheckConfig();
+        $config = new Configuration\ComposerUpdateCheckConfig();
 
         // Exclude patterns
         $excludePatterns = $this->getEnv('EXCLUDE_PATTERNS', true);
         foreach ($excludePatterns as $excludePattern) {
-            $config->excludePackageByPattern(PackageExcludePattern::create($excludePattern));
+            $config->excludePackageByPattern(Configuration\Options\PackageExcludePattern::create($excludePattern));
         }
 
         // Include dev packages

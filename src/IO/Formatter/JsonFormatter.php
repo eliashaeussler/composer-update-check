@@ -23,10 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use Symfony\Component\Console;
 
 use function count;
 use function json_encode;
@@ -43,10 +41,10 @@ final class JsonFormatter implements Formatter
     public const FORMAT = 'json';
 
     public function __construct(
-        private ?SymfonyStyle $io = null,
+        private ?Console\Style\SymfonyStyle $io = null,
     ) {}
 
-    public function formatResult(UpdateCheckResult $result): void
+    public function formatResult(Entity\Result\UpdateCheckResult $result): void
     {
         // Early return if IO is missing
         if (null === $this->io) {
@@ -74,7 +72,7 @@ final class JsonFormatter implements Formatter
     }
 
     /**
-     * @param list<Package> $excludedPackages
+     * @param list<Entity\Package\Package> $excludedPackages
      */
     private function renderUpToDateMessage(array $excludedPackages): void
     {
@@ -102,8 +100,8 @@ final class JsonFormatter implements Formatter
     }
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
-     * @param list<Package>         $excludedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\Package>         $excludedPackages
      *
      * @return array{
      *     status: string,
@@ -113,7 +111,7 @@ final class JsonFormatter implements Formatter
      *         newVersion: string,
      *         insecure?: bool,
      *     }>,
-     *     excludedPackages?: list<Package>,
+     *     excludedPackages?: list<Entity\Package\Package>,
      * }
      */
     private function renderTable(array $outdatedPackages, array $excludedPackages): array
@@ -154,7 +152,7 @@ final class JsonFormatter implements Formatter
     }
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      *
      * @return list<array{0: non-empty-string, 1: string, 2: string, 3?: bool}>
      */
@@ -181,7 +179,7 @@ final class JsonFormatter implements Formatter
     }
 
     /**
-     * @param list<OutdatedPackage> $outdatedPackages
+     * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      *
      * @return array<string, list<array{
      *     title: string,
@@ -249,7 +247,7 @@ final class JsonFormatter implements Formatter
         $this->io->writeln(json_encode($json, $flags));
     }
 
-    public function setIO(SymfonyStyle $io): void
+    public function setIO(Console\Style\SymfonyStyle $io): void
     {
         $this->io = $io;
     }

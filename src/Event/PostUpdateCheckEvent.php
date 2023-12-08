@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Event;
 
-use Composer\EventDispatcher\Event;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
+use Composer\EventDispatcher;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 /**
  * PostUpdateCheckEvent.
@@ -34,17 +34,17 @@ use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
  *
  * @codeCoverageIgnore
  */
-final class PostUpdateCheckEvent extends Event
+final class PostUpdateCheckEvent extends EventDispatcher\Event
 {
     public const NAME = 'post-update-check';
 
     public function __construct(
-        private readonly UpdateCheckResult $updateCheckResult,
+        private readonly Entity\Result\UpdateCheckResult $updateCheckResult,
     ) {
         parent::__construct(self::NAME);
     }
 
-    public function getUpdateCheckResult(): UpdateCheckResult
+    public function getUpdateCheckResult(): Entity\Result\UpdateCheckResult
     {
         return $this->updateCheckResult;
     }

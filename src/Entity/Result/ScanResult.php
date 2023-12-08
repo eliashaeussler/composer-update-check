@@ -23,8 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\Package;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 /**
  * ScanResult.
@@ -35,14 +34,14 @@ use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
 final class ScanResult
 {
     /**
-     * @param array<string, list<SecurityAdvisory>> $securityAdvisories
+     * @param array<string, list<Entity\Security\SecurityAdvisory>> $securityAdvisories
      */
     public function __construct(
         private readonly array $securityAdvisories,
     ) {}
 
     /**
-     * @return array<string, list<SecurityAdvisory>>
+     * @return array<string, list<Entity\Security\SecurityAdvisory>>
      */
     public function getSecurityAdvisories(): array
     {
@@ -50,14 +49,14 @@ final class ScanResult
     }
 
     /**
-     * @return list<SecurityAdvisory>
+     * @return list<Entity\Security\SecurityAdvisory>
      */
-    public function getSecurityAdvisoriesForPackage(Package $package): array
+    public function getSecurityAdvisoriesForPackage(Entity\Package\Package $package): array
     {
         return $this->securityAdvisories[$package->getName()] ?? [];
     }
 
-    public function isInsecure(Package $package): bool
+    public function isInsecure(Entity\Package\Package $package): bool
     {
         return [] !== $this->getSecurityAdvisoriesForPackage($package);
     }

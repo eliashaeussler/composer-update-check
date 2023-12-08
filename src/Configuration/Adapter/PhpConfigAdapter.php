@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
 
 /**
  * PhpConfigAdapter.
@@ -33,9 +33,9 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
  */
 final class PhpConfigAdapter extends FileBasedConfigAdapter
 {
-    public function resolve(): ComposerUpdateCheckConfig
+    public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $config = new ComposerUpdateCheckConfig();
+        $config = new Configuration\ComposerUpdateCheckConfig();
         $closure = require $this->filename;
 
         // Call closure with config object

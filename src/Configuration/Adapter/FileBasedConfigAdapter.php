@@ -23,10 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
-use CuyZ\Valinor\Mapper\TreeMapper;
-use CuyZ\Valinor\MapperBuilder;
-use EliasHaeussler\ComposerUpdateCheck\Exception\FileDoesNotExist;
-use Symfony\Component\Filesystem\Path;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\Filesystem;
 
 use function file_exists;
 use function getcwd;
@@ -40,10 +39,10 @@ use function getcwd;
 abstract class FileBasedConfigAdapter implements ConfigAdapter
 {
     protected readonly string $filename;
-    protected readonly TreeMapper $mapper;
+    protected readonly Valinor\Mapper\TreeMapper $mapper;
 
     /**
-     * @throws FileDoesNotExist
+     * @throws Exception\FileDoesNotExist
      */
     public function __construct(string $filename)
     {
@@ -52,25 +51,25 @@ abstract class FileBasedConfigAdapter implements ConfigAdapter
     }
 
     /**
-     * @throws FileDoesNotExist
+     * @throws Exception\FileDoesNotExist
      */
     private function resolveFilename(string $filename): string
     {
-        if (!Path::isAbsolute($filename)) {
+        if (!Filesystem\Path::isAbsolute($filename)) {
             $currentWorkingDirectory = (string) getcwd();
-            $filename = Path::join($currentWorkingDirectory, $filename);
+            $filename = Filesystem\Path::join($currentWorkingDirectory, $filename);
         }
 
         if (!file_exists($filename)) {
-            throw new FileDoesNotExist($filename);
+            throw new Exception\FileDoesNotExist($filename);
         }
 
         return $filename;
     }
 
-    private function createMapper(): TreeMapper
+    private function createMapper(): Valinor\Mapper\TreeMapper
     {
-        return (new MapperBuilder())
+        return (new Valinor\MapperBuilder())
             ->allowPermissiveTypes()
             ->mapper()
         ;

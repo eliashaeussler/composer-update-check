@@ -23,8 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
-use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\TextFormatter;
+use EliasHaeussler\ComposerUpdateCheck\IO;
 
 /**
  * ComposerUpdateCheckConfig.
@@ -35,32 +34,32 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\TextFormatter;
 final class ComposerUpdateCheckConfig
 {
     /**
-     * @param list<PackageExcludePattern>         $excludePatterns
+     * @param list<Options\PackageExcludePattern> $excludePatterns
      * @param array<string, array<string, mixed>> $reporters
      */
     public function __construct(
         private array $excludePatterns = [],
         private bool $includeDevPackages = true,
         private bool $performSecurityScan = false,
-        private string $format = TextFormatter::FORMAT,
+        private string $format = IO\Formatter\TextFormatter::FORMAT,
         private array $reporters = [],
     ) {}
 
     public function excludePackageByName(string $name): self
     {
-        $this->excludePatterns[] = PackageExcludePattern::byName($name);
+        $this->excludePatterns[] = Options\PackageExcludePattern::byName($name);
 
         return $this;
     }
 
     public function excludePackageByRegularExpression(string $regex): self
     {
-        $this->excludePatterns[] = PackageExcludePattern::byRegularExpression($regex);
+        $this->excludePatterns[] = Options\PackageExcludePattern::byRegularExpression($regex);
 
         return $this;
     }
 
-    public function excludePackageByPattern(PackageExcludePattern $excludePattern): self
+    public function excludePackageByPattern(Options\PackageExcludePattern $excludePattern): self
     {
         $this->excludePatterns[] = $excludePattern;
 
@@ -68,7 +67,7 @@ final class ComposerUpdateCheckConfig
     }
 
     /**
-     * @return list<PackageExcludePattern>
+     * @return list<Options\PackageExcludePattern>
      */
     public function getExcludePatterns(): array
     {

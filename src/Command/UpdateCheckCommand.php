@@ -23,21 +23,13 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
-use Composer\Command\BaseCommand;
-use CuyZ\Valinor\Mapper\Tree\Message\Messages;
-use CuyZ\Valinor\Mapper\Tree\Message\NodeMessage;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ChainedConfigAdapter;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\CommandInputConfigAdapter;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\ConfigAdapterFactory;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter\EnvironmentVariablesConfigAdapter;
-use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
-use EliasHaeussler\ComposerUpdateCheck\Exception\ConfigFileHasErrors;
-use EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory;
+use Composer\Command;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use EliasHaeussler\ComposerUpdateCheck\IO;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console;
 
 use function array_map;
 use function array_unshift;
@@ -49,12 +41,12 @@ use function sprintf;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class UpdateCheckCommand extends BaseCommand
+final class UpdateCheckCommand extends Command\BaseCommand
 {
-    private SymfonyStyle $io;
+    private Console\Style\SymfonyStyle $io;
 
     public function __construct(
-        private readonly FormatterFactory $formatterFactory,
+        private readonly IO\Formatter\FormatterFactory $formatterFactory,
         private readonly UpdateChecker $updateChecker,
     ) {
         parent::__construct('update-check');
@@ -67,58 +59,58 @@ final class UpdateCheckCommand extends BaseCommand
         $this->addOption(
             'config',
             'c',
-            InputOption::VALUE_REQUIRED,
+            Console\Input\InputOption::VALUE_REQUIRED,
             'Path to configuration file, can be in JSON, PHP oder YAML format',
         );
         $this->addOption(
             'exclude-packages',
             'e',
-            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
             'Packages to exclude when checking for available updates',
         );
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_NONE,
+            Console\Input\InputOption::VALUE_NONE,
             'Disables update check of require-dev packages.',
         );
         $this->addOption(
             'security-scan',
             's',
-            InputOption::VALUE_NONE,
+            Console\Input\InputOption::VALUE_NONE,
             'Run security scan for all outdated packages',
         );
         $this->addOption(
             'format',
             'f',
-            InputOption::VALUE_REQUIRED,
+            Console\Input\InputOption::VALUE_REQUIRED,
             'Format to display update check results',
         );
         $this->addOption(
             'reporter',
             'r',
-            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
             'Enable given reporters, may additionally contain a JSON-encoded string of reporter options, separated by colon (:)',
         );
         $this->addOption(
             'disable-reporter',
             'R',
-            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
             'Disable given reporters (even if they were enabled with the --enable-reporter option)',
         );
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    protected function initialize(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): void
     {
-        $this->io = new SymfonyStyle($input, $output);
+        $this->io = new Console\Style\SymfonyStyle($input, $output);
         $this->formatterFactory->setIO($this->io);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): int
     {
         try {
             $config = $this->resolveConfiguration($input);
-        } catch (ConfigFileHasErrors $exception) {
+        } catch (Exception\ConfigFileHasErrors $exception) {
             $this->displayMappingErrors($exception);
 
             return self::FAILURE;
@@ -131,28 +123,28 @@ final class UpdateCheckCommand extends BaseCommand
         return self::SUCCESS;
     }
 
-    private function resolveConfiguration(InputInterface $input): ComposerUpdateCheckConfig
+    private function resolveConfiguration(Console\Input\InputInterface $input): Configuration\ComposerUpdateCheckConfig
     {
         $filename = $input->getOption('config');
         $adapters = [
-            new CommandInputConfigAdapter($input),
-            new EnvironmentVariablesConfigAdapter(),
+            new Configuration\Adapter\CommandInputConfigAdapter($input),
+            new Configuration\Adapter\EnvironmentVariablesConfigAdapter(),
         ];
 
         if (null !== $filename && '' !== $filename) {
-            $configAdapterFactory = new ConfigAdapterFactory();
+            $configAdapterFactory = new Configuration\Adapter\ConfigAdapterFactory();
 
             array_unshift($adapters, $configAdapterFactory->make($filename));
         }
 
-        $configAdapter = new ChainedConfigAdapter($adapters);
+        $configAdapter = new Configuration\Adapter\ChainedConfigAdapter($adapters);
 
         return $configAdapter->resolve();
     }
 
-    private function displayMappingErrors(ConfigFileHasErrors $exception): void
+    private function displayMappingErrors(Exception\ConfigFileHasErrors $exception): void
     {
-        $errors = Messages::flattenFromNode($exception->error->node())->errors();
+        $errors = Valinor\Mapper\Tree\Message\Messages::flattenFromNode($exception->error->node())->errors();
 
         $this->io->error($exception->getMessage());
         $this->io->writeln('The following errors occurred:');
@@ -161,7 +153,7 @@ final class UpdateCheckCommand extends BaseCommand
         );
     }
 
-    private function formatErrorMessage(NodeMessage $message): string
+    private function formatErrorMessage(Valinor\Mapper\Tree\Message\NodeMessage $message): string
     {
         return sprintf('<comment>%s</comment>: %s', $message->node()->path(), $message->toString());
     }

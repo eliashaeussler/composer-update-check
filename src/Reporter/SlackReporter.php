@@ -24,14 +24,13 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
 use Composer\Composer;
-use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Report\SlackReport;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
+use Composer\IO;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Exception;
+use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver;
 
 /**
  * SlackReporter.
@@ -43,17 +42,17 @@ final class SlackReporter implements Reporter
 {
     public const NAME = 'slack';
 
-    private readonly OptionsResolver $resolver;
+    private readonly OptionsResolver\OptionsResolver $resolver;
 
     public function __construct(
         private readonly Client $client,
         private readonly Composer $composer,
-        private readonly IOInterface $io,
+        private readonly IO\IOInterface $io,
     ) {
         $this->resolver = $this->createOptionsResolver();
     }
 
-    public function report(UpdateCheckResult $result, array $options): bool
+    public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
     {
         ['url' => $url] = $this->resolver->resolve($options);
 
@@ -64,24 +63,24 @@ final class SlackReporter implements Reporter
         }
 
         // Create report
-        $report = SlackReport::create($result, $rootPackageName);
+        $report = Entity\Report\SlackReport::create($result, $rootPackageName);
 
         // Send report
         try {
-            $this->io->writeError('📤 Sending report to Slack... ', false, IOInterface::VERBOSE);
+            $this->io->writeError('📤 Sending report to Slack... ', false, IO\IOInterface::VERBOSE);
 
             $response = $this->client->post($url, [
                 RequestOptions::JSON => $report,
             ]);
             $successful = 200 === $response->getStatusCode();
-        } catch (GuzzleException) {
+        } catch (Exception\GuzzleException) {
             $successful = false;
         }
 
         if ($successful) {
-            $this->io->writeError('<info>Done</info>', true, IOInterface::VERBOSE);
+            $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
         } else {
-            $this->io->writeError('<error>Failed</error>', true, IOInterface::VERBOSE);
+            $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
         }
 
         return $successful;
@@ -92,15 +91,15 @@ final class SlackReporter implements Reporter
         return self::NAME;
     }
 
-    private function createOptionsResolver(): OptionsResolver
+    private function createOptionsResolver(): OptionsResolver\OptionsResolver
     {
-        $resolver = new OptionsResolver();
+        $resolver = new OptionsResolver\OptionsResolver();
 
         $resolver->define('url')
             ->allowedTypes('string')
             ->required()
             ->normalize(
-                static fn (OptionsResolver $optionsResolver, string $url) => new Uri($url),
+                static fn (OptionsResolver\OptionsResolver $optionsResolver, string $url) => new Psr7\Uri($url),
             )
         ;
 
