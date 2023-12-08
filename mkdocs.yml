@@ -19,7 +19,6 @@ nav:
     - Installation: install.md
     - Usage: usage.md
     - API: api.md
-    - 'Docker image': docker.md
   - Customization:
     - Events: events.md
     - Plugins: plugins.md
