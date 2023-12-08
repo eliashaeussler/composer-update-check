@@ -93,22 +93,3 @@ jobs:
           directory: .build/coverage
           fail_ci_if_error: true
           verbose: true
-
-  # Job: Run unit tests of composer-update-reporter
-  tests-reporter:
-    name: Tests of eliashaeussler/composer-update-reporter
-    runs-on: ubuntu-latest
-    if: ${{ github.actor != 'renovate[bot]' }}
-    steps:
-      - id: set-branch
-        run: echo "branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
-      - id: set-sha
-        run: echo "sha=${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_OUTPUT
-      - name: Trigger workflow
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: 'Tests for composer-update-check'
-          token: ${{ secrets.PAT_REPORTER_TRIGGER }}
-          repo: eliashaeussler/composer-update-reporter
-          ref: 'main'
-          inputs: '{ "update-check-branch": "${{ steps.set-branch.outputs.branch }}", "update-check-sha": "${{ steps.set-sha.outputs.sha }}" }'
