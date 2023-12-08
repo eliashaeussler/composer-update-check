@@ -25,11 +25,13 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
 use JsonSerializable;
 
 use function count;
 use function implode;
 use function sprintf;
+use function str_repeat;
 
 /**
  * MattermostReport.
@@ -58,17 +60,18 @@ final class MattermostReport implements JsonSerializable
     ): self {
         return new self(
             $channel,
-            self::createText($result),
-            self::createAttachments($result, $rootPackageName),
-            $result->hasInsecureOutdatedPackages() ? ':warning:' : ':package:',
+            self::createText($result, $rootPackageName),
+            self::createAttachments($result),
+            ':rotating_light:',
             $username,
         );
     }
 
-    private static function createText(UpdateCheckResult $result): string
+    private static function createText(UpdateCheckResult $result, string $rootPackageName = null): string
     {
         $numberOfOutdatedPackages = 0;
         $numberOfInsecurePackages = 0;
+        $textParts = [];
 
         // Count outdated and insecure packages
         foreach ($result->getOutdatedPackages() as $outdatedPackage) {
@@ -79,33 +82,36 @@ final class MattermostReport implements JsonSerializable
             }
         }
 
-        return sprintf(
-            '#### :rotating_light: %d outdated%s package%s',
+        // Outdated packages header
+        $textParts[] = sprintf(
+            '#### %d outdated%s package%s',
             $numberOfOutdatedPackages,
             $numberOfInsecurePackages > 0 ? sprintf(' (%d insecure)', $numberOfInsecurePackages) : '',
             1 !== $numberOfOutdatedPackages ? 's' : '',
         );
+
+        // Outdated packages table
+        $textParts[] = self::renderOutdatedPackagesTable($result, $rootPackageName);
+
+        // Security advisories header
+        if ($result->hasInsecureOutdatedPackages()) {
+            $textParts[] = '##### Security advisories';
+        }
+
+        return implode(PHP_EOL, $textParts);
     }
 
     /**
      * @return list<Dto\MattermostAttachment>
      */
-    private static function createAttachments(UpdateCheckResult $result, string $rootPackageName = null): array
+    private static function createAttachments(UpdateCheckResult $result): array
     {
-        $securityAdvisories = $result->getSecurityAdvisories();
         $attachments = [];
 
-        // Outdated packages
-        $attachments[] = new Dto\MattermostAttachment(
-            '#EE0000',
-            self::renderOutdatedPackagesTable($result, $rootPackageName),
-        );
-
-        // Security advisories
-        if ([] !== $securityAdvisories) {
+        foreach ($result->getSecurityAdvisories() as $securityAdvisory) {
             $attachments[] = new Dto\MattermostAttachment(
-                '#EE0000',
-                self::renderSecurityAdvisoriesTable($securityAdvisories),
+                self::getColorForSeverityLevel($securityAdvisory->getSeverity()),
+                self::renderSecurityAdvisoryTable($securityAdvisory),
             );
         }
 
@@ -121,18 +127,39 @@ final class MattermostReport implements JsonSerializable
             $textParts[] = sprintf('##### %s', $rootPackageName);
         }
 
-        $textParts[] = '| Package | Current version | New version |';
-        $textParts[] = '|:------- |:--------------- |:----------- |';
+        $headers = [
+            'Package',
+            'Current version',
+            'New version',
+        ];
+
+        if ($result->hasInsecureOutdatedPackages()) {
+            $headers[] = 'Severity';
+        }
+
+        $textParts[] = '|'.implode(' | ', $headers).'|';
+        $textParts[] = str_repeat('|:--- ', count($headers)).'|';
 
         foreach ($result->getOutdatedPackages() as $outdatedPackage) {
-            $textParts[] = sprintf(
-                '| [%s](%s) | %s%s | **%s** |',
+            $severityLevel = $outdatedPackage->getHighestSeverityLevel();
+
+            $row = sprintf(
+                '| [%s](%s) | %s | **%s** |',
                 $outdatedPackage->getName(),
                 $outdatedPackage->getProviderLink(),
                 $outdatedPackage->getOutdatedVersion(),
-                $outdatedPackage->isInsecure() ? ' :warning:' : '',
                 $outdatedPackage->getNewVersion(),
             );
+
+            if (null !== $severityLevel) {
+                $row .= sprintf(
+                    ' %s `%s` |',
+                    self::getEmojiForSeverityLevel($severityLevel),
+                    $severityLevel->value,
+                );
+            }
+
+            $textParts[] = $row;
         }
 
         if ($numberOfExcludedPackages > 0) {
@@ -146,32 +173,43 @@ final class MattermostReport implements JsonSerializable
         return implode(PHP_EOL, $textParts);
     }
 
-    /**
-     * @param list<SecurityAdvisory> $securityAdvisories
-     */
-    private static function renderSecurityAdvisoriesTable(array $securityAdvisories): string
+    private static function renderSecurityAdvisoryTable(SecurityAdvisory $securityAdvisory): string
     {
         $textParts = [
-            '##### Security advisories',
+            sprintf('###### %s', $securityAdvisory->getSanitizedTitle()),
+            sprintf('* Package: `%s`', $securityAdvisory->getPackageName()),
+            sprintf('* Reported at: `%s`', $securityAdvisory->getReportedAt()->format('Y-m-d')),
         ];
 
-        foreach ($securityAdvisories as $securityAdvisory) {
-            $textParts[] = sprintf('###### %s', $securityAdvisory->getTitle());
-            $textParts[] = sprintf('* Package: `%s`', $securityAdvisory->getPackageName());
-            $textParts[] = sprintf('* Advisory ID: `%s`', $securityAdvisory->getAdvisoryId());
-            $textParts[] = sprintf('* Reported at: `%s`', $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s'));
-            $textParts[] = sprintf('* Severity: `%s`', $securityAdvisory->getSeverity()->value);
+        if (null !== $securityAdvisory->getCVE()) {
+            $textParts[] = sprintf('* CVE: `%s`', $securityAdvisory->getCVE());
+        }
 
-            if (null !== $securityAdvisory->getCVE()) {
-                $textParts[] = sprintf('* CVE: `%s`', $securityAdvisory->getCVE());
-            }
-
-            if (null !== $securityAdvisory->getLink()) {
-                $textParts[] = sprintf('[Read more](%s)', $securityAdvisory->getLink());
-            }
+        if (null !== $securityAdvisory->getLink()) {
+            $textParts[] = sprintf('[Read more](%s)', $securityAdvisory->getLink());
         }
 
         return implode(PHP_EOL, $textParts);
+    }
+
+    private static function getColorForSeverityLevel(SeverityLevel $severityLevel): string
+    {
+        return match ($severityLevel) {
+            SeverityLevel::Low => '#EEEEEE',
+            SeverityLevel::Medium => '#FFD966',
+            SeverityLevel::High => '#EE0000',
+            SeverityLevel::Critical => '#8A2BE2',
+        };
+    }
+
+    private static function getEmojiForSeverityLevel(SeverityLevel $severityLevel): string
+    {
+        return match ($severityLevel) {
+            SeverityLevel::Low => ':white_circle:',
+            SeverityLevel::Medium => ':large_yellow_circle:',
+            SeverityLevel::High => ':red_circle:',
+            SeverityLevel::Critical => ':large_purple_circle:',
+        };
     }
 
     /**
