@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Result\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
 use JsonSerializable;
 
 use function count;
@@ -83,7 +84,6 @@ final class SlackReport implements JsonSerializable
         if ($remainingBlocks > 4) {
             $remainingSecurityAdvisories = count($result->getSecurityAdvisories());
             $remainingBlocks -= 2;
-            $blocks[] = Dto\SlackBlock::divider();
             $blocks[] = Dto\SlackBlock::header(
                 Dto\SlackBlockElement::plainText('Security advisories'),
             );
@@ -99,12 +99,6 @@ final class SlackReport implements JsonSerializable
 
                 --$remainingSecurityAdvisories;
             }
-        }
-
-        // Create insecure packages block
-        if ($result->hasInsecureOutdatedPackages()) {
-            $blocks[] = Dto\SlackBlock::divider();
-            $blocks[] = self::createInsecurePackagesBlock();
         }
 
         return new self($blocks);
@@ -147,20 +141,24 @@ final class SlackReport implements JsonSerializable
 
     private static function createOutdatedPackageBlock(OutdatedPackage $outdatedPackage): Dto\SlackBlock
     {
+        $highestSeverityLevel = $outdatedPackage->getHighestSeverityLevel();
+
         return Dto\SlackBlock::section(
             fields: [
                 Dto\SlackBlockElement::markdown(
                     sprintf(
-                        '<%s|%s>',
+                        '<%s|%s>%s',
                         $outdatedPackage->getProviderLink(),
                         $outdatedPackage->getName(),
+                        null !== $highestSeverityLevel
+                            ? sprintf("\n%s `%s`", self::getEmojiForSeverityLevel($highestSeverityLevel), $highestSeverityLevel->value)
+                            : '',
                     ),
                 ),
                 Dto\SlackBlockElement::markdown(
                     sprintf(
-                        "*Current version:* %s%s\n*New version:* %s",
+                        "*Current version:* %s\n*New version:* %s",
                         $outdatedPackage->getOutdatedVersion()->get(),
-                        $outdatedPackage->isInsecure() ? ' :warning:' : '',
                         $outdatedPackage->getNewVersion()->get(),
                     ),
                 ),
@@ -171,15 +169,13 @@ final class SlackReport implements JsonSerializable
     private static function createSecurityAdvisoryBlock(SecurityAdvisory $securityAdvisory): Dto\SlackBlock
     {
         $textParts = [
-            sprintf('*%s*', $securityAdvisory->getTitle()),
+            sprintf('*%s*', $securityAdvisory->getSanitizedTitle()),
             sprintf('• Package: `%s`', $securityAdvisory->getPackageName()),
-            sprintf('• Advisory ID: `%s`', $securityAdvisory->getAdvisoryId()),
             sprintf(
-                '• Reported at: `<!date^%d^{date} at {time}|%s>`',
+                '• Reported at: `<!date^%d^{date}|%s>`',
                 $securityAdvisory->getReportedAt()->getTimestamp(),
-                $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s'),
+                $securityAdvisory->getReportedAt()->format('Y-m-d'),
             ),
-            sprintf('• Severity: `%s`', $securityAdvisory->getSeverity()),
         ];
 
         if (null !== $securityAdvisory->getCVE()) {
@@ -206,15 +202,14 @@ final class SlackReport implements JsonSerializable
         );
     }
 
-    private static function createInsecurePackagesBlock(): Dto\SlackBlock
+    private static function getEmojiForSeverityLevel(SeverityLevel $severityLevel): string
     {
-        return Dto\SlackBlock::context(
-            elements: [
-                Dto\SlackBlockElement::markdown(
-                    'Package versions marked with :warning: are insecure.',
-                ),
-            ],
-        );
+        return match ($severityLevel) {
+            SeverityLevel::Low => ':white_circle:',
+            SeverityLevel::Medium => ':large_yellow_circle:',
+            SeverityLevel::High => ':red_circle:',
+            SeverityLevel::Critical => ':large_purple_circle:',
+        };
     }
 
     /**

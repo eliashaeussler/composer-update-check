@@ -52,11 +52,6 @@ final class SlackBlock implements JsonSerializable
         return new self('context', elements: $elements);
     }
 
-    public static function divider(): self
-    {
-        return new self('divider');
-    }
-
     public static function header(SlackBlockElement $text): self
     {
         return new self('header', $text);

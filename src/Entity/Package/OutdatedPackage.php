@@ -24,9 +24,12 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SecurityAdvisory;
+use EliasHaeussler\ComposerUpdateCheck\Entity\Security\SeverityLevel;
 use EliasHaeussler\ComposerUpdateCheck\Entity\Version;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
+
+use function usort;
 
 /**
  * OutdatedPackage.
@@ -74,6 +77,22 @@ final class OutdatedPackage implements Package
     public function getSecurityAdvisories(): array
     {
         return $this->securityAdvisories;
+    }
+
+    public function getHighestSeverityLevel(): ?SeverityLevel
+    {
+        if ([] === $this->securityAdvisories) {
+            return null;
+        }
+
+        $securityAdvisories = $this->securityAdvisories;
+
+        usort(
+            $securityAdvisories,
+            static fn (SecurityAdvisory $a, SecurityAdvisory $b) => $a->getSeverity()->compareTo($b->getSeverity()),
+        );
+
+        return array_pop($securityAdvisories)->getSeverity();
     }
 
     /**

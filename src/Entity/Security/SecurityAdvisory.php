@@ -27,6 +27,10 @@ use DateTimeImmutable;
 use JsonSerializable;
 use Psr\Http\Message\UriInterface;
 
+use function preg_quote;
+use function preg_replace;
+use function sprintf;
+
 /**
  * SecurityAdvisory.
  *
@@ -41,7 +45,7 @@ final class SecurityAdvisory implements JsonSerializable
         private readonly string $affectedVersions,
         private readonly string $title,
         private readonly DateTimeImmutable $reportedAt,
-        private readonly string $severity,
+        private readonly SeverityLevel $severity,
         private readonly ?string $cve = null,
         private readonly ?UriInterface $link = null,
     ) {}
@@ -66,12 +70,25 @@ final class SecurityAdvisory implements JsonSerializable
         return $this->title;
     }
 
+    public function getSanitizedTitle(): string
+    {
+        if (null === $this->cve) {
+            return $this->title;
+        }
+
+        return preg_replace(
+            sprintf('/^%s:\s/', preg_quote($this->cve)),
+            '',
+            $this->title,
+        );
+    }
+
     public function getReportedAt(): DateTimeImmutable
     {
         return $this->reportedAt;
     }
 
-    public function getSeverity(): string
+    public function getSeverity(): SeverityLevel
     {
         return $this->severity;
     }
@@ -106,7 +123,7 @@ final class SecurityAdvisory implements JsonSerializable
             'affectedVersions' => $this->affectedVersions,
             'title' => $this->title,
             'reportedAt' => $this->reportedAt,
-            'severity' => $this->severity,
+            'severity' => $this->severity->value,
             'cve' => $this->cve,
             'link' => null !== $this->link ? (string) $this->link : null,
         ];

@@ -151,7 +151,7 @@ final class TextFormatter implements Formatter
                 $definitionList = [
                     ['ID' => $securityAdvisory->getAdvisoryId()],
                     ['Reported at' => $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s')],
-                    ['Severity' => $securityAdvisory->getSeverity()],
+                    ['Severity' => $securityAdvisory->getSeverity()->value],
                     ['CVE' => $securityAdvisory->getCVE() ?? '<fg=gray>Unknown</>'],
                 ];
 

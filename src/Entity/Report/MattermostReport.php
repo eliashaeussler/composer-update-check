@@ -160,7 +160,7 @@ final class MattermostReport implements JsonSerializable
             $textParts[] = sprintf('* Package: `%s`', $securityAdvisory->getPackageName());
             $textParts[] = sprintf('* Advisory ID: `%s`', $securityAdvisory->getAdvisoryId());
             $textParts[] = sprintf('* Reported at: `%s`', $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s'));
-            $textParts[] = sprintf('* Severity: `%s`', $securityAdvisory->getSeverity());
+            $textParts[] = sprintf('* Severity: `%s`', $securityAdvisory->getSeverity()->value);
 
             if (null !== $securityAdvisory->getCVE()) {
                 $textParts[] = sprintf('* CVE: `%s`', $securityAdvisory->getCVE());

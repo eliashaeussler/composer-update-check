@@ -214,7 +214,7 @@ final class JsonFormatter implements Formatter
                     'title' => $securityAdvisory->getTitle(),
                     'advisoryId' => $securityAdvisory->getAdvisoryId(),
                     'reportedAt' => $securityAdvisory->getReportedAt()->format('Y-m-d H:i:s'),
-                    'severity' => $securityAdvisory->getSeverity(),
+                    'severity' => $securityAdvisory->getSeverity()->value,
                     'cve' => $securityAdvisory->getCVE(),
                 ];
 
