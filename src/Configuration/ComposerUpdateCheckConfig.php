@@ -53,7 +53,7 @@ final class ComposerUpdateCheckConfig
         return $this;
     }
 
-    public function excludePackageByRegex(string $regex): self
+    public function excludePackageByRegularExpression(string $regex): self
     {
         $this->excludePatterns[] = PackageExcludePattern::byRegularExpression($regex);
 
