@@ -48,14 +48,14 @@ final class ComposerUpdateCheckConfig
 
     public function excludePackageByName(string $name): self
     {
-        $this->excludePatterns[] = PackageExcludePattern::name($name);
+        $this->excludePatterns[] = PackageExcludePattern::byName($name);
 
         return $this;
     }
 
     public function excludePackageByRegex(string $regex): self
     {
-        $this->excludePatterns[] = PackageExcludePattern::regex($regex);
+        $this->excludePatterns[] = PackageExcludePattern::byRegularExpression($regex);
 
         return $this;
     }

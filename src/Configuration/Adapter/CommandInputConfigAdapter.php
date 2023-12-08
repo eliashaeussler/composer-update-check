@@ -74,9 +74,9 @@ final class CommandInputConfigAdapter implements ConfigAdapter
     private function resolveExcludePattern(string $pattern): PackageExcludePattern
     {
         if (str_starts_with($pattern, '/') || str_starts_with($pattern, '#')) {
-            return PackageExcludePattern::regex($pattern);
+            return PackageExcludePattern::byRegularExpression($pattern);
         }
 
-        return PackageExcludePattern::name($pattern);
+        return PackageExcludePattern::byName($pattern);
     }
 }

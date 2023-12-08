@@ -47,14 +47,14 @@ final class PackageExcludePattern
         $this->matchFunction = $matchFunction;
     }
 
-    public static function name(string $name): self
+    public static function byName(string $name): self
     {
         return new self(
             static fn (string $packageName) => fnmatch($name, $packageName),
         );
     }
 
-    public static function regex(string $regex): self
+    public static function byRegularExpression(string $regex): self
     {
         return new self(
             static fn (string $packageName) => 1 === preg_match($regex, $packageName),
