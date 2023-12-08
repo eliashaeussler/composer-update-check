@@ -76,11 +76,17 @@ final class SecurityAdvisory implements JsonSerializable
             return $this->title;
         }
 
-        return preg_replace(
+        $sanitizedTitle = preg_replace(
             sprintf('/^%s:\s/', preg_quote($this->cve)),
             '',
             $this->title,
         );
+
+        if (null === $sanitizedTitle) {
+            return $this->title;
+        }
+
+        return $sanitizedTitle;
     }
 
     public function getReportedAt(): DateTimeImmutable
