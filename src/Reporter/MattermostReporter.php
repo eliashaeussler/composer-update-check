@@ -110,7 +110,8 @@ final class MattermostReporter implements Reporter
         ;
 
         $resolver->define('username')
-            ->allowedTypes('string')
+            ->allowedTypes('string', 'null')
+            ->default(null)
         ;
 
         return $resolver;
