@@ -85,7 +85,7 @@ final class ContainerFactory
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass($containerXmlFilename));
         }
 
-        $container->compile();
+        $container->compile(true);
 
         return $container;
     }
