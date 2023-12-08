@@ -25,9 +25,14 @@ namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
 use EliasHaeussler\ComposerUpdateCheck\Configuration\ComposerUpdateCheckConfig;
 use EliasHaeussler\ComposerUpdateCheck\Configuration\Options\PackageExcludePattern;
+use EliasHaeussler\ComposerUpdateCheck\Exception\ReporterOptionsAreInvalid;
+use JsonException;
 use Symfony\Component\Console\Input\InputInterface;
 
+use function explode;
+use function is_array;
 use function is_string;
+use function json_decode;
 
 /**
  * CommandInputConfigAdapter.
@@ -41,6 +46,9 @@ final class CommandInputConfigAdapter implements ConfigAdapter
         private readonly InputInterface $input,
     ) {}
 
+    /**
+     * @throws ReporterOptionsAreInvalid
+     */
     public function resolve(): ComposerUpdateCheckConfig
     {
         $config = new ComposerUpdateCheckConfig();
@@ -67,6 +75,58 @@ final class CommandInputConfigAdapter implements ConfigAdapter
             $config->setFormat($this->input->getOption('format'));
         }
 
+        if ($this->input->hasOption('reporter') && is_array($this->input->getOption('reporter'))) {
+            $this->enableReporters($config, $this->input->getOption('reporter'));
+        }
+
+        if ($this->input->hasOption('disable-reporter') && is_array($this->input->getOption('disable-reporter'))) {
+            foreach ($this->input->getOption('disable-reporter') as $name) {
+                $config->disableReporter($name);
+            }
+        }
+
         return $config;
+    }
+
+    /**
+     * @param array<string> $reporters
+     *
+     * @throws ReporterOptionsAreInvalid
+     */
+    private function enableReporters(ComposerUpdateCheckConfig $config, array $reporters): void
+    {
+        foreach ($reporters as $reporterConfig) {
+            $configParts = explode(':', $reporterConfig, 2);
+            $name = $configParts[0];
+            $options = $configParts[1] ?? [];
+
+            if (is_string($options)) {
+                $options = $this->parseReporterOptions($name, $options);
+            } else {
+                $options = [];
+            }
+
+            $config->enableReporter($name, $options);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws ReporterOptionsAreInvalid
+     */
+    private function parseReporterOptions(string $name, string $json): array
+    {
+        try {
+            $options = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+            if (!is_array($options)) {
+                throw new ReporterOptionsAreInvalid($name);
+            }
+
+            return $options;
+        } catch (JsonException) {
+            throw new ReporterOptionsAreInvalid($name);
+        }
     }
 }

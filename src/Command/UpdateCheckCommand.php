@@ -94,6 +94,18 @@ final class UpdateCheckCommand extends BaseCommand
             InputOption::VALUE_REQUIRED,
             'Format to display update check results',
         );
+        $this->addOption(
+            'reporter',
+            'r',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Enable given reporters, may additionally contain a JSON-encoded string of reporter options, separated by colon (:)',
+        );
+        $this->addOption(
+            'disable-reporter',
+            'R',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Disable given reporters (even if they were enabled with the --enable-reporter option)',
+        );
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
