@@ -71,10 +71,10 @@ final class UpdateCheckCommand extends BaseCommand
             'Path to configuration file, can be in JSON, PHP oder YAML format',
         );
         $this->addOption(
-            'ignore-packages',
-            'i',
+            'exclude-packages',
+            'e',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'Packages to ignore when checking for available updates',
+            'Packages to exclude when checking for available updates',
         );
         $this->addOption(
             'no-dev',
