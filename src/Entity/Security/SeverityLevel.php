@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Security;
 
+use function usort;
+
 /**
  * SeverityLevel.
  *
@@ -41,6 +43,19 @@ enum SeverityLevel: string
     public function compareTo(self $other): int
     {
         return $this->getInternalLevel() <=> $other->getInternalLevel();
+    }
+
+    public static function getHighestSeverityLevel(self ...$severityLevels): self
+    {
+        usort($severityLevels, static fn (self $a, self $b) => $a->compareTo($b));
+
+        $highestSeverityLevel = array_pop($severityLevels);
+
+        if (null === $highestSeverityLevel) {
+            return self::Low;
+        }
+
+        return $highestSeverityLevel;
     }
 
     private function getInternalLevel(): int

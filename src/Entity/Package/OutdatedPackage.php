@@ -27,7 +27,7 @@ use EliasHaeussler\ComposerUpdateCheck\Entity;
 use GuzzleHttp\Psr7;
 use Psr\Http\Message;
 
-use function usort;
+use function array_map;
 
 /**
  * OutdatedPackage.
@@ -83,14 +83,12 @@ final class OutdatedPackage implements Package
             return null;
         }
 
-        $securityAdvisories = $this->securityAdvisories;
-
-        usort(
-            $securityAdvisories,
-            static fn (Entity\Security\SecurityAdvisory $a, Entity\Security\SecurityAdvisory $b) => $a->getSeverity()->compareTo($b->getSeverity()),
+        $securityLevels = array_map(
+            static fn (Entity\Security\SecurityAdvisory $securityAdvisory) => $securityAdvisory->getSeverity(),
+            $this->securityAdvisories,
         );
 
-        return array_pop($securityAdvisories)->getSeverity();
+        return Entity\Security\SeverityLevel::getHighestSeverityLevel(...$securityLevels);
     }
 
     /**
