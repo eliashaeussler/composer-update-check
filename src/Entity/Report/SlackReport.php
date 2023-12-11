@@ -208,8 +208,8 @@ final class SlackReport implements JsonSerializable
         return match ($severityLevel) {
             Entity\Security\SeverityLevel::Low => ':white_circle:',
             Entity\Security\SeverityLevel::Medium => ':large_yellow_circle:',
-            Entity\Security\SeverityLevel::High => ':red_circle:',
-            Entity\Security\SeverityLevel::Critical => ':black_circle:',
+            Entity\Security\SeverityLevel::High => ':large_orange_circle:',
+            Entity\Security\SeverityLevel::Critical => ':red_circle:',
         };
     }
 

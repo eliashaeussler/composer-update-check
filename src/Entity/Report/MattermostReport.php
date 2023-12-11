@@ -197,8 +197,8 @@ final class MattermostReport implements JsonSerializable
         return match ($severityLevel) {
             Entity\Security\SeverityLevel::Low => '#EEEEEE',
             Entity\Security\SeverityLevel::Medium => '#FFD966',
-            Entity\Security\SeverityLevel::High => '#EE0000',
-            Entity\Security\SeverityLevel::Critical => '#333333',
+            Entity\Security\SeverityLevel::High => '#F67C41',
+            Entity\Security\SeverityLevel::Critical => '#EE0000',
         };
     }
 
@@ -207,8 +207,8 @@ final class MattermostReport implements JsonSerializable
         return match ($severityLevel) {
             Entity\Security\SeverityLevel::Low => ':white_circle:',
             Entity\Security\SeverityLevel::Medium => ':large_yellow_circle:',
-            Entity\Security\SeverityLevel::High => ':red_circle:',
-            Entity\Security\SeverityLevel::Critical => ':black_circle:',
+            Entity\Security\SeverityLevel::High => ':large_orange_circle:',
+            Entity\Security\SeverityLevel::Critical => ':red_circle:',
         };
     }
 
