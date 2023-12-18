@@ -7,7 +7,9 @@ services:
   EliasHaeussler\ComposerUpdateCheck\:
     resource: '../src/*'
     exclude:
+      - '../src/Configuration/*'
       - '../src/DependencyInjection/*'
+      - '../src/Entity/*'
       - '../src/Event/*'
       - '../src/Exception/*'
       - '../src/Package/*'
