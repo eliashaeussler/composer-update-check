@@ -35,10 +35,7 @@ $symfonySet = PHPStanConfig\Set\SymfonySet::create()
 return PHPStanConfig\Config\Config::create(__DIR__)
     ->in(
         'src',
-        'tests',
-    )
-    ->not(
-        'tests/build/*',
+        'tests/src',
     )
     ->withBaseline()
     ->maxLevel()
