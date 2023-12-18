@@ -103,7 +103,7 @@
 			"@lint:php"
 		],
 		"lint:composer": "@fix:composer --dry-run",
-		"lint:editorconfig": "ec --git-only",
+		"lint:editorconfig": "ec",
 		"lint:php": "@fix:php --dry-run",
 		"migration": [
 			"@migration:rector"
