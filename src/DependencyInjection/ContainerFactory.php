@@ -30,9 +30,6 @@ use Symfony\Component\Filesystem;
 
 use function array_unique;
 use function dirname;
-use function file_exists;
-use function sys_get_temp_dir;
-use function uniqid;
 
 /**
  * ContainerFactory.
@@ -116,11 +113,7 @@ final class ContainerFactory
 
     private function buildContainerXmlFilename(DependencyInjection\ContainerBuilder $container): string
     {
-        $tempDir = sys_get_temp_dir();
-
-        do {
-            $filename = Filesystem\Path::join($tempDir, uniqid('ComposerUpdateCheck_')).'.xml';
-        } while (file_exists($filename));
+        $filename = dirname(__DIR__, 2).'/.build/cache/container.xml';
 
         $container->setParameter('debug.container_xml_filename', $filename);
 

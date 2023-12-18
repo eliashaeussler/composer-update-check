@@ -27,7 +27,7 @@ use Composer\Composer;
 use Composer\IO;
 use Symfony\Component\Console;
 
-require_once __DIR__.'/../../../vendor/autoload.php';
+require_once dirname(__DIR__, 3).'/vendor/autoload.php';
 
 $container = (new DependencyInjection\ContainerFactory())->make();
 $container->set(Composer::class, new Composer());

@@ -24,7 +24,10 @@ declare(strict_types=1);
 use EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 use EliasHaeussler\PHPStanConfig;
 
-$container = (new DependencyInjection\ContainerFactory())->make(true);
+$containerFactory = new DependencyInjection\ContainerFactory([
+    __DIR__.'/tests/build/config/services.php',
+]);
+$container = $containerFactory->make(true);
 $containerXmlFile = $container->getParameter('debug.container_xml_filename');
 
 $symfonySet = PHPStanConfig\Set\SymfonySet::create()
@@ -40,5 +43,6 @@ return PHPStanConfig\Config\Config::create(__DIR__)
     ->withBaseline()
     ->maxLevel()
     ->withSets($symfonySet)
+    ->useCacheDir('.build/cache/phpstan')
     ->toArray()
 ;
