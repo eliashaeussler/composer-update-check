@@ -61,7 +61,7 @@ final class JsonFormatter implements Formatter
             return;
         }
 
-        $json = $this->renderTable($outdatedPackages, $excludedPackages);
+        $json = $this->renderPackages($outdatedPackages, $excludedPackages);
         $securityAdvisories = $this->renderSecurityAdvisories($outdatedPackages);
 
         if ([] !== $securityAdvisories) {
@@ -114,29 +114,40 @@ final class JsonFormatter implements Formatter
      *     excludedPackages?: list<Entity\Package\Package>,
      * }
      */
-    private function renderTable(array $outdatedPackages, array $excludedPackages): array
+    private function renderPackages(array $outdatedPackages, array $excludedPackages): array
     {
         $numberOfOutdatedPackages = count($outdatedPackages);
+        $numberOfExcludedPackages = count($excludedPackages);
         $hasInsecurePackages = false;
+
+        if ($numberOfExcludedPackages > 0) {
+            $additionalInformation = sprintf(
+                ' (skipped %d package%s)',
+                $numberOfExcludedPackages,
+                1 !== $numberOfExcludedPackages ? 's' : '',
+            );
+        } else {
+            $additionalInformation = '';
+        }
 
         // Create status label
         if (1 === $numberOfOutdatedPackages) {
-            $statusLabel = '1 package is outdated.';
+            $statusLabel = sprintf('1 package is outdated%s.', $additionalInformation);
         } else {
-            $statusLabel = sprintf('%d packages are outdated.', $numberOfOutdatedPackages);
+            $statusLabel = sprintf('%d packages are outdated%s.', $numberOfOutdatedPackages, $additionalInformation);
         }
 
         // Print table
-        $tableHeader = ['name', 'outdatedVersion', 'newVersion'];
-        $tableRows = $this->parseTableRows($outdatedPackages, $hasInsecurePackages);
+        $rows = $this->parsePackages($outdatedPackages, $hasInsecurePackages);
         $result = [];
 
-        if ($hasInsecurePackages) {
-            $tableHeader[] = 'insecure';
-        }
+        foreach ($rows as $row) {
+            // Assure even secure packages have "insecure" value set
+            if ($hasInsecurePackages) {
+                $row['insecure'] ??= false;
+            }
 
-        foreach ($tableRows as $tableRow) {
-            $result[] = array_combine($tableHeader, $tableRow);
+            $result[] = $row;
         }
 
         $json = [
@@ -154,21 +165,21 @@ final class JsonFormatter implements Formatter
     /**
      * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      *
-     * @return list<array{0: non-empty-string, 1: string, 2: string, 3?: bool}>
+     * @return list<array{name: non-empty-string, outdatedVersion: string, newVersion: string, insecure?: bool}>
      */
-    private function parseTableRows(array $outdatedPackages, bool &$hasInsecurePackages = false): array
+    private function parsePackages(array $outdatedPackages, bool &$hasInsecurePackages = false): array
     {
         $tableRows = [];
 
         foreach ($outdatedPackages as $outdatedPackage) {
             $report = [
-                $outdatedPackage->getName(),
-                $outdatedPackage->getOutdatedVersion()->get(),
-                $outdatedPackage->getNewVersion()->get(),
+                'name' => $outdatedPackage->getName(),
+                'outdatedVersion' => $outdatedPackage->getOutdatedVersion()->get(),
+                'newVersion' => $outdatedPackage->getNewVersion()->get(),
             ];
 
             if ($outdatedPackage->isInsecure()) {
-                $report[] = $outdatedPackage->isInsecure();
+                $report['insecure'] = $outdatedPackage->isInsecure();
                 $hasInsecurePackages = true;
             }
 
