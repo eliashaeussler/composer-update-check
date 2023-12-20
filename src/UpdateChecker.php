@@ -98,7 +98,7 @@ final class UpdateChecker
     {
         // Early return if no packages are listed for update check
         if ([] === $packages) {
-            return new Entity\Result\UpdateCheckResult([]);
+            return new Entity\Result\UpdateCheckResult([], $excludedPackages);
         }
 
         // Ensure dependencies are installed
