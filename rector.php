@@ -33,7 +33,7 @@ return static function (RectorConfig $rectorConfig): void {
     Config::create($rectorConfig, PhpVersion::PHP_81)
         ->in(
             __DIR__.'/src',
-            __DIR__.'/tests',
+            __DIR__.'/tests/src',
         )
         ->withSymfony(Version::createMinor(5, 4))
         ->withPHPUnit()
