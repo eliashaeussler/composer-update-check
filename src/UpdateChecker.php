@@ -65,7 +65,7 @@ final class UpdateChecker
         // Overlay security scan
         if ($config->shouldPerformSecurityScan() && [] !== $result->getOutdatedPackages()) {
             try {
-                $this->io->writeError('🚨 Checking for insecure packages... ', false, IO\IOInterface::VERBOSE);
+                $this->io->writeError('🚨 Looking up security advisories... ', false, IO\IOInterface::VERBOSE);
                 $this->securityScanner->scanAndOverlayResult($result);
                 $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
             } catch (Exception\PackagistResponseHasErrors|Exception\UnableToFetchSecurityAdvisories $exception) {
