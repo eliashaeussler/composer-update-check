@@ -21,37 +21,30 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
+
+use Symfony\Component\DependencyInjection;
 
 /**
- * ExpectedCommandOutputTrait.
+ * PublicServicesPass.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @internal
  */
-trait ExpectedCommandOutputTrait
+final class PublicServicesPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
-    private static function getExpectedCommandOutput(string $package = null, string $outdated = null, string $new = null): string
+    public function process(DependencyInjection\ContainerBuilder $container): void
     {
-        $output = ' - Upgrading';
-
-        // Early return if no package is specified
-        if (null === $package) {
-            return $output;
+        foreach ($container->getDefinitions() as $definition) {
+            if (!$definition->isAbstract() && $definition->isAutoconfigured()) {
+                $definition->setPublic(true);
+            }
         }
 
-        $output .= ' '.$package;
-
-        // Early return if package versions are not completely specified
-        if (null === $outdated || null === $new || '' === trim($outdated) || '' === trim($new)) {
-            return $output;
+        foreach ($container->getAliases() as $alias) {
+            $alias->setPublic(true);
         }
-
-        // Build expected command output
-        if ($isLegacyPlatform) {
-            return sprintf('%s (%s) to %s (%s)', $output, $outdated, $package, $new);
-        }
-
-        return sprintf('%s (%s => %s)', $output, $outdated, $new);
     }
 }

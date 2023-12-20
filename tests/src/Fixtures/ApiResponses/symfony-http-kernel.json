@@ -1,0 +1,16 @@
+{
+	"advisories": {
+		"symfony/http-kernel": [
+			{
+				"advisoryId": "PKSA-hr4y-jwk2-1yb9",
+				"packageName": "symfony/http-kernel",
+				"title": "CVE-2022-24894: Prevent storing cookie headers in HttpCache",
+				"link": "https://symfony.com/cve-2022-24894",
+				"cve": "CVE-2022-24894",
+				"affectedVersions": "<5.4.0|>=5.4.0,<5.4.20|>=6.0.0",
+				"reportedAt": "2023-02-01 08:00:00",
+				"severity": "medium"
+			}
+		]
+	}
+}

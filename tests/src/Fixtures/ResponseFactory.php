@@ -21,35 +21,28 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use GuzzleHttp\Psr7;
 
 /**
- * AbstractTestCase.
+ * ResponseFactory.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @internal
  */
-abstract class AbstractTestCase extends TestCase
+final class ResponseFactory
 {
-    final public const TEST_APPLICATION_NORMAL = 'tests/build/test-application';
-    final public const TEST_APPLICATION_EMPTY = 'tests/build/test-application-empty';
-    final public const TEST_APPLICATION_ERRONEOUS = 'tests/build/test-application-erroneous';
-
-    protected function tearDown(): void
+    public static function json(string $fixture): Psr7\Response
     {
-        $reflection = new ReflectionClass($this);
-        foreach ($reflection->getProperties() as $property) {
-            if (
-                !$property->isStatic()
-                && !$property->isPrivate()
-                && !str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit')
-            ) {
-                unset($this->{$property->getName()});
-            }
-        }
-        unset($reflection, $property);
+        $filename = __DIR__.'/ApiResponses/'.$fixture.'.json';
+
+        return new Psr7\Response(
+            200,
+            ['Content-Type' => 'application/json; charset=utf-8'],
+            new Psr7\LazyOpenStream($filename, 'r+'),
+        );
     }
 }

@@ -24,11 +24,14 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Command;
 
 use Composer\Console\Application;
-use EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand;
-use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
-use EliasHaeussler\ComposerUpdateCheck\Tests\TestApplicationTrait;
-use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Console\Tester\CommandTester;
+use EliasHaeussler\ComposerUpdateCheck as Src;
+use EliasHaeussler\ComposerUpdateCheck\Tests;
+use GuzzleHttp\Handler\MockHandler;
+use PHPUnit\Framework;
+use Symfony\Component\Console;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use function json_encode;
 
 /**
  * UpdateCheckCommandTest.
@@ -36,139 +39,163 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class UpdateCheckCommandTest extends AbstractTestCase
+#[Framework\Attributes\CoversClass(Src\Command\UpdateCheckCommand::class)]
+final class UpdateCheckCommandTest extends Framework\TestCase
 {
-    use TestApplicationTrait;
-
-    private CommandTester $commandTester;
+    private Tests\Fixtures\TestApplication $testApplication;
+    private ContainerInterface $container;
+    private Console\Tester\CommandTester $commandTester;
 
     protected function setUp(): void
     {
-        $this->goToTestDirectory();
-
-        $application = new Application();
-        $application->add(new UpdateCheckCommand());
-
-        $this->commandTester = new CommandTester($application->find('update-check'));
+        $this->testApplication = Tests\Fixtures\TestApplication::normal()->boot();
+        $this->createCommandTester();
     }
 
-    #[Test]
+    #[Framework\Attributes\Test]
     public function executePrintsNoOutdatedPackagesMessageIfNoPackagesAreRequired(): void
     {
-        $this->goToTestDirectory(self::TEST_APPLICATION_EMPTY);
+        $this->testApplication->useEmpty();
+        $this->createCommandTester();
 
-        $this->commandTester->execute(['--json' => true]);
-
-        $expected = json_encode(['status' => 'All packages are up to date.']);
-        self::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
-    }
-
-    #[Test]
-    public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreSkipped(): void
-    {
-        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/*'], '--no-dev' => true]);
-
-        $expected = json_encode([
-            'status' => 'All packages are up to date (skipped 3 packages).',
-            'skipped' => ['codeception/codeception', 'symfony/console', 'symfony/http-kernel'],
+        $this->commandTester->execute([
+            '--format' => 'json',
         ]);
-        self::assertJsonStringEqualsJsonString($expected, $this->commandTester->getDisplay());
+
+        self::assertJsonStringEqualsJsonString(
+            json_encode(['status' => 'All packages are up to date.'], JSON_THROW_ON_ERROR),
+            $this->commandTester->getDisplay(),
+        );
     }
 
-    #[Test]
+    #[Framework\Attributes\Test]
+    public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreExcluded(): void
+    {
+        $this->commandTester->execute([
+            '--format' => 'json',
+            '--exclude-packages' => ['symfony/*'],
+            '--no-dev' => true,
+        ]);
+
+        self::assertJsonStringEqualsJsonString(
+            json_encode(
+                [
+                    'status' => 'All packages are up to date (skipped 2 packages).',
+                    'excludedPackages' => ['doctrine/dbal', 'symfony/http-kernel'],
+                ],
+                JSON_THROW_ON_ERROR,
+            ),
+            $this->commandTester->getDisplay(),
+        );
+    }
+
+    #[Framework\Attributes\Test]
     public function executePrintsListOfOutdatedPackagesWithoutDevRequirements(): void
     {
-        $this->commandTester->execute(['--json' => true, '--no-dev' => true]);
+        $this->commandTester->execute([
+            '--format' => 'json',
+            '--no-dev' => true,
+        ]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
-        $expectedStatus = '2 packages are outdated.';
 
-        self::assertSame($expectedStatus, $actualJson['status']);
-        self::assertCount(2, $actualJson['result']);
+        self::assertIsArray($actualJson);
+        self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
+        self::assertCount(1, $actualJson['outdatedPackages']);
 
-        self::assertSame('symfony/console', $actualJson['result'][0]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][0]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][0]['New version']);
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][0]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][0]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][0]['newVersion']);
 
-        self::assertSame('symfony/http-kernel', $actualJson['result'][1]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame(['doctrine/dbal'], $actualJson['excludedPackages']);
     }
 
-    #[Test]
-    public function executePrintsListOfOutdatedPackagesWithoutSkippedPackages(): void
+    #[Framework\Attributes\Test]
+    public function executePrintsListOfOutdatedPackagesWithoutExcludedPackages(): void
     {
-        $this->commandTester->execute(['--json' => true, '--ignore-packages' => ['symfony/console']]);
+        $this->commandTester->execute([
+            '--format' => 'json',
+            '--exclude-packages' => ['symfony/http-kernel'],
+        ]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
-        $expectedStatus = '2 packages are outdated.';
 
-        self::assertSame($expectedStatus, $actualJson['status']);
-        self::assertCount(2, $actualJson['result']);
+        self::assertIsArray($actualJson);
+        self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
+        self::assertCount(1, $actualJson['outdatedPackages']);
 
-        self::assertSame('codeception/codeception', $actualJson['result'][0]['Package']);
-        self::assertSame('4.1.9', $actualJson['result'][0]['Outdated version']);
-        self::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
+        self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
+        self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
+        self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
 
-        self::assertSame('symfony/http-kernel', $actualJson['result'][1]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][1]['New version']);
+        self::assertSame(['symfony/http-kernel'], $actualJson['excludedPackages']);
     }
 
-    #[Test]
+    #[Framework\Attributes\Test]
     public function executePrintsListOfOutdatedPackages(): void
     {
-        $this->commandTester->execute(['--json' => true]);
+        $this->commandTester->execute([
+            '--format' => 'json',
+        ]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
-        $expectedStatus = '3 packages are outdated.';
 
-        self::assertSame($expectedStatus, $actualJson['status']);
-        self::assertCount(3, $actualJson['result']);
+        self::assertIsArray($actualJson);
+        self::assertSame('2 packages are outdated.', $actualJson['status']);
+        self::assertCount(2, $actualJson['outdatedPackages']);
 
-        self::assertSame('codeception/codeception', $actualJson['result'][0]['Package']);
-        self::assertSame('4.1.9', $actualJson['result'][0]['Outdated version']);
-        self::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
+        self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
+        self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
+        self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
 
-        self::assertSame('symfony/console', $actualJson['result'][1]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][1]['New version']);
-
-        self::assertSame('symfony/http-kernel', $actualJson['result'][2]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][2]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][2]['New version']);
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
     }
 
-    #[Test]
+    #[Framework\Attributes\Test]
     public function executePrintsListOfOutdatedPackagesAndFlagsInsecurePackages(): void
     {
-        $this->commandTester->execute(['--json' => true, '--security-scan' => true]);
+        $mockHandler = $this->container->get(MockHandler::class);
+        $mockHandler->append(
+            Tests\Fixtures\ResponseFactory::json('symfony-http-kernel'),
+        );
+
+        $this->commandTester->execute([
+            '--format' => 'json',
+            '--security-scan' => true,
+        ]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
-        $expectedStatus = '3 packages are outdated.';
 
-        self::assertSame($expectedStatus, $actualJson['status']);
-        self::assertCount(3, $actualJson['result']);
+        self::assertIsArray($actualJson);
+        self::assertSame('2 packages are outdated.', $actualJson['status']);
+        self::assertCount(2, $actualJson['outdatedPackages']);
 
-        self::assertSame('codeception/codeception', $actualJson['result'][0]['Package']);
-        self::assertSame('4.1.9', $actualJson['result'][0]['Outdated version']);
-        self::assertNotSame('4.1.9', $actualJson['result'][0]['New version']);
-        self::assertTrue($actualJson['result'][0]['Insecure']);
+        self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
+        self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
+        self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
+        self::assertFalse($actualJson['outdatedPackages'][0]['insecure']);
 
-        self::assertSame('symfony/console', $actualJson['result'][1]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][1]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][1]['New version']);
-        self::assertFalse($actualJson['result'][1]['Insecure']);
-
-        self::assertSame('symfony/http-kernel', $actualJson['result'][2]['Package']);
-        self::assertSame('v4.4.9', $actualJson['result'][2]['Outdated version']);
-        self::assertNotSame('v4.4.9', $actualJson['result'][2]['New version']);
-        self::assertTrue($actualJson['result'][2]['Insecure']);
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
+        self::assertTrue($actualJson['outdatedPackages'][1]['insecure']);
     }
 
     protected function tearDown(): void
     {
-        $this->goBackToInitialDirectory();
-        parent::tearDown();
+        $this->testApplication->shutdown();
+    }
+
+    private function createCommandTester(): void
+    {
+        $this->container = Tests\Fixtures\ContainerFactory::make($this->testApplication);
+
+        $command = $this->container->get(Src\Command\UpdateCheckCommand::class);
+        $application = new Application();
+        $application->add($command);
+
+        $this->commandTester = new Console\Tester\CommandTester($command);
     }
 }

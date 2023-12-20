@@ -23,17 +23,13 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Security;
 
-use EliasHaeussler\ComposerUpdateCheck\Entity\Package\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\Entity\Result\ScanResult;
-use EliasHaeussler\ComposerUpdateCheck\Security\SecurityScanner;
-use EliasHaeussler\ComposerUpdateCheck\Tests\AbstractTestCase;
-use Http\Client\Exception\TransferException;
-use Http\Message\RequestMatcher\CallbackRequestMatcher;
-use Http\Mock\Client;
-use Nyholm\Psr7\Response;
-use PHPUnit\Framework\Attributes\Test;
-use Psr\Http\Message\RequestInterface;
-use RuntimeException;
+use DateTimeImmutable;
+use EliasHaeussler\ComposerUpdateCheck as Src;
+use EliasHaeussler\ComposerUpdateCheck\Tests;
+use GuzzleHttp\Exception;
+use GuzzleHttp\Handler;
+use GuzzleHttp\Psr7;
+use PHPUnit\Framework;
 
 /**
  * SecurityScannerTest.
@@ -41,101 +37,133 @@ use RuntimeException;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SecurityScannerTest extends AbstractTestCase
+#[Framework\Attributes\CoversClass(Src\Security\SecurityScanner::class)]
+final class SecurityScannerTest extends Framework\TestCase
 {
-    private SecurityScanner $subject;
-
-    private Client $client;
+    private Tests\Fixtures\TestApplication $testApplication;
+    private Handler\MockHandler $mockHandler;
+    private Src\Security\SecurityScanner $subject;
 
     protected function setUp(): void
     {
-        $this->client = new Client();
-        $this->subject = new SecurityScanner($this->client);
+        $this->testApplication = Tests\Fixtures\TestApplication::normal()->boot();
+
+        $container = Tests\Fixtures\ContainerFactory::make($this->testApplication);
+
+        $this->mockHandler = $container->get(Handler\MockHandler::class);
+        $this->subject = $container->get(Src\Security\SecurityScanner::class);
     }
 
-    #[Test]
+    #[Framework\Attributes\Test]
+    public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
+    {
+        $actual = $this->subject->scan([]);
+
+        self::assertSame([], $actual->getSecurityAdvisories());
+    }
+
+    #[Framework\Attributes\Test]
+    public function scanThrowsExceptionIfRequestFails(): void
+    {
+        $exception = new Exception\TransferException();
+        $outdatedPackage = new Src\Entity\Package\OutdatedPackage(
+            'foo',
+            new Src\Entity\Version('1.0.0'),
+            new Src\Entity\Version('1.0.1'),
+        );
+
+        $this->mockHandler->append($exception);
+
+        $this->expectExceptionObject(new Src\Exception\UnableToFetchSecurityAdvisories($exception));
+
+        $this->subject->scan([$outdatedPackage]);
+    }
+
+    #[Framework\Attributes\Test]
+    public function scanThrowsExceptionOnInvalidPackagistApiResponse(): void
+    {
+        $outdatedPackage = new Src\Entity\Package\OutdatedPackage(
+            'symfony/http-kernel',
+            new Src\Entity\Version('v5.4.19'),
+            new Src\Entity\Version('v5.4.33'),
+        );
+
+        $this->mockHandler->append(
+            Tests\Fixtures\ResponseFactory::json('invalid-packagist-response'),
+        );
+
+        $this->expectException(Src\Exception\PackagistResponseHasErrors::class);
+
+        $this->subject->scan([$outdatedPackage]);
+    }
+
+    #[Framework\Attributes\Test]
     public function scanReturnsScanResult(): void
     {
         $packages = [
-            new OutdatedPackage('foo', '1.0.0', '1.0.1'),
-            new OutdatedPackage('baz', '2.0.0', '2.1.0'),
+            new Src\Entity\Package\OutdatedPackage(
+                'symfony/console',
+                new Src\Entity\Version('v4.4.0'),
+                new Src\Entity\Version('v4.4.18'),
+            ),
+            new Src\Entity\Package\OutdatedPackage(
+                'symfony/http-kernel',
+                new Src\Entity\Version('v5.4.19'),
+                new Src\Entity\Version('v5.4.33'),
+            ),
         ];
-        $apiResult = [
-            'advisories' => [
-                'foo' => [
-                    ['affectedVersions' => '>=1.0.0,<2.0.0'],
-                ],
+
+        $this->mockHandler->append(
+            Tests\Fixtures\ResponseFactory::json('symfony-http-kernel'),
+        );
+
+        $expected = [
+            'symfony/http-kernel' => [
+                new Src\Entity\Security\SecurityAdvisory(
+                    'symfony/http-kernel',
+                    'PKSA-hr4y-jwk2-1yb9',
+                    '<5.4.0|>=5.4.0,<5.4.20|>=6.0.0',
+                    'CVE-2022-24894: Prevent storing cookie headers in HttpCache',
+                    new DateTimeImmutable('2023-02-01 08:00:00'),
+                    Src\Entity\Security\SeverityLevel::Medium,
+                    'CVE-2022-24894',
+                    new Psr7\Uri('https://symfony.com/cve-2022-24894'),
+                ),
             ],
         ];
 
-        $response = new Response(200, [], json_encode($apiResult));
-        $response->getBody()->rewind();
-        $matcher = function (RequestInterface $request) {
-            self::assertSame('GET', $request->getMethod());
-            self::assertSame(['application/json'], $request->getHeaders()['Accept']);
-            self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
+        $actual = $this->subject->scan($packages);
 
-            return true;
-        };
-        $this->client->on(new CallbackRequestMatcher($matcher), $response);
-
-        $scanResult = $this->subject->scan($packages);
-
-        self::assertInstanceOf(ScanResult::class, $scanResult);
-        self::assertCount(1, $scanResult->getSecurityAdvisories());
-        self::assertSame('foo', $scanResult->getSecurityAdvisories()[0]->getName());
-        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getSecurityAdvisories()[0]->getAffectedVersions());
+        self::assertEquals($expected, $actual->getSecurityAdvisories());
     }
 
-    #[Test]
-    public function scanReturnsEmptyScanResultIfNoPackagesAreRequestedToBeScanned(): void
+    #[Framework\Attributes\Test]
+    public function scanAndOverlayResultAppliesSecurityAdvisoriesToInsecureOutdatedPackages(): void
     {
-        self::assertSame([], $this->subject->scan([])->getSecurityAdvisories());
+        $securePackage = new Src\Entity\Package\OutdatedPackage(
+            'symfony/console',
+            new Src\Entity\Version('v4.4.0'),
+            new Src\Entity\Version('v4.4.18'),
+        );
+        $insecurePackage = new Src\Entity\Package\OutdatedPackage(
+            'symfony/http-kernel',
+            new Src\Entity\Version('v5.4.19'),
+            new Src\Entity\Version('v5.4.33'),
+        );
+        $result = new Src\Entity\Result\UpdateCheckResult([$securePackage, $insecurePackage]);
+
+        $this->mockHandler->append(
+            Tests\Fixtures\ResponseFactory::json('symfony-http-kernel'),
+        );
+
+        $this->subject->scanAndOverlayResult($result);
+
+        self::assertFalse($securePackage->isInsecure());
+        self::assertTrue($insecurePackage->isInsecure());
     }
 
-    #[Test]
-    public function scanExcludesPackagesWithoutAffectedVersions(): void
+    protected function tearDown(): void
     {
-        $packages = [
-            new OutdatedPackage('foo', '1.0.0', '1.0.1'),
-            new OutdatedPackage('baz', '2.0.0', '2.1.0'),
-        ];
-        $apiResult = [
-            'advisories' => [
-                'foo' => [
-                    ['affectedVersions' => '>=1.0.0,<2.0.0'],
-                ],
-                'baz' => [],
-            ],
-        ];
-
-        $response = new Response(200, [], json_encode($apiResult));
-        $response->getBody()->rewind();
-        $matcher = function (RequestInterface $request) {
-            self::assertSame('GET', $request->getMethod());
-            self::assertSame(['application/json'], $request->getHeaders()['Accept']);
-            self::assertSame(http_build_query(['packages' => ['foo', 'baz']]), $request->getUri()->getQuery());
-
-            return true;
-        };
-        $this->client->on(new CallbackRequestMatcher($matcher), $response);
-
-        $scanResult = $this->subject->scan($packages);
-
-        self::assertInstanceOf(ScanResult::class, $scanResult);
-        self::assertCount(1, $scanResult->getSecurityAdvisories());
-        self::assertSame('foo', $scanResult->getSecurityAdvisories()[0]->getName());
-        self::assertSame(['>=1.0.0,<2.0.0'], $scanResult->getSecurityAdvisories()[0]->getAffectedVersions());
-    }
-
-    #[Test]
-    public function scanThrowsExceptionIfRequestFails(): void
-    {
-        $this->client->addException(new TransferException());
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionCode(1610706128);
-
-        $this->subject->scan([new OutdatedPackage('foo', '1.0.0', '1.0.1')]);
+        $this->testApplication->shutdown();
     }
 }

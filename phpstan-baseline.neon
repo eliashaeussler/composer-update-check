@@ -4,8 +4,3 @@ parameters:
 			message: "#^Call to function method_exists\\(\\) with Composer\\\\Installer and 'setAudit' will always evaluate to true\\.$#"
 			count: 2
 			path: src/Composer/ComposerInstaller.php
-
-		-
-			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Tests\\\\AbstractTestCase\\)\\.$#"
-			count: 1
-			path: tests/src/AbstractTestCase.php
