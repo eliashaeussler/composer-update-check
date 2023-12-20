@@ -88,11 +88,9 @@ final class SecurityScanner
         $scanResult = $this->scan($outdatedPackages);
 
         foreach ($outdatedPackages as $outdatedPackage) {
-            if ($scanResult->isInsecure($outdatedPackage)) {
-                $outdatedPackage->setSecurityAdvisories(
-                    $scanResult->getSecurityAdvisoriesForPackage($outdatedPackage),
-                );
-            }
+            $outdatedPackage->setSecurityAdvisories(
+                $scanResult->getSecurityAdvisoriesForPackage($outdatedPackage),
+            );
         }
     }
 

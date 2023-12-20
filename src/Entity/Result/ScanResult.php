@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Result;
 
+use Composer\Semver;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 /**
@@ -51,12 +52,21 @@ final class ScanResult
     /**
      * @return list<Entity\Security\SecurityAdvisory>
      */
-    public function getSecurityAdvisoriesForPackage(Entity\Package\Package $package): array
+    public function getSecurityAdvisoriesForPackage(Entity\Package\OutdatedPackage $package): array
     {
-        return $this->securityAdvisories[$package->getName()] ?? [];
+        $packageVersion = $package->getOutdatedVersion()->get();
+        $securityAdvisories = [];
+
+        foreach ($this->securityAdvisories[$package->getName()] ?? [] as $securityAdvisory) {
+            if (Semver\Semver::satisfies($packageVersion, $securityAdvisory->getAffectedVersions())) {
+                $securityAdvisories[] = $securityAdvisory;
+            }
+        }
+
+        return $securityAdvisories;
     }
 
-    public function isInsecure(Entity\Package\Package $package): bool
+    public function isPackageInsecure(Entity\Package\OutdatedPackage $package): bool
     {
         return [] !== $this->getSecurityAdvisoriesForPackage($package);
     }
