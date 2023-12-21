@@ -83,12 +83,12 @@ final class OutdatedPackage implements Package
             return null;
         }
 
-        $securityLevels = array_map(
+        $severityLevels = array_map(
             static fn (Entity\Security\SecurityAdvisory $securityAdvisory) => $securityAdvisory->getSeverity(),
             $this->securityAdvisories,
         );
 
-        return Entity\Security\SeverityLevel::getHighestSeverityLevel(...$securityLevels);
+        return Entity\Security\SeverityLevel::getHighestSeverityLevel(...$severityLevels);
     }
 
     /**
