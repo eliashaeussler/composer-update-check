@@ -54,7 +54,7 @@ final class ScanResult
      */
     public function getSecurityAdvisoriesForPackage(Entity\Package\OutdatedPackage $package): array
     {
-        $packageVersion = $package->getOutdatedVersion()->get();
+        $packageVersion = $package->getOutdatedVersion()->toString();
         $securityAdvisories = [];
 
         foreach ($this->securityAdvisories[$package->getName()] ?? [] as $securityAdvisory) {

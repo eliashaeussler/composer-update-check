@@ -174,8 +174,8 @@ final class JsonFormatter implements Formatter
         foreach ($outdatedPackages as $outdatedPackage) {
             $report = [
                 'name' => $outdatedPackage->getName(),
-                'outdatedVersion' => $outdatedPackage->getOutdatedVersion()->get(),
-                'newVersion' => $outdatedPackage->getNewVersion()->get(),
+                'outdatedVersion' => $outdatedPackage->getOutdatedVersion()->toString(),
+                'newVersion' => $outdatedPackage->getNewVersion()->toString(),
             ];
 
             if ($outdatedPackage->isInsecure()) {

@@ -158,8 +158,8 @@ final class SlackReport implements JsonSerializable
                 Dto\SlackBlockElement::markdown(
                     sprintf(
                         "*Current version:* %s\n*New version:* %s",
-                        $outdatedPackage->getOutdatedVersion()->get(),
-                        $outdatedPackage->getNewVersion()->get(),
+                        $outdatedPackage->getOutdatedVersion()->toString(),
+                        $outdatedPackage->getNewVersion()->toString(),
                     ),
                 ),
             ],

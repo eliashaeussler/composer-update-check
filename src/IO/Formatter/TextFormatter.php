@@ -107,8 +107,8 @@ final class TextFormatter implements Formatter
         foreach ($outdatedPackages as $outdatedPackage) {
             $report = [
                 $outdatedPackage->getName(),
-                $outdatedPackage->getOutdatedVersion()->get(),
-                $outdatedPackage->getNewVersion()->get(),
+                $outdatedPackage->getOutdatedVersion()->toString(),
+                $outdatedPackage->getNewVersion()->toString(),
             ];
 
             if ($outdatedPackage->isInsecure()) {

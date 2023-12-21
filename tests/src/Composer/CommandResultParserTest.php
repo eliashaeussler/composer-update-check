@@ -60,8 +60,8 @@ final class CommandResultParserTest extends Framework\TestCase
 
         self::assertCount(1, $actual);
         self::assertSame('foo/baz', $actual[0]->getName());
-        self::assertSame('1.0.0', $actual[0]->getOutdatedVersion()->get());
-        self::assertSame('1.0.5', $actual[0]->getNewVersion()->get());
+        self::assertSame('1.0.0', $actual[0]->getOutdatedVersion()->toString());
+        self::assertSame('1.0.5', $actual[0]->getNewVersion()->toString());
     }
 
     /**

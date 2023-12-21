@@ -145,7 +145,7 @@ final class OutdatedPackage implements Package
 
     private function generateProviderLink(): Message\UriInterface
     {
-        $versionHash = explode(' ', $this->newVersion->get(), 2)[0];
+        $versionHash = explode(' ', $this->newVersion->toString(), 2)[0];
         $uri = sprintf(self::PROVIDER_LINK_PATTERN, $this->name, $versionHash);
 
         return new Psr7\Uri($uri);

@@ -63,7 +63,7 @@ final class SecurityScanner
         }
 
         foreach ($packages as $package) {
-            $packagesToScan[$package->getName()] = $package->getOutdatedVersion()->get();
+            $packagesToScan[$package->getName()] = $package->getOutdatedVersion()->toString();
         }
 
         try {

@@ -37,7 +37,7 @@ final class Version implements Stringable
         private readonly string $version,
     ) {}
 
-    public function get(): string
+    public function toString(): string
     {
         return $this->version;
     }
