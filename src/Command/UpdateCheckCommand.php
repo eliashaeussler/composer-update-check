@@ -110,6 +110,10 @@ final class UpdateCheckCommand extends Command\BaseCommand
     {
         try {
             $config = $this->resolveConfiguration($input);
+        } catch (Exception\ConfigFileIsInvalid $exception) {
+            $this->displayConfigError($exception);
+
+            return self::FAILURE;
         } catch (Exception\ConfigFileHasErrors $exception) {
             $this->displayMappingErrors($exception);
 
@@ -140,6 +144,18 @@ final class UpdateCheckCommand extends Command\BaseCommand
         $configAdapter = new Configuration\Adapter\ChainedConfigAdapter($adapters);
 
         return $configAdapter->resolve();
+    }
+
+    private function displayConfigError(Exception\ConfigFileIsInvalid $exception): void
+    {
+        $this->io->error($exception->getMessage());
+
+        if (null !== $exception->getPrevious()) {
+            $this->io->writeln([
+                'The following error occurred:',
+                ' * '.$exception->getPrevious()->getMessage(),
+            ]);
+        }
     }
 
     private function displayMappingErrors(Exception\ConfigFileHasErrors $exception): void

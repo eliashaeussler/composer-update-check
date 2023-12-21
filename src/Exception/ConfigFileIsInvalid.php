@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
+use Throwable;
+
 use function sprintf;
 
 /**
@@ -33,11 +35,12 @@ use function sprintf;
  */
 final class ConfigFileIsInvalid extends Exception
 {
-    public function __construct(string $filename)
+    public function __construct(string $filename, Throwable $previous = null)
     {
         parent::__construct(
             sprintf('The file "%s" does not contain valid configuration.', $filename),
             1701204777,
+            $previous,
         );
     }
 }

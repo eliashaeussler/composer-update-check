@@ -38,10 +38,15 @@ final class JsonConfigAdapter extends FileBasedConfigAdapter
 {
     /**
      * @throws Exception\ConfigFileHasErrors
+     * @throws Exception\ConfigFileIsInvalid
      */
     public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
-        $source = Valinor\Mapper\Source\Source::file(new SplFileObject($this->filename));
+        try {
+            $source = Valinor\Mapper\Source\Source::file(new SplFileObject($this->filename));
+        } catch (Valinor\Mapper\Source\Exception\InvalidSource $exception) {
+            throw new Exception\ConfigFileIsInvalid($this->filename, $exception);
+        }
 
         try {
             return $this->mapper->map(Configuration\ComposerUpdateCheckConfig::class, $source);
