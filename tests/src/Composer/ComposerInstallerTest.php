@@ -47,11 +47,8 @@ final class ComposerInstallerTest extends Framework\TestCase
         $this->testApplication = Tests\Fixtures\TestApplication::normal()->boot();
 
         $container = Tests\Fixtures\ContainerFactory::make($this->testApplication);
-        $io = $container->get(IO\IOInterface::class);
 
-        self::assertInstanceOf(IO\BufferIO::class, $io);
-
-        $this->io = $io;
+        $this->io = new IO\BufferIO();
         $this->subject = $container->get(Src\Composer\ComposerInstaller::class);
     }
 
@@ -60,7 +57,7 @@ final class ComposerInstallerTest extends Framework\TestCase
     {
         $expected = 'Installing dependencies from lock file (including require-dev)';
 
-        self::assertSame(0, $this->subject->runInstall());
+        self::assertSame(0, $this->subject->runInstall($this->io));
         self::assertStringContainsString($expected, $this->io->getOutput());
     }
 
@@ -72,9 +69,9 @@ final class ComposerInstallerTest extends Framework\TestCase
     public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, ?string $notExpected): void
     {
         // Ensure dependencies are installed
-        $this->subject->runInstall();
+        $this->subject->runInstall($this->io);
 
-        self::assertSame(0, $this->subject->runUpdate($packages));
+        self::assertSame(0, $this->subject->runUpdate($packages, $this->io));
         self::assertStringContainsString($expected, $this->io->getOutput());
 
         if (null !== $notExpected) {

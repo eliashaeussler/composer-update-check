@@ -44,12 +44,11 @@ final class ComposerInstaller
 {
     public function __construct(
         private readonly Composer $composer,
-        private readonly IO\IOInterface $io,
     ) {}
 
     public function runInstall(IO\IOInterface $io = null): int
     {
-        $io ??= $this->io;
+        $io ??= new IO\NullIO();
 
         $preferredInstall = $this->composer->getConfig()->get('preferred-install');
         $installer = Installer::create($io, $this->composer)
@@ -73,7 +72,7 @@ final class ComposerInstaller
      */
     public function runUpdate(array $packages, IO\IOInterface $io = null): int
     {
-        $io ??= $this->io;
+        $io ??= new IO\NullIO();
 
         $preferredInstall = $this->composer->getConfig()->get('preferred-install');
         $installer = Installer::create($io, $this->composer)
