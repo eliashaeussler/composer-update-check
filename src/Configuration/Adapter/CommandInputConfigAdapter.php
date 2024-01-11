@@ -32,6 +32,7 @@ use function explode;
 use function is_array;
 use function is_string;
 use function json_decode;
+use function trim;
 
 /**
  * CommandInputConfigAdapter.
@@ -100,7 +101,7 @@ final class CommandInputConfigAdapter implements ConfigAdapter
             $options = $configParts[1] ?? [];
 
             if (is_string($options)) {
-                $options = $this->parseReporterOptions($name, $options);
+                $options = $this->parseReporterOptions($name, trim($options));
             } else {
                 $options = [];
             }
