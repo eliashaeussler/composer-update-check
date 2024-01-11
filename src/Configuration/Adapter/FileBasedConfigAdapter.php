@@ -58,7 +58,7 @@ abstract class FileBasedConfigAdapter implements ConfigAdapter
     {
         if (!Filesystem\Path::isAbsolute($filename)) {
             $currentWorkingDirectory = (string) getcwd();
-            $filename = Filesystem\Path::join($currentWorkingDirectory, $filename);
+            $filename = Filesystem\Path::makeAbsolute($filename, $currentWorkingDirectory);
         }
 
         if (!file_exists($filename)) {
