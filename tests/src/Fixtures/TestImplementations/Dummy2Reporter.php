@@ -27,16 +27,16 @@ use EliasHaeussler\ComposerUpdateCheck\Entity;
 use EliasHaeussler\ComposerUpdateCheck\Reporter;
 
 /**
- * DummyReporter.
+ * Dummy2Reporter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  *
  * @internal
  */
-final class DummyReporter implements Reporter\Reporter
+final class Dummy2Reporter implements Reporter\Reporter
 {
-    public const NAME = 'dummy';
+    public const NAME = 'dummy-2';
 
     /**
      * @var list<array{Entity\Result\UpdateCheckResult, array<string, mixed>}>

@@ -42,15 +42,17 @@ use function dirname;
  */
 final class ContainerFactory
 {
-    public static function make(TestApplication $testApplication = null): DependencyInjection\ContainerInterface
-    {
+    public static function make(
+        TestApplication $testApplication = null,
+        IO\IOInterface $io = null,
+    ): DependencyInjection\ContainerInterface {
         $containerFactory = new Src\DependencyInjection\ContainerFactory([
             dirname(__DIR__, 2).'/build/config/services.php',
         ]);
         $container = $containerFactory->make(true);
         $rootPath = $testApplication?->getPath() ?? dirname(__DIR__, 2);
 
-        $io = new IO\BufferIO();
+        $io ??= new IO\BufferIO();
         $composer = Factory::create($io, Filesystem\Path::join($rootPath, 'composer.json'));
 
         $container->set(Composer::class, $composer);

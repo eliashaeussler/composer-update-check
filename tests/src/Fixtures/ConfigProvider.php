@@ -21,37 +21,18 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures\TestImplementations;
-
-use EliasHaeussler\ComposerUpdateCheck\Entity;
-use EliasHaeussler\ComposerUpdateCheck\Reporter;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
 
 /**
- * DummyReporter.
+ * ConfigProvider.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
- *
- * @internal
  */
-final class DummyReporter implements Reporter\Reporter
+final class ConfigProvider
 {
-    public const NAME = 'dummy';
-
-    /**
-     * @var list<array{Entity\Result\UpdateCheckResult, array<string, mixed>}>
-     */
-    public array $reportedResults = [];
-
-    public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
+    public static function json(string $filename): string
     {
-        $this->reportedResults[] = [$result, $options];
-
-        return true;
-    }
-
-    public static function getName(): string
-    {
-        return self::NAME;
+        return __DIR__.'/ConfigFiles/'.$filename.'.json';
     }
 }

@@ -96,7 +96,7 @@ final class UpdateCheckCommand extends Command\BaseCommand
             'disable-reporter',
             'R',
             Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
-            'Disable given reporters (even if they were enabled with the --enable-reporter option)',
+            'Disable given reporters (even if they were enabled with the --reporter option)',
         );
     }
 
