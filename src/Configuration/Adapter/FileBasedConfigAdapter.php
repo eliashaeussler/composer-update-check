@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
 use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
 use EliasHaeussler\ComposerUpdateCheck\Exception;
 use Symfony\Component\Filesystem;
 
@@ -71,6 +72,9 @@ abstract class FileBasedConfigAdapter implements ConfigAdapter
     {
         return (new Valinor\MapperBuilder())
             ->allowPermissiveTypes()
+            ->registerConstructor(
+                Configuration\Options\PackageExcludePattern::create(...),
+            )
             ->mapper()
         ;
     }
