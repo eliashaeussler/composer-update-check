@@ -38,7 +38,7 @@
 		"symfony/yaml": "^5.4 || ^6.0"
 	},
 	"require-dev": {
-		"armin/editorconfig-cli": "^1.7",
+		"armin/editorconfig-cli": "^1.8 || ^2.0",
 		"composer/composer": "^2.1",
 		"eliashaeussler/php-cs-fixer-config": "^2.0",
 		"eliashaeussler/phpstan-config": "^2.4",
