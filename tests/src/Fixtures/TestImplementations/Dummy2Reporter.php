@@ -39,13 +39,16 @@ final class Dummy2Reporter implements Reporter\Reporter
     public const NAME = 'dummy-2';
 
     /**
-     * @var list<array{Entity\Result\UpdateCheckResult, array<string, mixed>}>
+     * @var list<array{result: Entity\Result\UpdateCheckResult, options: array<string, mixed>}>
      */
     public array $reportedResults = [];
 
     public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
     {
-        $this->reportedResults[] = [$result, $options];
+        $this->reportedResults[] = [
+            'result' => $result,
+            'options' => $options,
+        ];
 
         return true;
     }

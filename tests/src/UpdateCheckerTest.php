@@ -270,8 +270,8 @@ final class UpdateCheckerTest extends Framework\TestCase
         $reportedResults = $this->reporter->reportedResults;
 
         self::assertCount(1, $reportedResults);
-        self::assertSame($actual, $reportedResults[0][0]);
-        self::assertSame(['foo' => 'baz'], $reportedResults[0][1]);
+        self::assertSame($actual, $reportedResults[0]['result']);
+        self::assertSame(['foo' => 'baz'], $reportedResults[0]['options']);
     }
 
     protected function tearDown(): void

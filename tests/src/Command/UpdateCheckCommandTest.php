@@ -200,12 +200,15 @@ final class UpdateCheckCommandTest extends Framework\TestCase
         $reporter = $this->container->get(Tests\Fixtures\TestImplementations\DummyReporter::class);
 
         $this->commandTester->execute([
-            '--reporter' => ['dummy'],
+            '--reporter' => ['dummy:{"foo":"baz"}'],
         ]);
 
         self::assertCount(1, $reporter->reportedResults);
 
-        $report = $reporter->reportedResults[0][0];
+        $report = $reporter->reportedResults[0]['result'];
+        $options = $reporter->reportedResults[0]['options'];
+
+        self::assertSame(['foo' => 'baz'], $options);
 
         self::assertSame('doctrine/dbal', $report->getOutdatedPackages()[0]->getName());
         self::assertEquals(new Src\Entity\Version('3.1.3'), $report->getOutdatedPackages()[0]->getOutdatedVersion());
