@@ -212,9 +212,11 @@ final class UpdateChecker
      */
     private function validateReporters(array $reporters): void
     {
-        foreach (array_keys($reporters) as $name) {
+        foreach ($reporters as $name => $options) {
             // Will throw an exception if reporter is not supported
-            $this->reporterFactory->make($name);
+            $reporter = $this->reporterFactory->make($name);
+            // Will throw an exception if reporter options are invalid
+            $reporter->validateOptions($options);
         }
     }
 

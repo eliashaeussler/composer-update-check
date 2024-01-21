@@ -41,5 +41,10 @@ interface Reporter
      */
     public function report(Entity\Result\UpdateCheckResult $result, array $options): bool;
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function validateOptions(array $options): void;
+
     public static function getName(): string;
 }

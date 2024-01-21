@@ -86,6 +86,14 @@ final class MattermostReporter implements Reporter
         return $successful;
     }
 
+    /**
+     * @throws OptionsResolver\Exception\ExceptionInterface
+     */
+    public function validateOptions(array $options): void
+    {
+        $this->resolver->resolve($options);
+    }
+
     public static function getName(): string
     {
         return self::NAME;
