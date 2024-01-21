@@ -110,7 +110,7 @@ final class EnvironmentVariablesConfigAdapter implements ConfigAdapter
     {
         $reporterConfig = [];
         $envVarPrefix = self::ENV_VAR_PREFIX.'REPORTER_';
-        $envVarPattern = sprintf('/^%s_(?P<name>[^_]+)_(?P<option>.+)$/', $envVarPrefix);
+        $envVarPattern = sprintf('/^%s(?P<name>[^_]+)_(?P<option>.+)$/', $envVarPrefix);
 
         // Fetch all relevant environment variables
         $envVariables = array_filter(
