@@ -67,18 +67,9 @@ final class MattermostReport implements JsonSerializable
 
     private static function createText(Entity\Result\UpdateCheckResult $result, string $rootPackageName = null): string
     {
-        $numberOfOutdatedPackages = 0;
-        $numberOfInsecurePackages = 0;
+        $numberOfOutdatedPackages = count($result->getOutdatedPackages());
+        $numberOfInsecurePackages = count($result->getInsecureOutdatedPackages());
         $textParts = [];
-
-        // Count outdated and insecure packages
-        foreach ($result->getOutdatedPackages() as $outdatedPackage) {
-            ++$numberOfOutdatedPackages;
-
-            if ($outdatedPackage->isInsecure()) {
-                ++$numberOfInsecurePackages;
-            }
-        }
 
         // Outdated packages header
         $textParts[] = sprintf(
