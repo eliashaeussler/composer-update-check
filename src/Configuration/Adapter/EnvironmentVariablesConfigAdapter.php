@@ -133,7 +133,7 @@ final class EnvironmentVariablesConfigAdapter implements ConfigAdapter
 
         // Yield reporter config
         foreach ($reporterConfig as $name => $config) {
-            $enabled = $this->isTrue($config['enable'] ?? null);
+            $enabled = $this->isTrue($config['enable'] ?? '1');
 
             unset($config['enable']);
 
