@@ -26,6 +26,8 @@ namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 use EliasHaeussler\ComposerUpdateCheck\Configuration;
 use EliasHaeussler\ComposerUpdateCheck\IO;
 
+use function array_replace_recursive;
+
 /**
  * ChainedConfigAdapter.
  *
@@ -73,7 +75,10 @@ final class ChainedConfigAdapter implements ConfigAdapter
         }
 
         foreach ($other->getReporters() as $name => $options) {
-            $config->enableReporter($name, $options);
+            $currentOptions = $config->getReporters()[$name] ?? [];
+            $mergedOptions = array_replace_recursive($currentOptions, $options);
+
+            $config->enableReporter($name, $mergedOptions);
         }
     }
 }
