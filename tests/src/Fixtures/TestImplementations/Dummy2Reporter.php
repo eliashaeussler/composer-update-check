@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures\TestImplementations;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 use EliasHaeussler\ComposerUpdateCheck\Reporter;
+use InvalidArgumentException;
 
 /**
  * Dummy2Reporter.
@@ -42,6 +43,7 @@ final class Dummy2Reporter implements Reporter\Reporter
      * @var list<array{result: Entity\Result\UpdateCheckResult, options: array<string, mixed>}>
      */
     public array $reportedResults = [];
+    public bool $treatOptionsAsInvalid = false;
 
     public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
     {
@@ -51,6 +53,13 @@ final class Dummy2Reporter implements Reporter\Reporter
         ];
 
         return true;
+    }
+
+    public function validateOptions(array $options): void
+    {
+        if ($this->treatOptionsAsInvalid) {
+            throw new InvalidArgumentException('Passed reporter options are invalid.', 1705848208);
+        }
     }
 
     public static function getName(): string

@@ -28,6 +28,7 @@ use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck as Src;
 use GuzzleHttp\Exception;
 use GuzzleHttp\Handler;
+use InvalidArgumentException;
 use PHPUnit\Framework;
 use Symfony\Component\Console;
 
@@ -71,6 +72,18 @@ final class UpdateCheckerTest extends Framework\TestCase
         $this->expectExceptionObject(
             new Src\Exception\ReporterIsNotSupported('foo'),
         );
+
+        $this->subject->run($this->config);
+    }
+
+    #[Framework\Attributes\Test]
+    public function runValidatesReporterOptions(): void
+    {
+        $this->reporter->treatOptionsAsInvalid = true;
+
+        $this->config->enableReporter('dummy');
+
+        $this->expectException(InvalidArgumentException::class);
 
         $this->subject->run($this->config);
     }
