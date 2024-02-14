@@ -112,6 +112,7 @@ final class MattermostReport implements JsonSerializable
         string $rootPackageName = null,
     ): string {
         $numberOfExcludedPackages = count($result->getExcludedPackages());
+        $hasInsecureOutdatedPackages = $result->hasInsecureOutdatedPackages();
         $textParts = [];
 
         if (null !== $rootPackageName) {
@@ -124,7 +125,7 @@ final class MattermostReport implements JsonSerializable
             'New version',
         ];
 
-        if ($result->hasInsecureOutdatedPackages()) {
+        if ($hasInsecureOutdatedPackages) {
             $headers[] = 'Severity';
         }
 
@@ -148,6 +149,8 @@ final class MattermostReport implements JsonSerializable
                     self::getEmojiForSeverityLevel($severityLevel),
                     $severityLevel->value,
                 );
+            } elseif ($hasInsecureOutdatedPackages) {
+                $row .= ' |';
             }
 
             $textParts[] = $row;
