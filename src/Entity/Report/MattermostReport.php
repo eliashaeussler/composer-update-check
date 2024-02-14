@@ -82,11 +82,6 @@ final class MattermostReport implements JsonSerializable
         // Outdated packages table
         $textParts[] = self::renderOutdatedPackagesTable($result, $rootPackageName);
 
-        // Security advisories header
-        if ($result->hasInsecureOutdatedPackages()) {
-            $textParts[] = '##### Security advisories';
-        }
-
         return implode(PHP_EOL, $textParts);
     }
 
