@@ -1,0 +1,13 @@
+{
+	"require": {
+		"symfony/http-kernel": "^5.4"
+	},
+	"require-dev": {
+		"doctrine/dbal": "^3.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"eliashaeussler/composer-update-check": true
+		}
+	}
+}

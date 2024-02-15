@@ -3,9 +3,10 @@ on:
   push:
     branches:
       - main
+      - 'renovate/**'
   pull_request:
     branches:
-      - '**'
+      - main
 
 jobs:
   cgl:
@@ -19,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           tools: composer:v2, composer-require-checker, composer-unused
 
       # Validation
@@ -28,7 +29,7 @@ jobs:
 
       # Install dependencies
       - name: Add required packages
-        run: composer require composer/composer:"^1.7 || ^2.0" composer/semver:"^1.0 || ^2.0 || ^3.0" --no-update
+        run: composer require composer/composer:"^2.1" composer/semver:"^3.4" --no-update
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
         with:
@@ -46,12 +47,16 @@ jobs:
 
       # Linting
       - name: Lint composer.json
-        run: composer lint:composer -- --dry-run
+        run: composer lint:composer
       - name: Lint .editorconfig
-        run: vendor/bin/ec --git-only
+        run: composer lint:editorconfig
       - name: Lint PHP
-        run: composer lint:php -- --dry-run
+        run: composer lint:php
 
       # SCA
       - name: SCA PHP
         run: composer sca:php -- --error-format github
+
+      # Migration
+      - name: Run Rector migration
+        run: composer migration:rector -- --dry-run

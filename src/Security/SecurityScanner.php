@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Security;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +14,22 @@ namespace EliasHaeussler\ComposerUpdateCheck\Security;
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Uri;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Symfony\Component\HttpClient\Psr18Client;
+namespace EliasHaeussler\ComposerUpdateCheck\Security;
+
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
+use Psr\Http\Message;
+use Spatie\Packagist;
 
 /**
  * SecurityScanner.
@@ -37,56 +37,70 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class SecurityScanner
+final class SecurityScanner
 {
-    public const API_ENDPOINT = 'https://packagist.org/api/security-advisories';
+    private readonly Valinor\Mapper\TreeMapper $mapper;
 
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    public function __construct(ClientInterface $client = null)
-    {
-        $this->requestFactory = new Psr17Factory();
-        $this->client = $client ?? new Psr18Client();
+    public function __construct(
+        private readonly Packagist\PackagistClient $client,
+    ) {
+        $this->mapper = $this->createMapper();
     }
 
     /**
-     * @param OutdatedPackage[] $packages
+     * @param list<Entity\Package\OutdatedPackage> $packages
+     *
+     * @throws Exception\PackagistResponseHasErrors
+     * @throws Exception\UnableToFetchSecurityAdvisories
      */
-    public function scan(array $packages): ScanResult
+    public function scan(array $packages): Entity\Result\ScanResult
     {
+        $packagesToScan = [];
+
         // Early return if no packages are requested to be scanned
         if ([] === $packages) {
-            return new ScanResult([]);
+            return new Entity\Result\ScanResult([]);
         }
 
-        // Parse package names
-        $packagesToScan = [];
         foreach ($packages as $package) {
-            $packagesToScan[] = $package->getName();
+            $packagesToScan[$package->getName()] = $package->getOutdatedVersion()->toString();
         }
 
-        // Build API request
-        $query = http_build_query(['packages' => $packagesToScan]);
-        $requestUri = new Uri(self::API_ENDPOINT);
-        $requestUri = $requestUri->withQuery($query);
-        $request = $this->requestFactory->createRequest('GET', $requestUri)->withHeader('Accept', 'application/json');
-
-        // Send API request and evaluate response
         try {
-            $response = $this->client->sendRequest($request);
-            $apiResult = $response->getBody()->__toString();
+            $advisories = $this->client->getAdvisoriesAffectingVersions($packagesToScan);
+            $source = Valinor\Mapper\Source\Source::array(['securityAdvisories' => $advisories]);
 
-            return ScanResult::fromApiResult(json_decode($apiResult, true) ?: []);
-        } catch (ClientExceptionInterface $e) {
-            throw new \RuntimeException('Error while scanning security vulnerabilities.', 1610706128, $e);
+            return $this->mapper->map(Entity\Result\ScanResult::class, $source);
+        } catch (GuzzleException $exception) {
+            throw new Exception\UnableToFetchSecurityAdvisories($exception);
+        } catch (Valinor\Mapper\MappingError $error) {
+            throw new Exception\PackagistResponseHasErrors($error);
         }
+    }
+
+    /**
+     * @throws Exception\PackagistResponseHasErrors
+     * @throws Exception\UnableToFetchSecurityAdvisories
+     */
+    public function scanAndOverlayResult(Entity\Result\UpdateCheckResult $result): void
+    {
+        $outdatedPackages = $result->getOutdatedPackages();
+        $scanResult = $this->scan($outdatedPackages);
+
+        foreach ($outdatedPackages as $outdatedPackage) {
+            $outdatedPackage->setSecurityAdvisories(
+                $scanResult->getSecurityAdvisoriesForPackage($outdatedPackage),
+            );
+        }
+    }
+
+    private function createMapper(): Valinor\Mapper\TreeMapper
+    {
+        return (new Valinor\MapperBuilder())
+            ->allowSuperfluousKeys()
+            ->infer(Message\UriInterface::class, static fn () => Psr7\Uri::class)
+            ->supportDateFormats('Y-m-d H:i:s')
+            ->mapper()
+        ;
     }
 }

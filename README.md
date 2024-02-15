@@ -44,10 +44,6 @@ automated quality assurance of your projects.
 composer require eliashaeussler/composer-update-check
 ```
 
-## :ship: Changelog
-
-View all notable release notes in the [Changelog](CHANGELOG.md).
-
 ## :gem: Credits
 
 [Business vector created by studiogstock - www.freepik.com](https://www.freepik.com/vectors/business)

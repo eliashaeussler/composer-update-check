@@ -1,0 +1,6 @@
+{
+	"require": {
+		"composer/composer": "^1.0",
+		"symfony/http-kernel": "^4.4"
+	}
+}

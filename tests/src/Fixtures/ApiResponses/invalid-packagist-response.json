@@ -1,0 +1,10 @@
+{
+	"advisories": {
+		"symfony/http-kernel": [
+			{
+				"packageName": "symfony/http-kernel",
+				"affectedVersions": "<5.4.0|>=5.4.0,<5.4.20|>=6.0.0"
+			}
+		]
+	}
+}

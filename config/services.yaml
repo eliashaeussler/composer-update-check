@@ -1,0 +1,39 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  EliasHaeussler\ComposerUpdateCheck\:
+    resource: '../src/*'
+    exclude:
+      - '../src/Configuration/*'
+      - '../src/DependencyInjection/*'
+      - '../src/Entity/*'
+      - '../src/Event/*'
+      - '../src/Exception/*'
+      - '../src/Package/*'
+      - '../src/Plugin.php'
+      - '../src/UpdateCheckResult.php'
+
+  EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand:
+    public: true
+
+  EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory:
+    arguments:
+      $formatters: !tagged_locator { tag: 'io.formatter', default_index_method: 'getFormat' }
+
+  EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory:
+    arguments:
+      $reporters: !tagged_locator { tag: 'reporter', default_index_method: 'getName' }
+
+  # Synthetic services (set when the container is built on runtime)
+  Composer\Composer:
+    synthetic: true
+  Composer\IO\IOInterface:
+    synthetic: true
+
+  # External services
+  GuzzleHttp\Client:
+  Spatie\Packagist\PackagistClient:
+  Spatie\Packagist\PackagistUrlGenerator:
