@@ -28,10 +28,12 @@ use Composer\DependencyResolver;
 use Composer\EventDispatcher;
 use Composer\Installer;
 use Composer\IO;
-use Composer\Util;
+use Composer\Package;
+use Composer\Repository;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 use function array_map;
+use function array_values;
 use function method_exists;
 
 /**
@@ -64,33 +66,43 @@ final class ComposerInstaller
             $installer->setAudit(false);
         }
 
-        $eventDispatcher = $composer->getEventDispatcher();
-        $eventDispatcher->setRunScripts(false);
-
         return $installer->run();
     }
 
     /**
      * @param list<Entity\Package\Package> $packages
      */
-    public function runUpdate(array $packages, IO\IOInterface $io = null): int
+    public function runUpdate(array $packages, IO\IOInterface $io = null): Entity\Result\ComposerUpdateResult
     {
         $io ??= new IO\NullIO();
 
+        $outdatedPackages = [];
+        $allowedPackageNames = array_map(
+            static fn (Entity\Package\Package $package) => $package->getName(),
+            $packages,
+        );
+
+        // Inject installer logger
         $composer = $this->buildComposer($io);
+        $composer->getInstallationManager()->addInstaller(
+            $this->createInstaller($allowedPackageNames, $outdatedPackages),
+        );
+
+        // Disable lock file management
+        $composer->getConfig()->merge([
+            'config' => [
+                'lock' => false,
+            ],
+        ]);
+
         $preferredInstall = $composer->getConfig()->get('preferred-install');
         $installer = Installer::create($io, $composer)
-            ->setDryRun()
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode()
             ->setUpdate(true)
-            ->setUpdateAllowList(
-                array_map(
-                    static fn (Entity\Package\Package $package) => $package->getName(),
-                    $packages,
-                ),
-            )
+            ->setDumpAutoloader(false)
+            ->setUpdateAllowList($allowedPackageNames)
             ->setUpdateAllowTransitiveDependencies(DependencyResolver\Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
 
@@ -98,15 +110,69 @@ final class ComposerInstaller
             $installer->setAudit(false);
         }
 
-        return $installer->run();
+        return new Entity\Result\ComposerUpdateResult(
+            $installer->run(),
+            array_values($outdatedPackages),
+        );
+    }
+
+    /**
+     * @param list<non-empty-string>                                  $allowedPackageNames
+     * @param array<non-empty-string, Entity\Package\OutdatedPackage> $outdatedPackages
+     */
+    private function createInstaller(array $allowedPackageNames, array &$outdatedPackages): Installer\InstallerInterface
+    {
+        return new class($allowedPackageNames, $outdatedPackages) extends Installer\NoopInstaller {
+            /**
+             * @param list<non-empty-string>                                  $allowedPackageNames
+             * @param array<non-empty-string, Entity\Package\OutdatedPackage> $outdatedPackages
+             */
+            public function __construct(
+                private readonly array $allowedPackageNames,
+                private array &$outdatedPackages,
+            ) {}
+
+            public function update(
+                Repository\InstalledRepositoryInterface $repo,
+                Package\PackageInterface $initial,
+                Package\PackageInterface $target,
+            ) {
+                $promise = parent::update($repo, $initial, $target);
+                /** @var non-empty-string $name */
+                $name = $initial->getName();
+
+                if ($this->isSuitablePackage($initial)) {
+                    $this->outdatedPackages[$name] = new Entity\Package\OutdatedPackage(
+                        $name,
+                        new Entity\Version($initial->getPrettyVersion()),
+                        new Entity\Version($target->getPrettyVersion()),
+                    );
+                }
+
+                return $promise;
+            }
+
+            private function isSuitablePackage(Package\PackageInterface $package): bool
+            {
+                $name = $package->getName();
+
+                if (!in_array($name, $this->allowedPackageNames, true)) {
+                    return false;
+                }
+
+                return !array_key_exists($name, $this->outdatedPackages);
+            }
+        };
     }
 
     private function buildComposer(IO\IOInterface $io): Composer
     {
         $composer = clone $this->composer;
-        $composer->setEventDispatcher(
-            new EventDispatcher\EventDispatcher($composer, $io, new Util\ProcessExecutor($io)),
-        );
+
+        $eventDispatcher = new EventDispatcher\EventDispatcher($composer, $io);
+        $eventDispatcher->setRunScripts(false);
+
+        $composer->setEventDispatcher($eventDispatcher);
 
         return $composer;
     }

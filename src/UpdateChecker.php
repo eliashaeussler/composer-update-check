@@ -38,7 +38,6 @@ use function array_merge;
 final class UpdateChecker
 {
     public function __construct(
-        private readonly Composer\CommandResultParser $commandResultParser,
         private readonly \Composer\Composer $composer,
         private readonly Composer\ComposerInstaller $installer,
         private readonly IO\IOInterface $io,
@@ -109,21 +108,19 @@ final class UpdateChecker
 
         // Run Composer installer
         $io = new IO\BufferIO();
-        $exitCode = $this->installer->runUpdate($packages, $io);
+        $result = $this->installer->runUpdate($packages, $io);
 
         // Handle installer failures
-        if ($exitCode > 0) {
+        if (!$result->isSuccessful()) {
             $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
             $this->io->writeError($io->getOutput());
 
-            throw new Exception\ComposerUpdateFailed($exitCode);
+            throw new Exception\ComposerUpdateFailed($result->getExitCode());
         }
 
         $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
 
-        $outdatedPackages = $this->commandResultParser->parse($io->getOutput(), $packages);
-
-        return new Entity\Result\UpdateCheckResult($outdatedPackages, $excludedPackages);
+        return new Entity\Result\UpdateCheckResult($result->getOutdatedPackages(), $excludedPackages);
     }
 
     /**
