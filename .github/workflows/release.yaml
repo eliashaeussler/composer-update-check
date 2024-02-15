@@ -21,17 +21,9 @@ jobs:
             exit 1
           fi
 
-      # Read changelog
-      - name: Read changelog
-        id: changelog
-        uses: mindsers/changelog-reader-action@v2
-        with:
-          validation_level: warn
-
       # Create release
       - name: Create release
         id: create-release
         uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: ${{ steps.changelog.outputs.changes }}
+          generate_release_notes: true
