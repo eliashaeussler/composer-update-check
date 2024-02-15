@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ["8.1", "8.2", "8.3"]
-        composer-version: ["2"]
+        composer-version: ["2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"]
         dependencies: ["highest", "lowest"]
     steps:
       - uses: actions/checkout@v3
@@ -29,19 +29,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v2
+          tools: composer:${{ matrix.composer-version }}
           coverage: none
 
       # Install dependencies
-      - name: Simulate Composer version
-        run: |
-          composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
-          composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
         with:
           dependency-versions: ${{ matrix.dependencies }}
-          composer-options: --with="composer/composer:^${{ matrix.composer-version }}"
+          composer-options: --with="composer/composer:~${{ matrix.composer-version }}.0"
       - name: Update Composer version
         run: composer self-update --${{ matrix.composer-version }}
 
