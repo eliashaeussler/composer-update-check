@@ -25,8 +25,10 @@ namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
 use Composer\Composer;
 use Composer\DependencyResolver;
+use Composer\EventDispatcher;
 use Composer\Installer;
 use Composer\IO;
+use Composer\Util;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 use function array_map;
@@ -50,8 +52,9 @@ final class ComposerInstaller
     {
         $io ??= new IO\NullIO();
 
-        $preferredInstall = $this->composer->getConfig()->get('preferred-install');
-        $installer = Installer::create($io, $this->composer)
+        $composer = $this->buildComposer($io);
+        $preferredInstall = $composer->getConfig()->get('preferred-install');
+        $installer = Installer::create($io, $composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode()
@@ -61,7 +64,7 @@ final class ComposerInstaller
             $installer->setAudit(false);
         }
 
-        $eventDispatcher = $this->composer->getEventDispatcher();
+        $eventDispatcher = $composer->getEventDispatcher();
         $eventDispatcher->setRunScripts(false);
 
         return $installer->run();
@@ -74,8 +77,9 @@ final class ComposerInstaller
     {
         $io ??= new IO\NullIO();
 
-        $preferredInstall = $this->composer->getConfig()->get('preferred-install');
-        $installer = Installer::create($io, $this->composer)
+        $composer = $this->buildComposer($io);
+        $preferredInstall = $composer->getConfig()->get('preferred-install');
+        $installer = Installer::create($io, $composer)
             ->setDryRun()
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
@@ -95,5 +99,15 @@ final class ComposerInstaller
         }
 
         return $installer->run();
+    }
+
+    private function buildComposer(IO\IOInterface $io): Composer
+    {
+        $composer = clone $this->composer;
+        $composer->setEventDispatcher(
+            new EventDispatcher\EventDispatcher($composer, $io, new Util\ProcessExecutor($io)),
+        );
+
+        return $composer;
     }
 }
