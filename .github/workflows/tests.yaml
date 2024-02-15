@@ -19,7 +19,7 @@ jobs:
         composer-version: ["2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"]
         dependencies: ["highest", "lowest"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -46,7 +46,7 @@ jobs:
     name: Test coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -95,7 +95,7 @@ jobs:
 
       # CodeClimate
       - name: CodeClimate report
-        uses: paambaati/codeclimate-action@v3.2.0
+        uses: paambaati/codeclimate-action@v5.0.0
         if: env.CC_TEST_REPORTER_ID
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
@@ -105,7 +105,7 @@ jobs:
 
       # codecov
       - name: codecov report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: |
