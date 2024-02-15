@@ -9,7 +9,6 @@ on:
       - main
 
 jobs:
-  # Job: Run unit tests
   tests:
     name: Tests (PHP ${{ matrix.php-version }}, Composer ${{ matrix.composer-version }} & ${{ matrix.dependencies }} dependencies)
     runs-on: ubuntu-latest
@@ -38,16 +37,11 @@ jobs:
         with:
           dependency-versions: ${{ matrix.dependencies }}
           composer-options: --with="composer/composer:~${{ matrix.composer-version }}.0"
-      - name: Update Composer version
-        run: composer self-update --${{ matrix.composer-version }}
 
       # Run tests
-      - name: Build coverage directory
-        run: mkdir -p .build/coverage
       - name: Run tests
         run: composer test
 
-  # Job: Collect and report test coverage
   coverage:
     name: Test coverage
     runs-on: ubuntu-latest
@@ -69,26 +63,52 @@ jobs:
         uses: ramsey/composer-install@v2
 
       # Run tests
-      - name: Build coverage directory
-        run: mkdir -p .build/coverage
       - name: Run tests with coverage
         run: composer test:coverage
 
-      # Report coverage
+      # Upload artifact
       - name: Fix coverage path
         working-directory: .build/coverage
         run: sed -i 's#/home/runner/work/composer-update-check/composer-update-check#${{ github.workspace }}#g' clover.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: .build/coverage/clover.xml
+          retention-days: 7
+
+  coverage-report:
+    name: Report test coverage
+    runs-on: ubuntu-latest
+    needs: coverage
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Download artifact
+      - name: Download coverage artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+
+      # CodeClimate
       - name: CodeClimate report
         uses: paambaati/codeclimate-action@v3.2.0
+        if: env.CC_TEST_REPORTER_ID
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageLocations: |
-            ${{ github.workspace }}/.build/coverage/clover.xml:clover
+            ${{ steps.download.outputs.download-path }}/clover.xml:clover
+
+      # codecov
       - name: codecov report
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: .build/coverage
+          files: |
+            ${{ steps.download.outputs.download-path }}/clover.xml
           fail_ci_if_error: true
           verbose: true
