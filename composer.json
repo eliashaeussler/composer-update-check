@@ -19,7 +19,7 @@
 		"rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
 	},
 	"require": {
-		"php": ">= 7.1 < 8.2",
+		"php": ">= 7.1 < 8.3",
 		"ext-json": "*",
 		"composer-plugin-api": "^1.0 || ^2.0",
 		"nyholm/psr7": "^1.0",
@@ -54,7 +54,8 @@
 	},
 	"config": {
 		"allow-plugins": {
-			"ergebnis/composer-normalize": true
+			"ergebnis/composer-normalize": true,
+			"php-http/discovery": true
 		},
 		"sort-packages": true
 	},
