@@ -22,7 +22,7 @@
 		"php": ">= 7.1 < 8.2",
 		"ext-json": "*",
 		"composer-plugin-api": "^1.0 || ^2.0",
-		"nyholm/psr7": "^1.0",
+		"nyholm/psr7": "^1.5.1",
 		"psr/http-client": "^1.0",
 		"psr/http-message": "^1.0",
 		"spatie/emoji": "^2.0 || ^3.0 || ^4.0",
