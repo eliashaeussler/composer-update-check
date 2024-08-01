@@ -90,7 +90,7 @@ final class SecurityAdvisoryTest extends Framework\TestCase
             'reportedAt' => new DateTimeImmutable('2023-02-01 08:00:00'),
             'severity' => Src\Entity\Security\SeverityLevel::Medium,
             'cve' => 'CVE-2022-24894',
-            'link' => new Psr7\Uri('https://symfony.com/cve-2022-24894'),
+            'link' => 'https://symfony.com/cve-2022-24894',
         ];
 
         self::assertJsonStringEqualsJsonString(
