@@ -3,4 +3,4 @@ parameters:
 		-
 			message: "#^Call to function method_exists\\(\\) with Composer\\\\Installer and 'setAudit' will always evaluate to true\\.$#"
 			count: 2
-			path: src/Composer/ComposerInstaller.php
+			path: src/Composer/Installer.php

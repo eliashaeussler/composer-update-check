@@ -39,7 +39,7 @@ final class UpdateChecker
 {
     public function __construct(
         private readonly \Composer\Composer $composer,
-        private readonly Composer\ComposerInstaller $installer,
+        private readonly Composer\Installer $installer,
         private readonly IO\IOInterface $io,
         private readonly Security\SecurityScanner $securityScanner,
         private readonly Reporter\ReporterFactory $reporterFactory,

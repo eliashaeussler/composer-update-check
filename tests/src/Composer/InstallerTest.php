@@ -28,19 +28,20 @@ use EliasHaeussler\ComposerUpdateCheck as Src;
 use EliasHaeussler\ComposerUpdateCheck\Tests;
 use Generator;
 use PHPUnit\Framework;
+use function count;
 
 /**
- * ComposerInstallerTest.
+ * InstallerTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-#[Framework\Attributes\CoversClass(Src\Composer\ComposerInstaller::class)]
-final class ComposerInstallerTest extends Framework\TestCase
+#[Framework\Attributes\CoversClass(Src\Composer\Installer::class)]
+final class InstallerTest extends Framework\TestCase
 {
     private Tests\Fixtures\TestApplication $testApplication;
     private IO\BufferIO $io;
-    private Src\Composer\ComposerInstaller $subject;
+    private Src\Composer\Installer $subject;
 
     protected function setUp(): void
     {
@@ -49,7 +50,7 @@ final class ComposerInstallerTest extends Framework\TestCase
         $container = Tests\Fixtures\ContainerFactory::make($this->testApplication);
 
         $this->io = new IO\BufferIO();
-        $this->subject = $container->get(Src\Composer\ComposerInstaller::class);
+        $this->subject = $container->get(Src\Composer\Installer::class);
     }
 
     #[Framework\Attributes\Test]
@@ -63,45 +64,50 @@ final class ComposerInstallerTest extends Framework\TestCase
 
     /**
      * @param list<Src\Entity\Package\Package> $packages
+     * @param list<non-empty-string> $expected
      */
     #[Framework\Attributes\Test]
     #[Framework\Attributes\DataProvider('runUpdateExecutesDryRunUpdateDataProvider')]
-    public function runUpdateExecutesDryRunUpdate(array $packages, string $expected, ?string $notExpected): void
+    public function runUpdateExecutesDryRunUpdate(array $packages, array $expected): void
     {
         // Ensure dependencies are installed
         $this->subject->runInstall($this->io);
 
-        self::assertSame(0, $this->subject->runUpdate($packages, $this->io));
-        self::assertStringContainsString($expected, $this->io->getOutput());
+        $actual = $this->subject->runUpdate($packages, $this->io);
 
-        if (null !== $notExpected) {
-            self::assertStringNotContainsString($notExpected, $this->io->getOutput());
+        self::assertEquals(0, $actual->getExitCode());
+        self::assertTrue($actual->isSuccessful());
+        self::assertCount(count($expected), $actual->getOutdatedPackages());
+
+        foreach ($expected as $i => $package) {
+            self::assertSame($package, $actual->getOutdatedPackages()[$i]->getName());
         }
     }
 
     /**
-     * @return Generator<string, array{list<Src\Entity\Package\Package>, string, string|null}>
+     * @return Generator<string, array{list<Src\Entity\Package\Package>, list<non-empty-string>}>
      */
     public static function runUpdateExecutesDryRunUpdateDataProvider(): Generator
     {
         yield 'no explicit whitelist' => [
             [],
-            '- Upgrading',
-            null,
+            [],
         ];
         yield 'doctrine/dbal only' => [
             [
                 new Src\Entity\Package\InstalledPackage('doctrine/dbal'),
             ],
-            '- Upgrading doctrine/dbal',
-            '- Upgrading symfony/http-kernel',
+            [
+                'doctrine/dbal',
+            ],
         ];
         yield 'symfony/http-kernel only' => [
             [
                 new Src\Entity\Package\InstalledPackage('symfony/http-kernel'),
             ],
-            '- Upgrading symfony/http-kernel',
-            '- Upgrading symfony/console',
+            [
+                'symfony/http-kernel',
+            ],
         ];
     }
 
