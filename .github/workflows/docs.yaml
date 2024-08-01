@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+      # @todo Remove once 2.x branch is merged
+      - 2.x
 
 jobs:
   render:
