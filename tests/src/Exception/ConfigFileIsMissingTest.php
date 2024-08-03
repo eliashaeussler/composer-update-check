@@ -21,17 +21,26 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Tests\Exception;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck as Src;
+use PHPUnit\Framework;
 
 /**
- * ConfigAdapter.
+ * ConfigFileIsMissingTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-interface ConfigAdapter
+#[Framework\Attributes\CoversClass(Src\Exception\ConfigFileIsMissing::class)]
+final class ConfigFileIsMissingTest extends Framework\TestCase
 {
-    public function resolve(): Configuration\ComposerUpdateCheckConfig;
+    #[Framework\Attributes\Test]
+    public function constructorCreatesExceptionForGivenConfigFile(): void
+    {
+        $actual = new Src\Exception\ConfigFileIsMissing('foo');
+
+        self::assertSame('The config file "foo" does not exist.', $actual->getMessage());
+        self::assertSame(1701204856, $actual->getCode());
+    }
 }

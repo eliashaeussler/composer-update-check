@@ -27,6 +27,7 @@ use Composer\Console\Application;
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck as Src;
 use EliasHaeussler\ComposerUpdateCheck\Tests;
+use Generator;
 use GuzzleHttp\Handler\MockHandler;
 use PHPUnit\Framework;
 use Symfony\Component\Console;
@@ -87,11 +88,19 @@ final class UpdateCheckCommandTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
-    public function executeUsesConfigFromGivenConfigFile(): void
+    public function executeResolvesRelativeConfigFilePath(): void
     {
+        $this->testApplication
+            ->withConfig(
+                Tests\Fixtures\ConfigProvider::php('valid-config'),
+                'composer-update-check.php',
+            )
+            ->reboot()
+        ;
+
         $this->commandTester->execute(
             [
-                '--config' => Tests\Fixtures\ConfigProvider::json('valid-config'),
+                '--config' => 'composer-update-check.php',
             ],
             [
                 'verbosity' => Console\Output\OutputInterface::VERBOSITY_VERBOSE,
@@ -102,19 +111,109 @@ final class UpdateCheckCommandTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
+    #[Framework\Attributes\DataProvider('executeUsesConfigFromGivenConfigFileDataProvider')]
+    public function executeUsesConfigFromGivenConfigFile(string $configFile): void
+    {
+        $this->commandTester->execute(
+            [
+                '--config' => $configFile,
+            ],
+            [
+                'verbosity' => Console\Output\OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
+
+        self::assertStringContainsString('🚫 Skipped "symfony/http-kernel"', $this->io->getOutput());
+    }
+
+    #[Framework\Attributes\Test]
+    public function executeOverwritesConfigFromGivenFileWithCommandOptions(): void
+    {
+        $this->commandTester->execute(
+            [
+                '--config' => Tests\Fixtures\ConfigProvider::php('valid-config'),
+                '--format' => Src\IO\Formatter\GitHubFormatter::FORMAT,
+            ],
+        );
+
+        self::assertStringContainsString(
+            '::warning file=composer.json,title=Package doctrine/dbal is outdated',
+            $this->commandTester->getDisplay(),
+        );
+    }
+
+    #[Framework\Attributes\Test]
+    public function executeOverwritesConfigFromGivenFileDefinedAsEnvironmentVariable(): void
+    {
+        $configFile = Tests\Fixtures\ConfigProvider::php('valid-config');
+
+        putenv('COMPOSER_UPDATE_CHECK_CONFIG='.$configFile);
+
+        $this->commandTester->execute([
+            '--format' => Src\IO\Formatter\GitHubFormatter::FORMAT,
+        ]);
+
+        putenv('COMPOSER_UPDATE_CHECK_CONFIG');
+
+        self::assertStringContainsString(
+            '::warning file=composer.json,title=Package doctrine/dbal is outdated',
+            $this->commandTester->getDisplay(),
+        );
+    }
+
+    #[Framework\Attributes\Test]
+    public function executeRespectsConfigFileDefinedAsEnvironmentVariableAndCommandOption(): void
+    {
+        $configFile = Tests\Fixtures\ConfigProvider::php('valid-config');
+
+        putenv('COMPOSER_UPDATE_CHECK_CONFIG='.$configFile);
+
+        $this->commandTester->execute([
+            '--config' => Tests\Fixtures\ConfigProvider::php('valid-config-exclude-symfony'),
+            '--exclude' => [
+                'doctrine/dbal',
+            ],
+        ]);
+
+        putenv('COMPOSER_UPDATE_CHECK_CONFIG');
+
+        self::assertStringContainsString('🚫 Skipped "doctrine/dbal"', $this->io->getOutput());
+        self::assertStringContainsString('🚫 Skipped "symfony/config"', $this->io->getOutput());
+        self::assertStringContainsString('🚫 Skipped "symfony/http-kernel"', $this->io->getOutput());
+    }
+
+    #[Framework\Attributes\Test]
+    public function executeOverwritesConfigFromGivenFileAndCommandOptionsWithEnvironmentVariables(): void
+    {
+        putenv('COMPOSER_UPDATE_CHECK_FORMAT='.Src\IO\Formatter\GitHubFormatter::FORMAT);
+
+        $this->commandTester->execute([
+            '--config' => Tests\Fixtures\ConfigProvider::php('valid-config'),
+            '--format' => Src\IO\Formatter\GitLabFormatter::FORMAT,
+        ]);
+
+        putenv('COMPOSER_UPDATE_CHECK_FORMAT');
+
+        self::assertStringContainsString(
+            '::warning file=composer.json,title=Package doctrine/dbal is outdated',
+            $this->commandTester->getDisplay(),
+        );
+    }
+
+    #[Framework\Attributes\Test]
     public function executePrintsNoOutdatedPackagesMessageIfOutdatedPackagesAreExcluded(): void
     {
         $this->commandTester->execute([
             '--format' => 'json',
-            '--exclude-packages' => ['symfony/*'],
+            '--exclude' => ['symfony/*'],
             '--no-dev' => true,
         ]);
 
         self::assertJsonStringEqualsJsonString(
             json_encode(
                 [
-                    'status' => 'All packages are up to date (skipped 2 packages).',
-                    'excludedPackages' => ['doctrine/dbal', 'symfony/http-kernel'],
+                    'status' => 'All packages are up to date (skipped 3 packages).',
+                    'excludedPackages' => ['doctrine/dbal', 'symfony/config', 'symfony/http-kernel'],
                 ],
                 JSON_THROW_ON_ERROR,
             ),
@@ -127,18 +226,22 @@ final class UpdateCheckCommandTest extends Framework\TestCase
     {
         $this->commandTester->execute([
             '--format' => 'json',
-            '--exclude-packages' => ['symfony/http-kernel'],
+            '--exclude' => ['symfony/http-kernel'],
         ]);
 
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
 
         self::assertIsArray($actualJson);
-        self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
-        self::assertCount(1, $actualJson['outdatedPackages']);
+        self::assertSame('2 packages are outdated (skipped 1 package).', $actualJson['status']);
+        self::assertCount(2, $actualJson['outdatedPackages']);
 
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
+
+        self::assertSame('symfony/config', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
 
         self::assertSame(['symfony/http-kernel'], $actualJson['excludedPackages']);
     }
@@ -154,12 +257,16 @@ final class UpdateCheckCommandTest extends Framework\TestCase
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
 
         self::assertIsArray($actualJson);
-        self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
-        self::assertCount(1, $actualJson['outdatedPackages']);
+        self::assertSame('2 packages are outdated (skipped 1 package).', $actualJson['status']);
+        self::assertCount(2, $actualJson['outdatedPackages']);
 
-        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][0]['name']);
+        self::assertSame('symfony/config', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][0]['newVersion']);
+
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
 
         self::assertSame(['doctrine/dbal'], $actualJson['excludedPackages']);
     }
@@ -180,18 +287,23 @@ final class UpdateCheckCommandTest extends Framework\TestCase
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
 
         self::assertIsArray($actualJson);
-        self::assertSame('2 packages are outdated.', $actualJson['status']);
-        self::assertCount(2, $actualJson['outdatedPackages']);
+        self::assertSame('3 packages are outdated.', $actualJson['status']);
+        self::assertCount(3, $actualJson['outdatedPackages']);
 
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
         self::assertFalse($actualJson['outdatedPackages'][0]['insecure']);
 
-        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('symfony/config', $actualJson['outdatedPackages'][1]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
-        self::assertTrue($actualJson['outdatedPackages'][1]['insecure']);
+        self::assertFalse($actualJson['outdatedPackages'][1]['insecure']);
+
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][2]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][2]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][2]['newVersion']);
+        self::assertTrue($actualJson['outdatedPackages'][2]['insecure']);
     }
 
     #[Framework\Attributes\Test]
@@ -214,9 +326,13 @@ final class UpdateCheckCommandTest extends Framework\TestCase
         self::assertEquals(new Src\Entity\Version('3.1.3'), $report->getOutdatedPackages()[0]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('3.1.3'), $report->getOutdatedPackages()[0]->getNewVersion());
 
-        self::assertSame('symfony/http-kernel', $report->getOutdatedPackages()[1]->getName());
+        self::assertSame('symfony/config', $report->getOutdatedPackages()[1]->getName());
         self::assertEquals(new Src\Entity\Version('v5.4.19'), $report->getOutdatedPackages()[1]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $report->getOutdatedPackages()[1]->getNewVersion());
+
+        self::assertSame('symfony/http-kernel', $report->getOutdatedPackages()[2]->getName());
+        self::assertEquals(new Src\Entity\Version('v5.4.19'), $report->getOutdatedPackages()[2]->getOutdatedVersion());
+        self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $report->getOutdatedPackages()[2]->getNewVersion());
     }
 
     #[Framework\Attributes\Test]
@@ -260,16 +376,31 @@ final class UpdateCheckCommandTest extends Framework\TestCase
         $actualJson = json_decode($this->commandTester->getDisplay(), true);
 
         self::assertIsArray($actualJson);
-        self::assertSame('2 packages are outdated.', $actualJson['status']);
-        self::assertCount(2, $actualJson['outdatedPackages']);
+        self::assertSame('3 packages are outdated.', $actualJson['status']);
+        self::assertCount(3, $actualJson['outdatedPackages']);
 
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
 
-        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
+        self::assertSame('symfony/config', $actualJson['outdatedPackages'][1]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
+
+        self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][2]['name']);
+        self::assertSame('v5.4.19', $actualJson['outdatedPackages'][2]['outdatedVersion']);
+        self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][2]['newVersion']);
+    }
+
+    /**
+     * @return Generator<string, array{string}>
+     */
+    public static function executeUsesConfigFromGivenConfigFileDataProvider(): Generator
+    {
+        yield 'json' => [Tests\Fixtures\ConfigProvider::json('valid-config')];
+        yield 'php' => [Tests\Fixtures\ConfigProvider::php('valid-config')];
+        yield 'yaml' => [Tests\Fixtures\ConfigProvider::yaml('valid-config')];
+        yield 'yml' => [Tests\Fixtures\ConfigProvider::yml('valid-config')];
     }
 
     protected function tearDown(): void

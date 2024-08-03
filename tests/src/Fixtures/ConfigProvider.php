@@ -23,16 +23,49 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
 
+use Symfony\Component\Filesystem;
+
+use function dirname;
+
 /**
  * ConfigProvider.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @internal
  */
 final class ConfigProvider
 {
-    public static function json(string $filename): string
+    public static function json(string $filename, bool $returnRelativePath = false): string
     {
-        return __DIR__.'/ConfigFiles/'.$filename.'.json';
+        return self::resolveFixturePath($filename.'.json', $returnRelativePath);
+    }
+
+    public static function php(string $filename, bool $returnRelativePath = false): string
+    {
+        return self::resolveFixturePath($filename.'.php', $returnRelativePath);
+    }
+
+    public static function yaml(string $filename, bool $returnRelativePath = false): string
+    {
+        return self::resolveFixturePath($filename.'.yaml', $returnRelativePath);
+    }
+
+    public static function yml(string $filename, bool $returnRelativePath = false): string
+    {
+        return self::resolveFixturePath($filename.'.yml', $returnRelativePath);
+    }
+
+    private static function resolveFixturePath(string $filename, bool $returnRelativePath): string
+    {
+        $rootPath = dirname(__DIR__, 3);
+        $fixturePath = __DIR__.'/ConfigFiles/'.$filename;
+
+        if ($returnRelativePath) {
+            $fixturePath = Filesystem\Path::makeRelative($fixturePath, $rootPath);
+        }
+
+        return $fixturePath;
     }
 }

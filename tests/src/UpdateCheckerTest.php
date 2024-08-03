@@ -44,7 +44,7 @@ final class UpdateCheckerTest extends Framework\TestCase
     private Fixtures\TestApplication $testApplication;
     private IO\BufferIO $io;
     private Composer $composer;
-    private Src\Configuration\ComposerUpdateCheckConfig $config;
+    private Src\Config\ComposerUpdateCheckConfig $config;
     private Handler\MockHandler $mockHandler;
     private Fixtures\TestImplementations\DummyReporter $reporter;
     private Src\UpdateChecker $subject;
@@ -58,7 +58,7 @@ final class UpdateCheckerTest extends Framework\TestCase
         $container->set(IO\IOInterface::class, $this->io);
 
         $this->composer = $container->get(Composer::class);
-        $this->config = new Src\Configuration\ComposerUpdateCheckConfig();
+        $this->config = new Src\Config\ComposerUpdateCheckConfig();
         $this->mockHandler = $container->get(Handler\MockHandler::class);
         $this->reporter = $container->get(Fixtures\TestImplementations\DummyReporter::class);
         $this->subject = $container->get(Src\UpdateChecker::class);
@@ -131,6 +131,7 @@ final class UpdateCheckerTest extends Framework\TestCase
             [],
             [
                 new Src\Entity\Package\InstalledPackage('doctrine/dbal'),
+                new Src\Entity\Package\InstalledPackage('symfony/config'),
                 new Src\Entity\Package\InstalledPackage('symfony/http-kernel'),
             ],
         );
@@ -141,6 +142,7 @@ final class UpdateCheckerTest extends Framework\TestCase
 
         self::assertStringContainsString('📦 Resolving packages...', $output);
         self::assertStringContainsString('🚫 Skipped dev-requirements', $output);
+        self::assertStringContainsString('🚫 Skipped symfony/config', $output);
         self::assertStringContainsString('🚫 Skipped symfony/http-kernel', $output);
     }
 
@@ -152,11 +154,15 @@ final class UpdateCheckerTest extends Framework\TestCase
         $actual = $this->subject->run($this->config);
         $outdatedPackages = $actual->getOutdatedPackages();
 
-        self::assertCount(1, $outdatedPackages);
+        self::assertCount(2, $outdatedPackages);
 
-        self::assertSame('symfony/http-kernel', $outdatedPackages[0]->getName());
+        self::assertSame('symfony/config', $outdatedPackages[0]->getName());
         self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[0]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[0]->getNewVersion());
+
+        self::assertSame('symfony/http-kernel', $outdatedPackages[1]->getName());
+        self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getOutdatedVersion());
+        self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getNewVersion());
 
         $output = $this->io->getOutput();
 
@@ -172,11 +178,15 @@ final class UpdateCheckerTest extends Framework\TestCase
         $actual = $this->subject->run($this->config);
         $outdatedPackages = $actual->getOutdatedPackages();
 
-        self::assertCount(1, $outdatedPackages);
+        self::assertCount(2, $outdatedPackages);
 
         self::assertSame('doctrine/dbal', $outdatedPackages[0]->getName());
         self::assertEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getNewVersion());
+
+        self::assertSame('symfony/config', $outdatedPackages[1]->getName());
+        self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getOutdatedVersion());
+        self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getNewVersion());
 
         $output = $this->io->getOutput();
 
@@ -190,15 +200,19 @@ final class UpdateCheckerTest extends Framework\TestCase
         $actual = $this->subject->run($this->config);
         $outdatedPackages = $actual->getOutdatedPackages();
 
-        self::assertCount(2, $outdatedPackages);
+        self::assertCount(3, $outdatedPackages);
 
         self::assertSame('doctrine/dbal', $outdatedPackages[0]->getName());
         self::assertEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getNewVersion());
 
-        self::assertSame('symfony/http-kernel', $outdatedPackages[1]->getName());
+        self::assertSame('symfony/config', $outdatedPackages[1]->getName());
         self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getNewVersion());
+
+        self::assertSame('symfony/http-kernel', $outdatedPackages[2]->getName());
+        self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[2]->getOutdatedVersion());
+        self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[2]->getNewVersion());
     }
 
     #[Framework\Attributes\Test]
@@ -233,17 +247,22 @@ final class UpdateCheckerTest extends Framework\TestCase
         $actual = $this->subject->run($this->config);
         $outdatedPackages = $actual->getOutdatedPackages();
 
-        self::assertCount(2, $outdatedPackages);
+        self::assertCount(3, $outdatedPackages);
 
         self::assertSame('doctrine/dbal', $outdatedPackages[0]->getName());
         self::assertEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('3.1.3'), $outdatedPackages[0]->getNewVersion());
         self::assertFalse($outdatedPackages[0]->isInsecure());
 
-        self::assertSame('symfony/http-kernel', $outdatedPackages[1]->getName());
+        self::assertSame('symfony/config', $outdatedPackages[1]->getName());
         self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getOutdatedVersion());
         self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getNewVersion());
-        self::assertTrue($outdatedPackages[1]->isInsecure());
+        self::assertFalse($outdatedPackages[1]->isInsecure());
+
+        self::assertSame('symfony/http-kernel', $outdatedPackages[2]->getName());
+        self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[2]->getOutdatedVersion());
+        self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[2]->getNewVersion());
+        self::assertTrue($outdatedPackages[2]->isInsecure());
 
         self::assertStringContainsString('🚨 Looking up security advisories...', $this->io->getOutput());
     }
@@ -261,12 +280,17 @@ final class UpdateCheckerTest extends Framework\TestCase
         $listener = static function (Src\Event\PostUpdateCheckEvent $event): void {
             $outdatedPackages = $event->getUpdateCheckResult()->getOutdatedPackages();
 
-            self::assertCount(1, $outdatedPackages);
+            self::assertCount(2, $outdatedPackages);
 
-            self::assertSame('symfony/http-kernel', $outdatedPackages[0]->getName());
+            self::assertSame('symfony/config', $outdatedPackages[0]->getName());
             self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[0]->getOutdatedVersion());
             self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[0]->getNewVersion());
-            self::assertTrue($outdatedPackages[0]->isInsecure());
+            self::assertFalse($outdatedPackages[0]->isInsecure());
+
+            self::assertSame('symfony/http-kernel', $outdatedPackages[1]->getName());
+            self::assertEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getOutdatedVersion());
+            self::assertNotEquals(new Src\Entity\Version('v5.4.19'), $outdatedPackages[1]->getNewVersion());
+            self::assertTrue($outdatedPackages[1]->isInsecure());
         };
 
         $this->composer->getEventDispatcher()->addListener(Src\Event\PostUpdateCheckEvent::NAME, $listener);
@@ -277,7 +301,7 @@ final class UpdateCheckerTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function runReportsOutdatedPackages(): void
     {
-        $this->config->enableReporter('dummy', ['foo' => 'baz']);
+        $this->config->addReporter('dummy', new Src\Config\Option\ReporterConfig(options: ['foo' => 'baz']));
 
         $actual = $this->subject->run($this->config);
         $reportedResults = $this->reporter->reportedResults;

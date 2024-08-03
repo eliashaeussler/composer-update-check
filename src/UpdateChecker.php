@@ -53,9 +53,9 @@ final class UpdateChecker
      * @throws Exception\ReporterOptionsAreInvalid
      * @throws Exception\UnableToFetchSecurityAdvisories
      */
-    public function run(Configuration\ComposerUpdateCheckConfig $config): Entity\Result\UpdateCheckResult
+    public function run(Config\ComposerUpdateCheckConfig $config): Entity\Result\UpdateCheckResult
     {
-        $this->validateReporters($config->getReporters());
+        $this->validateReporters($config->getEnabledReporters());
 
         // Run update check
         [$packages, $excludedPackages] = $this->resolvePackagesForUpdateCheck($config);
@@ -78,9 +78,9 @@ final class UpdateChecker
         $this->dispatchPostUpdateCheckEvent($result);
 
         // Report update check result
-        foreach ($config->getReporters() as $name => $options) {
+        foreach ($config->getEnabledReporters() as $name => $reporterConfig) {
             $reporter = $this->reporterFactory->make($name);
-            $reporter->report($result, $options);
+            $reporter->report($result, $reporterConfig->getOptions());
         }
 
         return $result;
@@ -147,7 +147,7 @@ final class UpdateChecker
     /**
      * @return array{list<Entity\Package\Package>, list<Entity\Package\Package>}
      */
-    private function resolvePackagesForUpdateCheck(Configuration\ComposerUpdateCheckConfig $config): array
+    private function resolvePackagesForUpdateCheck(Config\ComposerUpdateCheckConfig $config): array
     {
         $this->io->writeError('📦 Resolving packages... ', false, IO\IOInterface::VERBOSE);
 
@@ -175,7 +175,7 @@ final class UpdateChecker
         // Remove packages by exclude patterns
         $excludedPackages = array_merge(
             $excludedPackages,
-            $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns(), $outputWasWritten),
+            $this->removeByExcludePatterns($requiredPackages, $config->getPackageExcludePatterns(), $outputWasWritten),
         );
 
         if (!$outputWasWritten) {
@@ -189,8 +189,8 @@ final class UpdateChecker
     }
 
     /**
-     * @param array<non-empty-string>                           $packages
-     * @param list<Configuration\Options\PackageExcludePattern> $excludePatterns
+     * @param array<non-empty-string>                   $packages
+     * @param list<Config\Option\PackageExcludePattern> $excludePatterns
      *
      * @return array<non-empty-string>
      */
@@ -230,17 +230,17 @@ final class UpdateChecker
     }
 
     /**
-     * @param array<string, array<string, mixed>> $reporters
+     * @param array<string, Config\Option\ReporterConfig> $reporters
      *
      * @throws Exception\ReporterIsNotSupported
      */
     private function validateReporters(array $reporters): void
     {
-        foreach ($reporters as $name => $options) {
+        foreach ($reporters as $name => $config) {
             // Will throw an exception if reporter is not supported
             $reporter = $this->reporterFactory->make($name);
             // Will throw an exception if reporter options are invalid
-            $reporter->validateOptions($options);
+            $reporter->validateOptions($config->getOptions());
         }
     }
 

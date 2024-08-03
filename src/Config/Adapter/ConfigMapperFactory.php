@@ -21,30 +21,30 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Config\Adapter;
 
-use EliasHaeussler\ComposerUpdateCheck\Exception;
-use Symfony\Component\Filesystem;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Config;
 
 /**
- * ConfigAdapterFactory.
+ * ConfigMapperFactory.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @internal
  */
-final class ConfigAdapterFactory
+final class ConfigMapperFactory
 {
-    /**
-     * @throws Exception\ConfigFileIsNotSupported
-     * @throws Exception\FileDoesNotExist
-     */
-    public function make(string $filename): ConfigAdapter
+    public function get(): Valinor\Mapper\TreeMapper
     {
-        return match (Filesystem\Path::getExtension($filename, true)) {
-            'json' => new JsonConfigAdapter($filename),
-            'php' => new PhpConfigAdapter($filename),
-            'yaml', 'yml' => new YamlConfigAdapter($filename),
-            default => throw new Exception\ConfigFileIsNotSupported($filename),
-        };
+        return (new Valinor\MapperBuilder())
+            ->registerConstructor(
+                Config\Option\PackageExcludePattern::create(...),
+            )
+            ->allowPermissiveTypes()
+            ->enableFlexibleCasting()
+            ->mapper()
+        ;
     }
 }

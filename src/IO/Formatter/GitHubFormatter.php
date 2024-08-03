@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use Composer\Factory;
-use Composer\Util;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\ComposerUpdateCheck\Helper;
 use Symfony\Component\Console;
 use Symfony\Component\Filesystem;
 
@@ -56,7 +56,7 @@ final class GitHubFormatter implements Formatter
         // Resolve path to composer.json file
         $composerFile = Filesystem\Path::makeRelative(
             (string) realpath(Factory::getComposerFile()),
-            Util\Platform::getCwd(),
+            Helper\FilesystemHelper::getWorkingDirectory(),
         );
 
         $outdatedPackages = $result->getOutdatedPackages();

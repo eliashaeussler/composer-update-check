@@ -25,12 +25,14 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
 
 use Composer\Command;
 use CuyZ\Valinor;
-use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Config;
 use EliasHaeussler\ComposerUpdateCheck\Exception;
+use EliasHaeussler\ComposerUpdateCheck\Helper;
 use EliasHaeussler\ComposerUpdateCheck\IO;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 use Symfony\Component\Console;
 use Symfony\Component\DependencyInjection;
+use Symfony\Component\Filesystem;
 
 use function array_map;
 use function array_unshift;
@@ -64,7 +66,7 @@ final class UpdateCheckCommand extends Command\BaseCommand
             'Path to configuration file, can be in JSON, PHP oder YAML format',
         );
         $this->addOption(
-            'exclude-packages',
+            'exclude',
             'e',
             Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
             'Packages to exclude when checking for available updates',
@@ -86,6 +88,7 @@ final class UpdateCheckCommand extends Command\BaseCommand
             'f',
             Console\Input\InputOption::VALUE_REQUIRED,
             'Format to display update check results',
+            IO\Formatter\TextFormatter::FORMAT,
         );
         $this->addOption(
             'reporter',
@@ -109,8 +112,8 @@ final class UpdateCheckCommand extends Command\BaseCommand
     protected function execute(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): int
     {
         try {
-            $config = $this->resolveConfiguration($input);
-        } catch (Exception\ConfigFileIsInvalid $exception) {
+            $config = $this->resolveConfig($input);
+        } catch (Exception\ConfigFileIsInvalid|Exception\ConfigFileIsMissing|Exception\ConfigFileIsNotSupported $exception) {
             $this->displayConfigError($exception);
 
             return self::FAILURE;
@@ -127,26 +130,47 @@ final class UpdateCheckCommand extends Command\BaseCommand
         return self::SUCCESS;
     }
 
-    private function resolveConfiguration(Console\Input\InputInterface $input): Configuration\ComposerUpdateCheckConfig
+    /**
+     * @throws Exception\ConfigFileHasErrors
+     * @throws Exception\ConfigFileIsInvalid
+     * @throws Exception\ConfigFileIsMissing
+     * @throws Exception\ConfigFileIsNotSupported
+     */
+    private function resolveConfig(Console\Input\InputInterface $input): Config\ComposerUpdateCheckConfig
     {
-        $filename = $input->getOption('config');
-        $adapters = [
-            new Configuration\Adapter\CommandInputConfigAdapter($input),
-            new Configuration\Adapter\EnvironmentVariablesConfigAdapter(),
+        $configFile = $input->getOption('config');
+        $configFileFromEnv = getenv('COMPOSER_UPDATE_CHECK_CONFIG');
+        $configAdapters = [
+            new Config\Adapter\ConsoleInputConfigAdapter($input),
+            new Config\Adapter\EnvironmentVariablesConfigAdapter(),
         ];
 
-        if (null !== $filename && '' !== $filename) {
-            $configAdapterFactory = new Configuration\Adapter\ConfigAdapterFactory();
-
-            array_unshift($adapters, $configAdapterFactory->make($filename));
+        if (false !== $configFileFromEnv) {
+            array_unshift($configAdapters, $this->loadConfigFromFile($configFileFromEnv));
+        }
+        if (null !== $configFile) {
+            array_unshift($configAdapters, $this->loadConfigFromFile($configFile));
         }
 
-        $configAdapter = new Configuration\Adapter\ChainedConfigAdapter($adapters);
-
-        return $configAdapter->resolve();
+        return (new Config\Adapter\CompositeConfigAdapter($configAdapters))->get();
     }
 
-    private function displayConfigError(Exception\ConfigFileIsInvalid $exception): void
+    /**
+     * @throws Exception\ConfigFileIsNotSupported
+     */
+    private function loadConfigFromFile(string $configFile): Config\Adapter\ConfigAdapter
+    {
+        $configFile = Helper\FilesystemHelper::resolveRelativePath($configFile);
+        $extension = Filesystem\Path::getExtension($configFile, true);
+
+        return match ($extension) {
+            'php' => new Config\Adapter\PhpConfigAdapter($configFile),
+            'json', 'yaml', 'yml' => new Config\Adapter\FileConfigAdapter($configFile),
+            default => throw new Exception\ConfigFileIsNotSupported($configFile),
+        };
+    }
+
+    private function displayConfigError(Exception\Exception $exception): void
     {
         $this->io->error($exception->getMessage());
 

@@ -24,10 +24,10 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use Composer\Factory;
-use Composer\Util;
 use DateTimeImmutable;
 use DateTimeInterface;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\ComposerUpdateCheck\Helper;
 use Symfony\Component\Console;
 use Symfony\Component\Filesystem;
 
@@ -127,7 +127,7 @@ final class GitLabFormatter implements Formatter
         // Resolve path to composer.json file
         $composerFile = Filesystem\Path::makeRelative(
             (string) realpath(Factory::getComposerFile()),
-            Util\Platform::getCwd(),
+            Helper\FilesystemHelper::getWorkingDirectory(),
         );
 
         $flags = JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR;

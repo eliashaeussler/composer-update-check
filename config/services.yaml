@@ -6,11 +6,12 @@ services:
   EliasHaeussler\ComposerUpdateCheck\:
     resource: '../src/*'
     exclude:
-      - '../src/Configuration/*'
+      - '../src/Config/*'
       - '../src/DependencyInjection/*'
       - '../src/Entity/*'
       - '../src/Event/*'
       - '../src/Exception/*'
+      - '../src/Helper/*'
       - '../src/Plugin.php'
 
   # Synthetic services (set when the container is built on runtime)

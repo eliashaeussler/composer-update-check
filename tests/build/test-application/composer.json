@@ -1,5 +1,6 @@
 {
 	"require": {
+		"symfony/config": "^5.4",
 		"symfony/http-kernel": "^5.4"
 	},
 	"require-dev": {

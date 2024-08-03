@@ -6,6 +6,6 @@ parameters:
 			path: src/Composer/Installer.php
 
 		-
-			message: "#^Parameter \\#1 \\.\\.\\.\\$constructors of method CuyZ\\\\Valinor\\\\MapperBuilder\\:\\:registerConstructor\\(\\) expects \\(pure\\-callable\\(\\)\\: mixed\\)\\|class\\-string, Closure\\(string\\)\\: EliasHaeussler\\\\ComposerUpdateCheck\\\\Configuration\\\\Options\\\\PackageExcludePattern given\\.$#"
+			message: "#^Variable property access on \\$this\\(EliasHaeussler\\\\ComposerUpdateCheck\\\\Config\\\\ComposerUpdateCheckConfig\\)\\.$#"
 			count: 1
-			path: src/Configuration/Adapter/FileBasedConfigAdapter.php
+			path: src/Config/ComposerUpdateCheckConfig.php

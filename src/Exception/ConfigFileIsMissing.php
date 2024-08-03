@@ -21,26 +21,23 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use function sprintf;
 
 /**
- * PhpConfigAdapter.
+ * ConfigFileIsMissing.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class PhpConfigAdapter extends FileBasedConfigAdapter
+final class ConfigFileIsMissing extends Exception
 {
-    public function resolve(): Configuration\ComposerUpdateCheckConfig
+    public function __construct(string $configFile)
     {
-        $config = new Configuration\ComposerUpdateCheckConfig();
-        $closure = require $this->filename;
-
-        // Call closure with config object
-        $closure($config);
-
-        return $config;
+        parent::__construct(
+            sprintf('The config file "%s" does not exist.', $configFile),
+            1701204856,
+        );
     }
 }
