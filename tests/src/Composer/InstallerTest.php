@@ -28,6 +28,7 @@ use EliasHaeussler\ComposerUpdateCheck as Src;
 use EliasHaeussler\ComposerUpdateCheck\Tests;
 use Generator;
 use PHPUnit\Framework;
+
 use function count;
 
 /**
@@ -64,7 +65,7 @@ final class InstallerTest extends Framework\TestCase
 
     /**
      * @param list<Src\Entity\Package\Package> $packages
-     * @param list<non-empty-string> $expected
+     * @param list<non-empty-string>           $expected
      */
     #[Framework\Attributes\Test]
     #[Framework\Attributes\DataProvider('runUpdateExecutesDryRunUpdateDataProvider')]
