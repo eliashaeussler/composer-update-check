@@ -29,15 +29,11 @@ jobs:
 
       # Validation
       - name: Validate composer.json
-        run: composer validate --no-check-lock
+        run: composer validate
 
       # Install dependencies
       - name: Add required packages
-        run: composer require composer/composer:"^2.2" composer/semver:"^3.4" --no-update
-      - name: Install Composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          dependency-versions: highest
+        run: composer require composer/composer:"^2.2" composer/semver:"^3.4"
 
       # Check Composer dependencies
       - name: Check dependencies
