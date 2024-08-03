@@ -31,7 +31,7 @@ $container = $containerFactory->make(true);
 $containerXmlFile = $container->getParameter('debug.container_xml_filename');
 
 $symfonySet = PHPStanConfig\Set\SymfonySet::create()
-    ->withConsoleApplicationLoader('Tests/build/phpstan/console-application.php')
+    ->withConsoleApplicationLoader('tests/build/phpstan/console-application.php')
     ->withContainerXmlPath($containerXmlFile)
 ;
 
