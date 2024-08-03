@@ -23,10 +23,11 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
+use Composer\Autoload;
 use Composer\Composer;
 use Composer\DependencyResolver;
 use Composer\EventDispatcher;
-use Composer\Installer;
+use Composer\Installer as ComposerInstaller;
 use Composer\IO;
 use Composer\Package;
 use Composer\Repository;
@@ -37,14 +38,14 @@ use function array_values;
 use function method_exists;
 
 /**
- * ComposerInstaller.
+ * Installer.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  *
  * @internal
  */
-final class ComposerInstaller
+final class Installer
 {
     public function __construct(
         private readonly Composer $composer,
@@ -56,7 +57,7 @@ final class ComposerInstaller
 
         $composer = $this->buildComposer($io);
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $installer = Installer::create($io, $composer)
+        $installer = ComposerInstaller::create($io, $composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode()
@@ -85,7 +86,12 @@ final class ComposerInstaller
         // Inject installer logger
         $composer = $this->buildComposer($io);
         $composer->getInstallationManager()->addInstaller(
-            $this->createInstaller($allowedPackageNames, $outdatedPackages),
+            $this->mockInstaller($allowedPackageNames, $outdatedPackages),
+        );
+
+        // Disable writing of package updates in local repository
+        $composer->getRepositoryManager()->setLocalRepository(
+            $this->mockLocalRepository($composer->getRepositoryManager()->getLocalRepository()),
         );
 
         // Disable lock file management
@@ -96,7 +102,7 @@ final class ComposerInstaller
         ]);
 
         $preferredInstall = $composer->getConfig()->get('preferred-install');
-        $installer = Installer::create($io, $composer)
+        $installer = ComposerInstaller::create($io, $composer)
             ->setPreferSource('source' === $preferredInstall)
             ->setPreferDist('dist' === $preferredInstall)
             ->setDevMode()
@@ -120,9 +126,11 @@ final class ComposerInstaller
      * @param list<non-empty-string>                                  $allowedPackageNames
      * @param array<non-empty-string, Entity\Package\OutdatedPackage> $outdatedPackages
      */
-    private function createInstaller(array $allowedPackageNames, array &$outdatedPackages): Installer\InstallerInterface
-    {
-        return new class($allowedPackageNames, $outdatedPackages) extends Installer\NoopInstaller {
+    private function mockInstaller(
+        array $allowedPackageNames,
+        array &$outdatedPackages,
+    ): ComposerInstaller\InstallerInterface {
+        return new class($allowedPackageNames, $outdatedPackages) extends ComposerInstaller\NoopInstaller {
             /**
              * @param list<non-empty-string>                                  $allowedPackageNames
              * @param array<non-empty-string, Entity\Package\OutdatedPackage> $outdatedPackages
@@ -165,14 +173,32 @@ final class ComposerInstaller
         };
     }
 
+    private function mockLocalRepository(
+        Repository\InstalledRepositoryInterface $repository,
+    ): Repository\InstalledRepositoryInterface {
+        $newRepository = new Repository\InstalledArrayRepository();
+        $newRepository->setDevPackageNames($repository->getDevPackageNames());
+
+        foreach ($repository->getPackages() as $package) {
+            $newPackage = clone $package;
+            $newPackage->setId($package->getId());
+            $newRepository->addPackage($newPackage);
+        }
+
+        return $newRepository;
+    }
+
     private function buildComposer(IO\IOInterface $io): Composer
     {
         $composer = clone $this->composer;
 
         $eventDispatcher = new EventDispatcher\EventDispatcher($composer, $io);
         $eventDispatcher->setRunScripts(false);
-
         $composer->setEventDispatcher($eventDispatcher);
+
+        $autoloadGenerator = new Autoload\AutoloadGenerator($composer->getEventDispatcher(), $io);
+        $autoloadGenerator->setRunScripts(false);
+        $composer->setAutoloadGenerator($autoloadGenerator);
 
         return $composer;
     }
