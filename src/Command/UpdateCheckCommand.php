@@ -46,7 +46,6 @@ final class UpdateCheckCommand extends Command\BaseCommand
     private Console\Style\SymfonyStyle $io;
 
     public function __construct(
-        private readonly IO\Formatter\FormatterFactory $formatterFactory,
         private readonly UpdateChecker $updateChecker,
     ) {
         parent::__construct('update-check');
@@ -103,7 +102,6 @@ final class UpdateCheckCommand extends Command\BaseCommand
     protected function initialize(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): void
     {
         $this->io = new Console\Style\SymfonyStyle($input, $output);
-        $this->formatterFactory->setIO($this->io);
     }
 
     protected function execute(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): int
@@ -120,7 +118,7 @@ final class UpdateCheckCommand extends Command\BaseCommand
             return self::FAILURE;
         }
 
-        $formatter = $this->formatterFactory->make($config->getFormat());
+        $formatter = (new IO\Formatter\FormatterFactory($this->io))->make($config->getFormat());
         $result = $this->updateChecker->run($config);
         $formatter->formatResult($result);
 

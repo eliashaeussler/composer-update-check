@@ -23,11 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 
-use EliasHaeussler\ComposerUpdateCheck\IO;
 use EliasHaeussler\ComposerUpdateCheck\Reporter;
 use Symfony\Component\DependencyInjection;
 
 return static function (DependencyInjection\ContainerBuilder $container): void {
-    $container->registerForAutoconfiguration(IO\Formatter\Formatter::class)->addTag('io.formatter');
     $container->registerForAutoconfiguration(Reporter\Reporter::class)->addTag('reporter');
 };
