@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Symfony\Component\DependencyInjection;
 
 /**
  * Reporter.
@@ -32,6 +33,7 @@ use EliasHaeussler\ComposerUpdateCheck\Exception;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
+#[DependencyInjection\Attribute\AutoconfigureTag('reporter')]
 interface Reporter
 {
     /**

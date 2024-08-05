@@ -38,6 +38,7 @@ final class ReporterFactory
      * @param DependencyInjection\ServiceLocator<Reporter> $reporters
      */
     public function __construct(
+        #[DependencyInjection\Attribute\TaggedLocator('reporter', defaultIndexMethod: 'getName')]
         private readonly DependencyInjection\ServiceLocator $reporters,
     ) {}
 
