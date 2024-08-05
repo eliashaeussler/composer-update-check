@@ -106,7 +106,6 @@ final class ContainerFactory
         $configDir = dirname(__DIR__, 2).'/config';
 
         return [
-            $configDir.'/services.php',
             $configDir.'/services.yaml',
         ];
     }

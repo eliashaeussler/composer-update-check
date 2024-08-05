@@ -2,7 +2,6 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
-    public: false
 
   EliasHaeussler\ComposerUpdateCheck\:
     resource: '../src/*'
@@ -12,16 +11,7 @@ services:
       - '../src/Entity/*'
       - '../src/Event/*'
       - '../src/Exception/*'
-      - '../src/Package/*'
       - '../src/Plugin.php'
-      - '../src/UpdateCheckResult.php'
-
-  EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand:
-    public: true
-
-  EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory:
-    arguments:
-      $reporters: !tagged_locator { tag: 'reporter', default_index_method: 'getName' }
 
   # Synthetic services (set when the container is built on runtime)
   Composer\Composer:

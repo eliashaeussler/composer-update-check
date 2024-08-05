@@ -30,6 +30,7 @@ use EliasHaeussler\ComposerUpdateCheck\Exception;
 use EliasHaeussler\ComposerUpdateCheck\IO;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
 use Symfony\Component\Console;
+use Symfony\Component\DependencyInjection;
 
 use function array_map;
 use function array_unshift;
@@ -41,6 +42,7 @@ use function sprintf;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
+#[DependencyInjection\Attribute\Autoconfigure(public: true)]
 final class UpdateCheckCommand extends Command\BaseCommand
 {
     private Console\Style\SymfonyStyle $io;
