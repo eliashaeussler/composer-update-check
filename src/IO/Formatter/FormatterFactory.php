@@ -25,7 +25,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
 use EliasHaeussler\ComposerUpdateCheck\Exception;
 use Symfony\Component\Console;
-use Symfony\Component\DependencyInjection;
 
 /**
  * FormatterFactory.
@@ -35,11 +34,7 @@ use Symfony\Component\DependencyInjection;
  */
 final class FormatterFactory
 {
-    /**
-     * @param DependencyInjection\ServiceLocator<Formatter> $formatters
-     */
     public function __construct(
-        private readonly DependencyInjection\ServiceLocator $formatters,
         private ?Console\Style\SymfonyStyle $io = null,
     ) {}
 
@@ -48,17 +43,13 @@ final class FormatterFactory
      */
     public function make(string $format): Formatter
     {
-        if (!$this->formatters->has($format)) {
-            throw new Exception\FormatterIsNotSupported($format);
-        }
-
-        $formatter = $this->formatters->get($format);
-
-        if (null !== $this->io) {
-            $formatter->setIO($this->io);
-        }
-
-        return $formatter;
+        return match ($format) {
+            GitHubFormatter::FORMAT => new GitHubFormatter($this->io),
+            GitLabFormatter::FORMAT => new GitLabFormatter($this->io),
+            JsonFormatter::FORMAT => new JsonFormatter($this->io),
+            TextFormatter::FORMAT => new TextFormatter($this->io),
+            default => throw new Exception\FormatterIsNotSupported($format),
+        };
     }
 
     public function setIO(Console\Style\SymfonyStyle $io): void

@@ -19,10 +19,6 @@ services:
   EliasHaeussler\ComposerUpdateCheck\Command\UpdateCheckCommand:
     public: true
 
-  EliasHaeussler\ComposerUpdateCheck\IO\Formatter\FormatterFactory:
-    arguments:
-      $formatters: !tagged_locator { tag: 'io.formatter', default_index_method: 'getFormat' }
-
   EliasHaeussler\ComposerUpdateCheck\Reporter\ReporterFactory:
     arguments:
       $reporters: !tagged_locator { tag: 'reporter', default_index_method: 'getName' }
