@@ -47,8 +47,11 @@ final class UpdateCheckResult
      * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      * @param list<Entity\Package\Package>         $excludedPackages
      */
-    public function __construct(array $outdatedPackages, array $excludedPackages = [])
-    {
+    public function __construct(
+        array $outdatedPackages,
+        array $excludedPackages = [],
+        private readonly ?Entity\Package\InstalledPackage $rootPackage = null,
+    ) {
         $this->outdatedPackages = $this->sortPackages($outdatedPackages);
         $this->excludedPackages = $this->sortPackages($excludedPackages);
     }
@@ -67,6 +70,11 @@ final class UpdateCheckResult
     public function getExcludedPackages(): array
     {
         return $this->excludedPackages;
+    }
+
+    public function getRootPackage(): ?Entity\Package\InstalledPackage
+    {
+        return $this->rootPackage;
     }
 
     /**

@@ -120,7 +120,11 @@ final class UpdateChecker
 
         $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
 
-        return new Entity\Result\UpdateCheckResult($result->getOutdatedPackages(), $excludedPackages);
+        return new Entity\Result\UpdateCheckResult(
+            $result->getOutdatedPackages(),
+            $excludedPackages,
+            $this->lookupRootPackage(),
+        );
     }
 
     /**
@@ -235,5 +239,16 @@ final class UpdateChecker
         $event = new Event\PostUpdateCheckEvent($result);
 
         $this->composer->getEventDispatcher()->dispatch($event->getName(), $event);
+    }
+
+    private function lookupRootPackage(): ?Entity\Package\InstalledPackage
+    {
+        $rootPackageName = $this->composer->getPackage()->getName();
+
+        if ('__root__' === $rootPackageName || '' === $rootPackageName) {
+            return null;
+        }
+
+        return new Entity\Package\InstalledPackage($rootPackageName);
     }
 }
