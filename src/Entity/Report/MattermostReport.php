@@ -54,18 +54,17 @@ final class MattermostReport implements JsonSerializable
         string $channel,
         ?string $username,
         Entity\Result\UpdateCheckResult $result,
-        string $rootPackageName = null,
     ): self {
         return new self(
             $channel,
-            self::createText($result, $rootPackageName),
+            self::createText($result),
             self::createAttachments($result),
             ':rotating_light:',
             $username,
         );
     }
 
-    private static function createText(Entity\Result\UpdateCheckResult $result, string $rootPackageName = null): string
+    private static function createText(Entity\Result\UpdateCheckResult $result): string
     {
         $numberOfOutdatedPackages = count($result->getOutdatedPackages());
         $numberOfInsecurePackages = count($result->getInsecureOutdatedPackages());
@@ -80,7 +79,7 @@ final class MattermostReport implements JsonSerializable
         );
 
         // Outdated packages table
-        $textParts[] = self::renderOutdatedPackagesTable($result, $rootPackageName);
+        $textParts[] = self::renderOutdatedPackagesTable($result);
 
         return implode(PHP_EOL, $textParts);
     }
@@ -102,10 +101,9 @@ final class MattermostReport implements JsonSerializable
         return $attachments;
     }
 
-    private static function renderOutdatedPackagesTable(
-        Entity\Result\UpdateCheckResult $result,
-        string $rootPackageName = null,
-    ): string {
+    private static function renderOutdatedPackagesTable(Entity\Result\UpdateCheckResult $result): string
+    {
+        $rootPackageName = $result->getRootPackage()?->getName();
         $numberOfExcludedPackages = count($result->getExcludedPackages());
         $hasInsecureOutdatedPackages = $result->hasInsecureOutdatedPackages();
         $textParts = [];

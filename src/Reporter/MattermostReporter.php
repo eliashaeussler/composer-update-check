@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
-use Composer\Composer;
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 use GuzzleHttp\Client;
@@ -46,7 +45,6 @@ final class MattermostReporter implements Reporter
 
     public function __construct(
         private readonly Client $client,
-        private readonly Composer $composer,
         private readonly IO\IOInterface $io,
     ) {
         $this->resolver = $this->createOptionsResolver();
@@ -56,14 +54,8 @@ final class MattermostReporter implements Reporter
     {
         ['url' => $url, 'channel' => $channel, 'username' => $username] = $this->resolver->resolve($options);
 
-        // Resolve root package name from composer.json
-        $rootPackageName = $this->composer->getPackage()->getName();
-        if ('__root__' === $rootPackageName) {
-            $rootPackageName = null;
-        }
-
         // Create report
-        $report = Entity\Report\MattermostReport::create($channel, $username, $result, $rootPackageName);
+        $report = Entity\Report\MattermostReport::create($channel, $username, $result);
 
         // Send report
         try {

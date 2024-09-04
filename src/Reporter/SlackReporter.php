@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
-use Composer\Composer;
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 use GuzzleHttp\Client;
@@ -46,7 +45,6 @@ final class SlackReporter implements Reporter
 
     public function __construct(
         private readonly Client $client,
-        private readonly Composer $composer,
         private readonly IO\IOInterface $io,
     ) {
         $this->resolver = $this->createOptionsResolver();
@@ -56,14 +54,8 @@ final class SlackReporter implements Reporter
     {
         ['url' => $url] = $this->resolver->resolve($options);
 
-        // Resolve root package name from composer.json
-        $rootPackageName = $this->composer->getPackage()->getName();
-        if ('__root__' === $rootPackageName) {
-            $rootPackageName = null;
-        }
-
         // Create report
-        $report = Entity\Report\SlackReport::create($result, $rootPackageName);
+        $report = Entity\Report\SlackReport::create($result);
 
         // Send report
         try {
@@ -107,7 +99,7 @@ final class SlackReporter implements Reporter
             ->allowedTypes('string')
             ->required()
             ->normalize(
-                static fn (OptionsResolver\OptionsResolver $optionsResolver, string $url) => new Psr7\Uri($url),
+                static fn (OptionsResolver\OptionsResolver $resolver, string $url) => new Psr7\Uri($url),
             )
         ;
 

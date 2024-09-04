@@ -47,10 +47,9 @@ final class SlackReport implements JsonSerializable
         public readonly array $blocks,
     ) {}
 
-    public static function create(
-        Entity\Result\UpdateCheckResult $result,
-        string $rootPackageName = null,
-    ): self {
+    public static function create(Entity\Result\UpdateCheckResult $result): self
+    {
+        $rootPackageName = $result->getRootPackage()?->getName();
         $remainingBlocks = self::MAX_BLOCKS;
         $remainingPackages = count($result->getOutdatedPackages());
 
