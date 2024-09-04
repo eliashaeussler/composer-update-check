@@ -149,7 +149,7 @@ final class Installer
                 /** @var non-empty-string $name */
                 $name = $initial->getName();
 
-                if ($this->isSuitablePackage($initial)) {
+                if ($this->isSuitableUpdate($initial, $target)) {
                     $this->outdatedPackages[$name] = new Entity\Package\OutdatedPackage(
                         $name,
                         new Entity\Version($initial->getPrettyVersion()),
@@ -160,15 +160,21 @@ final class Installer
                 return $promise;
             }
 
-            private function isSuitablePackage(Package\PackageInterface $package): bool
-            {
-                $name = $package->getName();
+            private function isSuitableUpdate(
+                Package\PackageInterface $initial,
+                Package\PackageInterface $target,
+            ): bool {
+                $name = $initial->getName();
 
                 if (!in_array($name, $this->allowedPackageNames, true)) {
                     return false;
                 }
 
-                return !array_key_exists($name, $this->outdatedPackages);
+                if (array_key_exists($name, $this->outdatedPackages)) {
+                    return false;
+                }
+
+                return $initial->getPrettyVersion() !== $target->getPrettyVersion();
             }
         };
     }
