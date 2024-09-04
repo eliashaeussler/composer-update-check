@@ -79,7 +79,7 @@ final class OutdatedPackage implements Package
 
     public function getHighestSeverityLevel(): ?Entity\Security\SeverityLevel
     {
-        if ([] === $this->securityAdvisories) {
+        if (!$this->isInsecure()) {
             return null;
         }
 
@@ -101,6 +101,9 @@ final class OutdatedPackage implements Package
         return $this;
     }
 
+    /**
+     * @phpstan-assert-if-true !null $this->getHighestSeverityLevel()
+     */
     public function isInsecure(): bool
     {
         return [] !== $this->securityAdvisories;
