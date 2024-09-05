@@ -64,6 +64,11 @@ final class UpdateCheckResult
         return $this->outdatedPackages;
     }
 
+    public function hasOutdatedPackages(): bool
+    {
+        return [] !== $this->outdatedPackages;
+    }
+
     /**
      * @return list<Entity\Package\Package>
      */

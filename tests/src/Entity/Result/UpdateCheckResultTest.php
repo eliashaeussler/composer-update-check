@@ -76,6 +76,28 @@ final class UpdateCheckResultTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
+    public function hasOutdatedPackagesReturnsTrueIfAnyPackagesAreOutdated(): void
+    {
+        $subject = new Src\Entity\Result\UpdateCheckResult([
+            new Src\Entity\Package\OutdatedPackage(
+                'foo/baz',
+                new Src\Entity\Version('1.5.0'),
+                new Src\Entity\Version('1.7.2'),
+            ),
+        ]);
+
+        self::assertTrue($subject->hasOutdatedPackages());
+    }
+
+    #[Framework\Attributes\Test]
+    public function hasOutdatedPackagesReturnsFalseIfNoPackagesAreOutdated(): void
+    {
+        $subject = new Src\Entity\Result\UpdateCheckResult([]);
+
+        self::assertFalse($subject->hasOutdatedPackages());
+    }
+
+    #[Framework\Attributes\Test]
     public function getSecurityAdvisoriesReturnsAllSecurityAdvisoriesOfOutdatedPackages(): void
     {
         $bazAdvisory = new Src\Entity\Security\SecurityAdvisory(
