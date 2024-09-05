@@ -52,6 +52,14 @@ final class TeamsReporter implements Reporter
 
     public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
     {
+        // Early return if no packages are outdated
+        if (!$result->hasOutdatedPackages()) {
+            $this->io->writeError('🚫 Skipped Teams report', true, IO\IOInterface::VERBOSE);
+
+            return true;
+        }
+
+        // Resolve configuration options
         ['url' => $url] = $this->resolver->resolve($options);
 
         // Create report
