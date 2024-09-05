@@ -141,7 +141,7 @@ final class UpdateCheckerTest extends Framework\TestCase
 
         self::assertStringContainsString('📦 Resolving packages...', $output);
         self::assertStringContainsString('🚫 Skipped dev-requirements', $output);
-        self::assertStringContainsString('🚫 Skipped "symfony/http-kernel"', $output);
+        self::assertStringContainsString('🚫 Skipped symfony/http-kernel', $output);
     }
 
     #[Framework\Attributes\Test]
@@ -181,7 +181,7 @@ final class UpdateCheckerTest extends Framework\TestCase
         $output = $this->io->getOutput();
 
         self::assertStringContainsString('📦 Resolving packages...', $output);
-        self::assertStringContainsString('🚫 Skipped "symfony/http-kernel"', $output);
+        self::assertStringContainsString('🚫 Skipped symfony/http-kernel', $output);
     }
 
     #[Framework\Attributes\Test]
