@@ -98,7 +98,7 @@ final class UpdateCheckCommandTest extends Framework\TestCase
             ],
         );
 
-        self::assertStringContainsString('🚫 Skipped "symfony/http-kernel"', $this->io->getOutput());
+        self::assertStringContainsString('🚫 Skipped symfony/http-kernel', $this->io->getOutput());
     }
 
     #[Framework\Attributes\Test]

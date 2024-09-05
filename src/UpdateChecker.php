@@ -149,8 +149,9 @@ final class UpdateChecker
      */
     private function resolvePackagesForUpdateCheck(Configuration\ComposerUpdateCheckConfig $config): array
     {
-        $this->io->writeError('📦 Resolving packages...', true, IO\IOInterface::VERBOSE);
+        $this->io->writeError('📦 Resolving packages... ', false, IO\IOInterface::VERBOSE);
 
+        $outputWasWritten = false;
         $rootPackage = $this->composer->getPackage();
         /** @var array<non-empty-string> $requiredPackages */
         $requiredPackages = array_keys($rootPackage->getRequires());
@@ -164,14 +165,22 @@ final class UpdateChecker
         } else {
             $excludedPackages = $requiredDevPackages;
 
-            $this->io->writeError('🚫 Skipped dev-requirements', true, IO\IOInterface::VERBOSE);
+            $this->io->writeError(['', '🚫 Skipped dev-requirements'], true, IO\IOInterface::VERBOSE);
+
+            if ($this->io->isVerbose()) {
+                $outputWasWritten = true;
+            }
         }
 
         // Remove packages by exclude patterns
         $excludedPackages = array_merge(
             $excludedPackages,
-            $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns()),
+            $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns(), $outputWasWritten),
         );
+
+        if (!$outputWasWritten) {
+            $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
+        }
 
         return [
             $this->mapPackageNamesToPackage($requiredPackages),
@@ -185,23 +194,37 @@ final class UpdateChecker
      *
      * @return array<non-empty-string>
      */
-    private function removeByExcludePatterns(array &$packages, array $excludePatterns): array
-    {
+    private function removeByExcludePatterns(
+        array &$packages,
+        array $excludePatterns,
+        bool &$outputWasWritten = false,
+    ): array {
         $excludedPackages = [];
 
-        $packages = array_filter($packages, function (string $package) use (&$excludedPackages, $excludePatterns) {
-            foreach ($excludePatterns as $excludePattern) {
-                if ($excludePattern->matches($package)) {
-                    $excludedPackages[] = $package;
+        $packages = array_filter(
+            $packages,
+            function (string $package) use (&$excludedPackages, $excludePatterns, &$outputWasWritten) {
+                foreach ($excludePatterns as $excludePattern) {
+                    if ($excludePattern->matches($package)) {
+                        $excludedPackages[] = $package;
 
-                    $this->io->writeError(sprintf('🚫 Skipped "%s"', $package), true, IO\IOInterface::VERBOSE);
+                        if ($this->io->isVerbose()) {
+                            if (!$outputWasWritten) {
+                                $this->io->writeError('', true, IO\IOInterface::VERBOSE);
+                            }
 
-                    return false;
+                            $outputWasWritten = true;
+                        }
+
+                        $this->io->writeError(sprintf('🚫 Skipped <info>%s</info>', $package), true, IO\IOInterface::VERBOSE);
+
+                        return false;
+                    }
                 }
-            }
 
-            return true;
-        });
+                return true;
+            },
+        );
 
         return $excludedPackages;
     }
