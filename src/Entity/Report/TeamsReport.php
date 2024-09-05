@@ -122,15 +122,14 @@ final class TeamsReport implements JsonSerializable
                 $highestSeverityLevel = Entity\Security\SeverityLevel::getHighestSeverityLevel(...$highestSeverityLevels);
                 $contents[] = Dto\TeamsContent::textBlock(
                     text: sprintf(
-                        '%s marked as **insecure** with a %sseverity of **%s**.',
+                        '%s marked as **insecure** with a highest severity of **%s**.',
                         $numberOfInsecurePackages === $numberOfOutdatedPackages
                             ? ($numberOfInsecurePackages > 1 ? 'They are' : 'It is')
                             : sprintf(
                                 '%d of them %s',
                                 $numberOfInsecurePackages,
-                                $numberOfInsecurePackages > 1 ? 'is' : 'are',
+                                $numberOfInsecurePackages > 1 ? 'are' : 'is',
                             ),
-                        $numberOfInsecurePackages > 1 ? 'highest' : '',
                         $highestSeverityLevel->value,
                     ),
                     wrap: true,
@@ -152,6 +151,7 @@ final class TeamsReport implements JsonSerializable
 
     private static function createTableWithOutdatedPackages(Entity\Result\UpdateCheckResult $result): Dto\TeamsContent
     {
+        $hasInsecureOutdatedPackages = $result->hasInsecureOutdatedPackages();
         $rowCells = [];
         $rowHeaders = [
             'Package',
@@ -159,7 +159,7 @@ final class TeamsReport implements JsonSerializable
             'New version',
         ];
 
-        if ($result->hasInsecureOutdatedPackages()) {
+        if ($hasInsecureOutdatedPackages) {
             $rowHeaders[] = 'Security advisory';
         }
 
@@ -226,6 +226,12 @@ final class TeamsReport implements JsonSerializable
                             ),
                             wrap: true,
                         ),
+                    ],
+                );
+            } elseif ($hasInsecureOutdatedPackages) {
+                $cells[] = new Dto\TeamsTableCell(
+                    [
+                        Dto\TeamsContent::textBlock(''),
                     ],
                 );
             }
@@ -320,15 +326,14 @@ final class TeamsReport implements JsonSerializable
         if ([] !== $highestSeverityLevels) {
             $highestSeverityLevel = Entity\Security\SeverityLevel::getHighestSeverityLevel(...$highestSeverityLevels);
             $addition = sprintf(
-                ' %s marked as insecure with a %sseverity of "%s".',
+                ' %s marked as insecure with a highest severity of "%s".',
                 $numberOfInsecurePackages === $numberOfOutdatedPackages
                     ? ($numberOfInsecurePackages > 1 ? 'They are' : 'It is')
                     : sprintf(
                         '%d of them %s',
                         $numberOfInsecurePackages,
-                        $numberOfInsecurePackages > 1 ? 'is' : 'are',
+                        $numberOfInsecurePackages > 1 ? 'are' : 'is',
                     ),
-                $numberOfInsecurePackages > 1 ? 'highest' : '',
                 $highestSeverityLevel->value,
             );
         }
