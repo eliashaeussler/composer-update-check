@@ -23,10 +23,9 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
-use Composer\Autoload;
 use Composer\Composer;
 use Composer\DependencyResolver;
-use Composer\EventDispatcher;
+use Composer\Factory;
 use Composer\Installer as ComposerInstaller;
 use Composer\IO;
 use Composer\Package;
@@ -196,15 +195,9 @@ final class Installer
 
     private function buildComposer(IO\IOInterface $io): Composer
     {
-        $composer = clone $this->composer;
-
-        $eventDispatcher = new EventDispatcher\EventDispatcher($composer, $io);
-        $eventDispatcher->setRunScripts(false);
-        $composer->setEventDispatcher($eventDispatcher);
-
-        $autoloadGenerator = new Autoload\AutoloadGenerator($composer->getEventDispatcher(), $io);
-        $autoloadGenerator->setRunScripts(false);
-        $composer->setAutoloadGenerator($autoloadGenerator);
+        $composer = Factory::create($io, $this->composer->getConfig()->getConfigSource()->getName(), true);
+        $composer->getEventDispatcher()->setRunScripts(false);
+        $composer->getAutoloadGenerator()->setRunScripts(false);
 
         return $composer;
     }
