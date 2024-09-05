@@ -26,8 +26,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
 use JsonSerializable;
 
-use function array_fill;
-use function count;
 use function sprintf;
 
 /**
@@ -122,7 +120,7 @@ final class TeamsReport implements JsonSerializable
                 $highestSeverityLevel = Entity\Security\SeverityLevel::getHighestSeverityLevel(...$highestSeverityLevels);
                 $contents[] = Dto\TeamsContent::textBlock(
                     text: sprintf(
-                        '%s marked as **insecure** with a highest severity of **%s**.',
+                        '%s marked as **insecure** with a highest severity of **%s %s**.',
                         $numberOfInsecurePackages === $numberOfOutdatedPackages
                             ? ($numberOfInsecurePackages > 1 ? 'They are' : 'It is')
                             : sprintf(
@@ -130,6 +128,7 @@ final class TeamsReport implements JsonSerializable
                                 $numberOfInsecurePackages,
                                 $numberOfInsecurePackages > 1 ? 'are' : 'is',
                             ),
+                        self::getEmojiForSeverityLevel($highestSeverityLevel),
                         $highestSeverityLevel->value,
                     ),
                     wrap: true,
@@ -152,18 +151,20 @@ final class TeamsReport implements JsonSerializable
     private static function createTableWithOutdatedPackages(Entity\Result\UpdateCheckResult $result): Dto\TeamsContent
     {
         $hasInsecureOutdatedPackages = $result->hasInsecureOutdatedPackages();
+        $columns = [];
         $rowCells = [];
         $rowHeaders = [
-            'Package',
-            'Current version',
-            'New version',
+            'Package' => 2,
+            'Current version' => 1,
+            'New version' => 1,
         ];
 
         if ($hasInsecureOutdatedPackages) {
-            $rowHeaders[] = 'Security advisory';
+            $rowHeaders['Security advisory'] = 1;
         }
 
-        foreach ($rowHeaders as $rowHeader) {
+        foreach ($rowHeaders as $rowHeader => $columnWidth) {
+            $columns[] = new Dto\TeamsTableColumn($columnWidth);
             $rowCells[] = new Dto\TeamsTableCell(
                 [
                     Dto\TeamsContent::textBlock(
@@ -174,7 +175,6 @@ final class TeamsReport implements JsonSerializable
             );
         }
 
-        $columns = array_fill(0, count($rowHeaders), new Dto\TeamsTableColumn(1));
         $rows = [
             new Dto\TeamsTableRow(
                 cells: $rowCells,
