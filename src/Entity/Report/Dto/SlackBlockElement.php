@@ -38,11 +38,17 @@ final class SlackBlockElement implements JsonSerializable
         public readonly string $text,
     ) {}
 
+    /**
+     * @see https://api.slack.com/reference/block-kit/composition-objects#text
+     */
     public static function markdown(string $text): self
     {
         return new self('mrkdwn', $text);
     }
 
+    /**
+     * @see https://api.slack.com/reference/block-kit/composition-objects#text
+     */
     public static function plainText(string $text): self
     {
         return new self('plain_text', $text);

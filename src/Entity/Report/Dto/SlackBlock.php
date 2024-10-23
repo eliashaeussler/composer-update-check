@@ -46,12 +46,17 @@ final class SlackBlock implements JsonSerializable
 
     /**
      * @param list<SlackBlockElement> $elements
+     *
+     * @see https://api.slack.com/reference/block-kit/blocks#context
      */
     public static function context(array $elements): self
     {
         return new self('context', elements: $elements);
     }
 
+    /**
+     * @see https://api.slack.com/reference/block-kit/blocks#header
+     */
     public static function header(SlackBlockElement $text): self
     {
         return new self('header', $text);
@@ -59,6 +64,8 @@ final class SlackBlock implements JsonSerializable
 
     /**
      * @param list<SlackBlockElement>|null $fields
+     *
+     * @see https://api.slack.com/reference/block-kit/blocks#section
      */
     public static function section(
         SlackBlockElement $text = null,

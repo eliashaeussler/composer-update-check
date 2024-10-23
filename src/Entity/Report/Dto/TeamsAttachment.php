@@ -44,6 +44,8 @@ final class TeamsAttachment implements JsonSerializable
     /**
      * @param list<TeamsContent> $body
      * @param list<TeamsAction>  $actions
+     *
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/AdaptiveCard.json
      */
     public static function adaptiveCard(array $body, string $fallbackText, array $actions = []): self
     {

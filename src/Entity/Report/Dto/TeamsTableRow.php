@@ -32,6 +32,8 @@ use function array_filter;
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/TableRow.json
  */
 final class TeamsTableRow implements JsonSerializable
 {

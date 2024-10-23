@@ -30,6 +30,8 @@ use JsonSerializable;
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
+ *
+ * @see https://developers.mattermost.com/integrate/reference/message-attachments/
  */
 final class MattermostAttachment implements JsonSerializable
 {

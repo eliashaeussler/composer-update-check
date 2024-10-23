@@ -61,6 +61,8 @@ final class TeamsContent implements JsonSerializable
 
     /**
      * @param list<self> $items
+     *
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/Container.json
      */
     public static function container(
         array $items,
@@ -79,6 +81,8 @@ final class TeamsContent implements JsonSerializable
 
     /**
      * @param list<TeamsFact> $facts
+     *
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/FactSet.json
      */
     public static function factSet(array $facts, Entity\Report\Enum\TeamsSpacing $spacing = null): self
     {
@@ -92,6 +96,8 @@ final class TeamsContent implements JsonSerializable
     /**
      * @param list<TeamsTableColumn> $columns
      * @param list<TeamsTableRow>    $rows
+     *
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/Table.json
      */
     public static function table(
         array $columns,
@@ -108,6 +114,9 @@ final class TeamsContent implements JsonSerializable
         );
     }
 
+    /**
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/TextBlock.json
+     */
     public static function textBlock(
         string $text,
         bool $wrap = false,
