@@ -47,6 +47,8 @@ final class TeamsAction implements JsonSerializable
 
     /**
      * @param list<string> $targetElements
+     *
+     * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/actions/Action.ToggleVisibility.json
      */
     public static function toggleVisibility(string $id, string $title, array $targetElements): self
     {
