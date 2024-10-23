@@ -99,8 +99,8 @@ final class TeamsReport implements JsonSerializable
                     1 !== $numberOfOutdatedPackages ? 'are' : 'is',
                 ),
                 wrap: true,
-                size: 'Large',
-                weight: 'Bolder',
+                size: Enum\TeamsFontSize::Large,
+                weight: Enum\TeamsFontWeight::Bolder,
             ),
         ];
 
@@ -132,7 +132,7 @@ final class TeamsReport implements JsonSerializable
                         $highestSeverityLevel->value,
                     ),
                     wrap: true,
-                    spacing: 'None',
+                    spacing: Enum\TeamsSpacing::None,
                 );
             }
         }
@@ -208,7 +208,7 @@ final class TeamsReport implements JsonSerializable
                         Dto\TeamsContent::textBlock(
                             text: $outdatedPackage->getNewVersion()->toString(),
                             wrap: true,
-                            weight: 'Bolder',
+                            weight: Enum\TeamsFontWeight::Bolder,
                         ),
                     ],
                 ),
@@ -253,8 +253,8 @@ final class TeamsReport implements JsonSerializable
             Dto\TeamsContent::textBlock(
                 text: 'Security advisories',
                 wrap: true,
-                size: 'Large',
-                weight: 'Bolder',
+                size: Enum\TeamsFontSize::Large,
+                weight: Enum\TeamsFontWeight::Bolder,
             ),
         ];
 
@@ -277,11 +277,11 @@ final class TeamsReport implements JsonSerializable
                             $securityAdvisory->getSanitizedTitle(),
                         ),
                         wrap: true,
-                        weight: 'Bolder',
+                        weight: Enum\TeamsFontWeight::Bolder,
                     ),
                     Dto\TeamsContent::factSet(
                         facts: $facts,
-                        spacing: 'Small',
+                        spacing: Enum\TeamsSpacing::Small,
                     ),
                 ];
 
@@ -289,7 +289,6 @@ final class TeamsReport implements JsonSerializable
                     $containerItems[] = Dto\TeamsContent::textBlock(
                         text: sprintf('[Read more](%s)', $securityAdvisory->getLink()),
                         wrap: true,
-                        weight: 'Small',
                     );
                 }
 
@@ -301,7 +300,7 @@ final class TeamsReport implements JsonSerializable
             items: $items,
             isVisible: false,
             id: self::SECURITY_ADVISORIES_CONTAINER_ID,
-            spacing: 'Medium',
+            spacing: Enum\TeamsSpacing::Medium,
         );
     }
 
