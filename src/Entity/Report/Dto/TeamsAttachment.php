@@ -47,8 +47,12 @@ final class TeamsAttachment implements JsonSerializable
      *
      * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/AdaptiveCard.json
      */
-    public static function adaptiveCard(array $body, string $fallbackText, array $actions = []): self
-    {
+    public static function adaptiveCard(
+        array $body,
+        string $fallbackText,
+        array $actions = [],
+        string $additionalData = '',
+    ): self {
         return new self(
             'application/vnd.microsoft.card.adaptive',
             [
@@ -60,6 +64,7 @@ final class TeamsAttachment implements JsonSerializable
                 ],
                 'fallbackText' => $fallbackText,
                 'actions' => $actions,
+                '$data' => $additionalData,
             ],
         );
     }
