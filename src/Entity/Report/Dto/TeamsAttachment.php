@@ -51,7 +51,7 @@ final class TeamsAttachment implements JsonSerializable
             'application/vnd.microsoft.card.adaptive',
             [
                 'type' => 'AdaptiveCard',
-                'version' => '1.2',
+                'version' => '1.5',
                 'body' => $body,
                 'msteams' => [
                     'width' => 'Full',
