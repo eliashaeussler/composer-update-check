@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Entity\Report\Dto;
 
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 use JsonSerializable;
 
 use function array_filter;
@@ -51,10 +52,10 @@ final class TeamsContent implements JsonSerializable
         public readonly ?bool $isVisible = null,
         public readonly ?array $items = null,
         public readonly ?array $rows = null,
-        public readonly ?string $size = null,
-        public readonly ?string $spacing = null,
+        public readonly ?Entity\Report\Enum\TeamsFontSize $size = null,
+        public readonly ?Entity\Report\Enum\TeamsSpacing $spacing = null,
         public readonly ?string $text = null,
-        public readonly ?string $weight = null,
+        public readonly ?Entity\Report\Enum\TeamsFontWeight $weight = null,
         public readonly ?bool $wrap = null,
     ) {}
 
@@ -65,7 +66,7 @@ final class TeamsContent implements JsonSerializable
         array $items,
         bool $isVisible = true,
         string $id = null,
-        string $spacing = null,
+        Entity\Report\Enum\TeamsSpacing $spacing = null,
     ): self {
         return new self(
             type: 'Container',
@@ -79,7 +80,7 @@ final class TeamsContent implements JsonSerializable
     /**
      * @param list<TeamsFact> $facts
      */
-    public static function factSet(array $facts, string $spacing = null): self
+    public static function factSet(array $facts, Entity\Report\Enum\TeamsSpacing $spacing = null): self
     {
         return new self(
             type: 'FactSet',
@@ -110,9 +111,9 @@ final class TeamsContent implements JsonSerializable
     public static function textBlock(
         string $text,
         bool $wrap = false,
-        string $size = null,
-        string $spacing = null,
-        string $weight = null,
+        Entity\Report\Enum\TeamsFontSize $size = null,
+        Entity\Report\Enum\TeamsSpacing $spacing = null,
+        Entity\Report\Enum\TeamsFontWeight $weight = null,
     ): self {
         return new self(
             type: 'TextBlock',
@@ -154,10 +155,10 @@ final class TeamsContent implements JsonSerializable
             'isVisible' => $this->isVisible,
             'items' => $this->items,
             'rows' => $this->rows,
-            'size' => $this->size,
-            'spacing' => $this->spacing,
+            'size' => $this->size?->value,
+            'spacing' => $this->spacing?->value,
             'text' => $this->text,
-            'weight' => $this->weight,
+            'weight' => $this->weight?->value,
             'wrap' => $this->wrap,
         ];
 
