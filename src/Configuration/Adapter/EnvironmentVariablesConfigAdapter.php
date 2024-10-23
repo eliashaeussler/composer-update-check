@@ -32,7 +32,6 @@ use function getenv;
 use function preg_match;
 use function sprintf;
 use function str_starts_with;
-use function strtolower;
 use function trim;
 
 /**
@@ -125,8 +124,8 @@ final class EnvironmentVariablesConfigAdapter implements ConfigAdapter
                 continue;
             }
 
-            $reporterName = strtolower($matches['name']);
-            $reporterOption = strtolower($matches['option']);
+            $reporterName = $matches['name'];
+            $reporterOption = $matches['option'];
 
             $reporterConfig[$reporterName][$reporterOption] ??= $value;
         }
