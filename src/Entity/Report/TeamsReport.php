@@ -46,23 +46,24 @@ final class TeamsReport implements JsonSerializable
         public readonly array $attachments,
     ) {}
 
-    public static function create(Entity\Result\UpdateCheckResult $result): self
+    public static function create(Entity\Result\UpdateCheckResult $result, string $additionalData = ''): self
     {
         return new self(
             'message',
-            self::createAttachments($result),
+            self::createAttachments($result, $additionalData),
         );
     }
 
     /**
      * @return list<Dto\TeamsAttachment>
      */
-    private static function createAttachments(Entity\Result\UpdateCheckResult $result): array
+    private static function createAttachments(Entity\Result\UpdateCheckResult $result, string $additionalData = ''): array
     {
         $attachment = Dto\TeamsAttachment::adaptiveCard(
             self::createCardBody($result),
             self::createFallbackText($result),
             self::createCardActions($result),
+            $additionalData,
         );
 
         return [$attachment];

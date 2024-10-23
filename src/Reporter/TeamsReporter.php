@@ -60,10 +60,10 @@ final class TeamsReporter implements Reporter
         }
 
         // Resolve configuration options
-        ['url' => $url] = $this->resolver->resolve($options);
+        ['url' => $url, 'additionalData' => $additionalData] = $this->resolver->resolve($options);
 
         // Create report
-        $report = Entity\Report\TeamsReport::create($result);
+        $report = Entity\Report\TeamsReport::create($result, $additionalData);
 
         // Send report
         try {
@@ -109,6 +109,11 @@ final class TeamsReporter implements Reporter
             ->normalize(
                 static fn (OptionsResolver\OptionsResolver $resolver, string $url) => new Psr7\Uri($url),
             )
+        ;
+
+        $resolver->define('additionalData')
+            ->allowedTypes('string')
+            ->default('')
         ;
 
         return $resolver;
