@@ -76,7 +76,7 @@ final class InstallerTest extends Framework\TestCase
 
         $actual = $this->subject->runUpdate($packages, $this->io);
 
-        self::assertEquals(0, $actual->getExitCode());
+        self::assertSame(0, $actual->getExitCode());
         self::assertTrue($actual->isSuccessful());
         self::assertCount(count($expected), $actual->getOutdatedPackages());
 
