@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Event;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +14,17 @@ namespace EliasHaeussler\ComposerUpdateCheck\Event;
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\EventDispatcher\Event;
-use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
-use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+namespace EliasHaeussler\ComposerUpdateCheck\Event;
+
+use Composer\EventDispatcher;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 
 /**
  * PostUpdateCheckEvent.
@@ -36,54 +34,18 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
  *
  * @codeCoverageIgnore
  */
-class PostUpdateCheckEvent extends Event
+final class PostUpdateCheckEvent extends EventDispatcher\Event
 {
     public const NAME = 'post-update-check';
 
-    /**
-     * @var UpdateCheckResult
-     */
-    private $updateCheckResult;
-
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
-
-    /**
-     * @var Options
-     */
-    private $options;
-
-    /**
-     * @param string[] $args
-     * @param string[] $flags
-     */
     public function __construct(
-        UpdateCheckResult $updateCheckResult,
-        OutputBehavior $behavior,
-        Options $options,
-        array $args = [],
-        array $flags = []
+        private readonly Entity\Result\UpdateCheckResult $updateCheckResult,
     ) {
-        parent::__construct(self::NAME, $args, $flags);
-        $this->updateCheckResult = $updateCheckResult;
-        $this->behavior = $behavior;
-        $this->options = $options;
+        parent::__construct(self::NAME);
     }
 
-    public function getUpdateCheckResult(): UpdateCheckResult
+    public function getUpdateCheckResult(): Entity\Result\UpdateCheckResult
     {
         return $this->updateCheckResult;
-    }
-
-    public function getBehavior(): OutputBehavior
-    {
-        return $this->behavior;
-    }
-
-    public function getOptions(): Options
-    {
-        return $this->options;
     }
 }

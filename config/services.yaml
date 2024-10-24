@@ -1,0 +1,25 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  EliasHaeussler\ComposerUpdateCheck\:
+    resource: '../src/*'
+    exclude:
+      - '../src/Configuration/*'
+      - '../src/DependencyInjection/*'
+      - '../src/Entity/*'
+      - '../src/Event/*'
+      - '../src/Exception/*'
+      - '../src/Plugin.php'
+
+  # Synthetic services (set when the container is built on runtime)
+  Composer\Composer:
+    synthetic: true
+  Composer\IO\IOInterface:
+    synthetic: true
+
+  # External services
+  GuzzleHttp\Client:
+  Spatie\Packagist\PackagistClient:
+  Spatie\Packagist\PackagistUrlGenerator:

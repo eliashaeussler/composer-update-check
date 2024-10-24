@@ -19,28 +19,36 @@
 		"rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
 	},
 	"require": {
-		"php": ">= 7.1 < 8.2",
+		"php": "~8.1.0 || ~8.2.0 || ~8.3.0",
 		"ext-json": "*",
-		"composer-plugin-api": "^1.0 || ^2.0",
-		"nyholm/psr7": "^1.0",
+		"composer-plugin-api": "^2.2",
+		"composer/semver": "^1.0 || ^2.0 || ^3.0",
+		"cuyz/valinor": "^1.7",
+		"guzzlehttp/guzzle": "^7.0",
+		"guzzlehttp/psr7": "^2.0",
 		"psr/http-client": "^1.0",
-		"psr/http-message": "^1.0",
-		"spatie/emoji": "^2.0 || ^3.0 || ^4.0",
-		"symfony/console": "^4.4.11 || ^5.0.11 || ^6.0",
-		"symfony/http-client": "^4.4.11 || ^5.0.11 || ^6.0"
+		"psr/http-message": "^1.0 || ^2.0 || ^3.0",
+		"spatie/packagist-api": "^2.1",
+		"symfony/config": "^5.4 || ^6.0 || ^7.0",
+		"symfony/console": "^5.4 || ^6.0 || ^7.0",
+		"symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
+		"symfony/filesystem": "^5.4 || ^6.0 || ^7.0",
+		"symfony/options-resolver": "^5.4 || ^6.0 || ^7.0",
+		"symfony/yaml": "^5.4 || ^6.0 || ^7.0"
 	},
 	"require-dev": {
-		"armin/editorconfig-cli": "^1.5",
-		"composer/composer": "^1.7 || ^2.0",
-		"composer/semver": "^1.0 || ^2.0 || ^3.0",
-		"ergebnis/composer-normalize": "^2.8",
-		"friendsofphp/php-cs-fixer": ">= 2.17 < 4.0",
-		"php-http/discovery": "^1.14",
-		"php-http/httplug": "^2.0",
-		"php-http/mock-client": "^1.3",
-		"phpstan/phpstan": "^1.2",
-		"phpunit/phpunit": "^7.5 || ^8.5.23 || ^9.0",
-		"symfony/filesystem": ">= 4.4 < 7.0"
+		"armin/editorconfig-cli": "^1.8 || ^2.0",
+		"composer/composer": "^2.2",
+		"eliashaeussler/php-cs-fixer-config": "^2.0",
+		"eliashaeussler/phpstan-config": "^2.4",
+		"eliashaeussler/rector-config": "^3.0",
+		"ergebnis/composer-normalize": "^2.39",
+		"php-http/discovery": "^1.19",
+		"php-http/httplug": "^2.4",
+		"php-http/mock-client": "^1.6",
+		"phpstan/extension-installer": "^1.3",
+		"phpstan/phpstan-symfony": "^1.3",
+		"phpunit/phpunit": "^10.4"
 	},
 	"autoload": {
 		"psr-4": {
@@ -49,12 +57,14 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests"
+			"EliasHaeussler\\ComposerUpdateCheck\\Tests\\": "tests/src"
 		}
 	},
 	"config": {
 		"allow-plugins": {
-			"ergebnis/composer-normalize": true
+			"ergebnis/composer-normalize": true,
+			"php-http/discovery": true,
+			"phpstan/extension-installer": true
 		},
 		"sort-packages": true
 	},
@@ -73,20 +83,37 @@
 		"docs:open": "open http://$(docker-compose -f docs/build/docker-compose.yaml port docs 8000)",
 		"docs:start": "@docs:exec up -d",
 		"docs:stop": "@docs:exec down",
+		"fix": [
+			"@fix:composer",
+			"@fix:editorconfig",
+			"@fix:php"
+		],
+		"fix:composer": [
+			"@composer normalize",
+			"@composer normalize tests/build/test-application/composer.json",
+			"@composer normalize tests/build/test-application-empty/composer.json",
+			"@composer normalize tests/build/test-application-erroneous/composer.json --no-check-lock --no-update-lock"
+		],
+		"fix:editorconfig": "@lint:editorconfig --fix",
+		"fix:php": "php-cs-fixer fix",
 		"lint": [
 			"@lint:composer",
 			"@lint:editorconfig",
 			"@lint:php"
 		],
-		"lint:composer": "@composer normalize",
-		"lint:editorconfig": "ec --fix --git-only",
-		"lint:php": "php-cs-fixer fix",
+		"lint:composer": "@fix:composer --dry-run",
+		"lint:editorconfig": "ec --git-only",
+		"lint:php": "@fix:php --dry-run",
+		"migration": [
+			"@migration:rector"
+		],
+		"migration:rector": "rector process -c rector.php",
 		"sca": [
 			"@sca:php"
 		],
-		"sca:php": "phpstan analyse -c phpstan.neon",
+		"sca:php": "phpstan analyse -c phpstan.php",
 		"simulate": "bin/simulate-application.sh",
-		"test": "phpunit -c phpunit.xml",
-		"test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.coverage.xml"
+		"test": "@test:coverage --no-coverage",
+		"test:coverage": "phpunit -c phpunit.xml"
 	}
 }

@@ -1,0 +1,11 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to function method_exists\\(\\) with Composer\\\\Installer and 'setAudit' will always evaluate to true\\.$#"
+			count: 2
+			path: src/Composer/Installer.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$constructors of method CuyZ\\\\Valinor\\\\MapperBuilder\\:\\:registerConstructor\\(\\) expects \\(pure\\-callable\\(\\)\\: mixed\\)\\|class\\-string, Closure\\(string\\)\\: EliasHaeussler\\\\ComposerUpdateCheck\\\\Configuration\\\\Options\\\\PackageExcludePattern given\\.$#"
+			count: 1
+			path: src/Configuration/Adapter/FileBasedConfigAdapter.php

@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Composer package "eliashaeussler/composer-update-check".
+ *
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+use EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
+use EliasHaeussler\PHPStanConfig;
+
+$containerFactory = new DependencyInjection\ContainerFactory([
+    __DIR__.'/tests/build/config/services.php',
+]);
+$container = $containerFactory->make(true);
+$containerXmlFile = $container->getParameter('debug.container_xml_filename');
+
+$symfonySet = PHPStanConfig\Set\SymfonySet::create()
+    ->withConsoleApplicationLoader('tests/build/phpstan/console-application.php')
+    ->withContainerXmlPath($containerXmlFile)
+;
+
+return PHPStanConfig\Config\Config::create(__DIR__)
+    ->in(
+        'src',
+        'tests/src',
+    )
+    ->withBaseline()
+    ->maxLevel()
+    ->withSets($symfonySet)
+    ->useCacheDir('.build/cache/phpstan')
+    ->toArray()
+;

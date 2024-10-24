@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck\Command;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +14,27 @@ namespace EliasHaeussler\ComposerUpdateCheck\Command;
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\Command\BaseCommand;
-use Composer\Factory;
-use Composer\IO\BufferIO;
-use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
-use EliasHaeussler\ComposerUpdateCheck\IO\Style;
-use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
-use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+namespace EliasHaeussler\ComposerUpdateCheck\Command;
+
+use Composer\Command;
+use CuyZ\Valinor;
+use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use EliasHaeussler\ComposerUpdateCheck\IO;
 use EliasHaeussler\ComposerUpdateCheck\UpdateChecker;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console;
+use Symfony\Component\DependencyInjection;
+
+use function array_map;
+use function array_unshift;
+use function sprintf;
 
 /**
  * UpdateCheckCommand.
@@ -43,149 +42,135 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UpdateCheckCommand extends BaseCommand
+#[DependencyInjection\Attribute\Autoconfigure(public: true)]
+final class UpdateCheckCommand extends Command\BaseCommand
 {
-    /**
-     * @var SymfonyStyle
-     */
-    private $symfonyStyle;
+    private Console\Style\SymfonyStyle $io;
 
-    /**
-     * @var OutputBehavior
-     */
-    private $behavior;
+    public function __construct(
+        private readonly UpdateChecker $updateChecker,
+    ) {
+        parent::__construct('update-check');
+    }
 
     protected function configure(): void
     {
-        $this->setName('update-check');
         $this->setDescription('Checks your root requirements for available updates.');
 
         $this->addOption(
-            'ignore-packages',
-            'i',
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-            'Packages to ignore when checking for available updates',
-            []
+            'config',
+            'c',
+            Console\Input\InputOption::VALUE_REQUIRED,
+            'Path to configuration file, can be in JSON, PHP oder YAML format',
+        );
+        $this->addOption(
+            'exclude-packages',
+            'e',
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
+            'Packages to exclude when checking for available updates',
         );
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_NONE,
-            'Disables update check of require-dev packages.'
+            Console\Input\InputOption::VALUE_NONE,
+            'Disables update check of require-dev packages.',
         );
         $this->addOption(
             'security-scan',
             's',
-            InputOption::VALUE_NONE,
-            'Run security scan for all outdated packages'
+            Console\Input\InputOption::VALUE_NONE,
+            'Run security scan for all outdated packages',
         );
         $this->addOption(
-            'json',
-            'j',
-            InputOption::VALUE_NONE,
-            'Format update check as JSON'
+            'format',
+            'f',
+            Console\Input\InputOption::VALUE_REQUIRED,
+            'Format to display update check results',
+        );
+        $this->addOption(
+            'reporter',
+            'r',
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
+            'Enable given reporters, may additionally contain a JSON-encoded string of reporter options, separated by colon (:)',
+        );
+        $this->addOption(
+            'disable-reporter',
+            'R',
+            Console\Input\InputOption::VALUE_REQUIRED | Console\Input\InputOption::VALUE_IS_ARRAY,
+            'Disable given reporters (even if they were enabled with the --reporter option)',
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function initialize(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): void
     {
-        $this->symfonyStyle = new SymfonyStyle($input, $output);
-
-        // Prepare command options
-        $json = $input->getOption('json');
-        $securityScan = $input->getOption('security-scan');
-
-        // Initialize IO
-        $style = new Style($json ? Style::JSON : Style::NORMAL);
-        $verbosity = new Verbosity($style->isJson() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE);
-        $this->behavior = new OutputBehavior($style, $verbosity, $this->getIO());
-        $output->setVerbosity($verbosity->getLevel());
-
-        // Run update check
-        $composer = Factory::create(new BufferIO());
-        $updateChecker = new UpdateChecker($composer, $this->behavior, Options::fromInput($input));
-        $result = $updateChecker->run();
-
-        // Decorate update check result
-        $this->decorateResult($result, $updateChecker->getPackageBlacklist(), $securityScan);
-
-        return 0;
+        $this->io = new Console\Style\SymfonyStyle($input, $output);
     }
 
-    /**
-     * @param string[] $ignoredPackages
-     */
-    private function decorateResult(UpdateCheckResult $result, array $ignoredPackages, bool $flagInsecurePackages = false): void
+    protected function execute(Console\Input\InputInterface $input, Console\Output\OutputInterface $output): int
     {
-        $outdatedPackages = $result->getOutdatedPackages();
+        try {
+            $config = $this->resolveConfiguration($input);
+        } catch (Exception\ConfigFileIsInvalid $exception) {
+            $this->displayConfigError($exception);
 
-        // Print message if no packages are outdated
-        if ([] === $outdatedPackages) {
-            $countSkipped = count($ignoredPackages);
-            $message = sprintf(
-                'All packages are up to date%s.',
-                $countSkipped > 0 ? sprintf(' (skipped %d package%s)', $countSkipped, 1 !== $countSkipped ? 's' : '') : ''
-            );
-            if ($this->behavior->style->isJson()) {
-                $this->buildJsonReport(['status' => $message], $ignoredPackages);
-            } else {
-                $this->symfonyStyle->success($message);
-            }
+            return self::FAILURE;
+        } catch (Exception\ConfigFileHasErrors $exception) {
+            $this->displayMappingErrors($exception);
 
-            return;
+            return self::FAILURE;
         }
 
-        // Print header
-        $statusLabel = 1 === count($outdatedPackages)
-            ? '1 package is outdated.'
-            : sprintf('%d packages are outdated.', count($outdatedPackages));
-        if (!$this->behavior->style->isJson()) {
-            $this->symfonyStyle->warning($statusLabel);
+        $formatter = (new IO\Formatter\FormatterFactory($this->io))->make($config->getFormat());
+        $result = $this->updateChecker->run($config);
+        $formatter->formatResult($result);
+
+        return self::SUCCESS;
+    }
+
+    private function resolveConfiguration(Console\Input\InputInterface $input): Configuration\ComposerUpdateCheckConfig
+    {
+        $filename = $input->getOption('config');
+        $adapters = [
+            new Configuration\Adapter\CommandInputConfigAdapter($input),
+            new Configuration\Adapter\EnvironmentVariablesConfigAdapter(),
+        ];
+
+        if (null !== $filename && '' !== $filename) {
+            $configAdapterFactory = new Configuration\Adapter\ConfigAdapterFactory();
+
+            array_unshift($adapters, $configAdapterFactory->make($filename));
         }
 
-        // Parse table rows
-        $tableRows = [];
-        foreach ($outdatedPackages as $outdatedPackage) {
-            $report = [
-                $outdatedPackage->getName(),
-                $outdatedPackage->getOutdatedVersion(),
-                $outdatedPackage->getNewVersion(),
-            ];
-            if ($flagInsecurePackages) {
-                if (!$this->behavior->style->isJson() && $outdatedPackage->isInsecure()) {
-                    $report[1] .= ' <fg=red;options=bold>insecure</>';
-                } elseif ($this->behavior->style->isJson()) {
-                    $report[] = $outdatedPackage->isInsecure();
-                }
-            }
-            $tableRows[] = $report;
-        }
+        $configAdapter = new Configuration\Adapter\ChainedConfigAdapter($adapters);
 
-        // Print table
-        $tableHeader = ['Package', 'Outdated version', 'New version'];
-        if (!$this->behavior->style->isJson()) {
-            $this->symfonyStyle->table($tableHeader, $tableRows);
-        } else {
-            $result = [];
-            if ($flagInsecurePackages) {
-                $tableHeader[] = 'Insecure';
-            }
-            foreach ($tableRows as $tableRow) {
-                $result[] = array_combine($tableHeader, $tableRow);
-            }
-            $this->buildJsonReport(['status' => $statusLabel, 'result' => $result], $ignoredPackages);
+        return $configAdapter->resolve();
+    }
+
+    private function displayConfigError(Exception\ConfigFileIsInvalid $exception): void
+    {
+        $this->io->error($exception->getMessage());
+
+        if (null !== $exception->getPrevious()) {
+            $this->io->writeln([
+                'The following error occurred:',
+                ' * '.$exception->getPrevious()->getMessage(),
+            ]);
         }
     }
 
-    /**
-     * @param array{status: string, result?: array<int, array<string, mixed>>} $report
-     * @param string[]                                                         $ignoredPackages
-     */
-    private function buildJsonReport(array $report, array $ignoredPackages = []): void
+    private function displayMappingErrors(Exception\ConfigFileHasErrors $exception): void
     {
-        if ([] !== $ignoredPackages) {
-            $report['skipped'] = $ignoredPackages;
-        }
-        $this->symfonyStyle->writeln(json_encode($report));
+        $errors = Valinor\Mapper\Tree\Message\Messages::flattenFromNode($exception->error->node())->errors();
+
+        $this->io->error($exception->getMessage());
+        $this->io->writeln('The following errors occurred:');
+        $this->io->listing(
+            array_map($this->formatErrorMessage(...), $errors->toArray()),
+        );
+    }
+
+    private function formatErrorMessage(Valinor\Mapper\Tree\Message\NodeMessage $message): string
+    {
+        return sprintf('<comment>%s</comment>: %s', $message->node()->path(), $message->toString());
     }
 }

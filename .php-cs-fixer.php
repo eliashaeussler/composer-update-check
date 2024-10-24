@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,20 +14,27 @@ declare(strict_types=1);
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$finder = \PhpCsFixer\Finder::create()
-    ->in([__DIR__.'/src', __DIR__.'/tests']);
+use EliasHaeussler\PhpCsFixerConfig;
+use Symfony\Component\Finder;
 
-$config = new \PhpCsFixer\Config();
+$header = PhpCsFixerConfig\Rules\Header::create(
+    'eliashaeussler/composer-update-check',
+    PhpCsFixerConfig\Package\Type::ComposerPackage,
+    PhpCsFixerConfig\Package\Author::create('Elias Häußler', 'elias@haeussler.dev'),
+    PhpCsFixerConfig\Package\CopyrightRange::from(2020),
+    PhpCsFixerConfig\Package\License::GPL3OrLater,
+);
 
-return $config->setRules([
-        '@PSR2' => true,
-        '@Symfony' => true,
-    ])
-    ->setFinder($finder);
+return PhpCsFixerConfig\Config::create()
+    ->withRule($header)
+    ->withFinder(
+        static fn (Finder\Finder $finder) => $finder->in(__DIR__),
+    )
+;

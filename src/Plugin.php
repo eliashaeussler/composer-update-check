@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateCheck;
-
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-check".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2020-2024 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +14,19 @@ namespace EliasHaeussler\ComposerUpdateCheck;
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace EliasHaeussler\ComposerUpdateCheck;
+
 use Composer\Composer;
-use Composer\IO\IOInterface;
-use Composer\Plugin\Capability\CommandProvider;
-use Composer\Plugin\Capable;
-use Composer\Plugin\PluginInterface;
-use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
+use Composer\IO;
+use Composer\Plugin as ComposerPlugin;
+use Symfony\Component\DependencyInjection as SymfonyDI;
 
 /**
  * Plugin.
@@ -38,19 +36,27 @@ use EliasHaeussler\ComposerUpdateCheck\Capability\UpdateCheckCommandProvider;
  *
  * @codeCoverageIgnore
  */
-class Plugin implements PluginInterface, Capable
+final class Plugin implements ComposerPlugin\PluginInterface, ComposerPlugin\Capable, ComposerPlugin\Capability\CommandProvider
 {
-    public function activate(Composer $composer, IOInterface $io): void
+    private static SymfonyDI\ContainerInterface $container;
+
+    public function __construct()
     {
-        $this->autoloadFunctions($composer);
+        self::$container ??= (new DependencyInjection\ContainerFactory())->make();
     }
 
-    public function deactivate(Composer $composer, IOInterface $io): void
+    public function activate(Composer $composer, IO\IOInterface $io): void
+    {
+        self::$container->set(Composer::class, $composer);
+        self::$container->set(IO\IOInterface::class, $io);
+    }
+
+    public function deactivate(Composer $composer, IO\IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
 
-    public function uninstall(Composer $composer, IOInterface $io): void
+    public function uninstall(Composer $composer, IO\IOInterface $io): void
     {
         // Nothing to do here. Just go ahead :)
     }
@@ -58,27 +64,14 @@ class Plugin implements PluginInterface, Capable
     public function getCapabilities(): array
     {
         return [
-            CommandProvider::class => UpdateCheckCommandProvider::class,
+            ComposerPlugin\Capability\CommandProvider::class => self::class,
         ];
     }
 
-    /**
-     * Workaround to ensure required functions from dependencies are auto-loaded.
-     *
-     * @see https://github.com/composer/composer/issues/4764#issuecomment-379619265
-     */
-    protected function autoloadFunctions(Composer $composer): void
+    public function getCommands(): array
     {
-        $vendor = $composer->getConfig()->get('vendor-dir');
-
-        $this->loadFailsafe($vendor.'/symfony/polyfill-php73/bootstrap.php');
-        $this->loadFailsafe($vendor.'/symfony/polyfill-php80/bootstrap.php');
-    }
-
-    protected function loadFailsafe(string $vendorFile): void
-    {
-        if (file_exists($vendorFile)) {
-            require_once $vendorFile;
-        }
+        return [
+            self::$container->get(Command\UpdateCheckCommand::class),
+        ];
     }
 }

@@ -3,23 +3,37 @@ on:
   push:
     branches:
       - main
+      - 'renovate/**'
+      # @todo Remove once 2.x branch is merged
+      - 2.x
   pull_request:
     branches:
-      - '**'
+      - main
+      # @todo Remove once 2.x branch is merged
+      - 2.x
 
 jobs:
-  # Job: Run unit tests
   tests:
     name: Tests (PHP ${{ matrix.php-version }}, Composer ${{ matrix.composer-version }} & ${{ matrix.dependencies }} dependencies)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0", "8.1"]
-        composer-version: ["1", "2"]
+        php-version: ["8.1", "8.2", "8.3"]
+        composer-version: ["2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8"]
         dependencies: ["highest", "lowest"]
+        # Avoid incompatible interface implementations in Composer v2.6 & symfony/console v7
+        include:
+          - php-version: "8.2"
+            composer-version: "2.6"
+            dependencies: "highest"
+            composer-extra-options: '--with="symfony/console:^6.0"'
+          - php-version: "8.3"
+            composer-version: "2.6"
+            dependencies: "highest"
+            composer-extra-options: '--with="symfony/console:^6.0"'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -28,34 +42,25 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer:v2
+          tools: composer:${{ matrix.composer-version }}
           coverage: none
 
       # Install dependencies
-      - name: Simulate Composer version
-        run: |
-          composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
-          composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
       - name: Install Composer dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
         with:
           dependency-versions: ${{ matrix.dependencies }}
-          composer-options: --with="composer/composer:^${{ matrix.composer-version }}"
-      - name: Update Composer version
-        run: composer self-update --${{ matrix.composer-version }}
+          composer-options: '--with="composer/composer:~${{ matrix.composer-version }}.0" ${{ matrix.composer-extra-options }}'
 
       # Run tests
-      - name: Build coverage directory
-        run: mkdir -p .build/coverage
       - name: Run tests
         run: composer test
 
-  # Job: Collect and report test coverage
   coverage:
     name: Test coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -63,72 +68,57 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           tools: composer:v2
           coverage: pcov
 
       # Install dependencies
       - name: Install Composer dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
 
       # Run tests
-      - name: Build coverage directory
-        run: mkdir -p .build/coverage
       - name: Run tests with coverage
         run: composer test:coverage
 
-      # Report coverage
+      # Upload artifact
       - name: Fix coverage path
         working-directory: .build/coverage
         run: sed -i 's#/home/runner/work/composer-update-check/composer-update-check#${{ github.workspace }}#g' clover.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: .build/coverage/clover.xml
+          retention-days: 7
+
+  coverage-report:
+    name: Report test coverage
+    runs-on: ubuntu-latest
+    needs: coverage
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Download artifact
+      - name: Download coverage artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+
+      # CodeClimate
       - name: CodeClimate report
-        uses: paambaati/codeclimate-action@v3.2.0
+        uses: paambaati/codeclimate-action@v9.0.0
+        if: env.CC_TEST_REPORTER_ID
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageLocations: |
-            ${{ github.workspace }}/.build/coverage/clover.xml:clover
-      - name: codecov report
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: .build/coverage
-          fail_ci_if_error: true
-          verbose: true
+            ${{ steps.download.outputs.download-path }}/clover.xml:clover
 
-  # Job: Run Docker tests
-  tests-docker:
-    name: Tests with Docker (PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0", "8.1"]
-        composer-version: ["1", "2"]
-    steps:
-      - uses: actions/checkout@v3
+      # Coveralls
+      - name: Coveralls report
+        uses: coverallsapp/github-action@v2
         with:
-          fetch-depth: 0
-
-      # Run tests
-      - name: Run tests
-        run: ./bin/run-docker-tests.sh --composer-version "${{ matrix.composer-version }}" --php-version "${{ matrix.php-version }}"
-
-  # Job: Run unit tests of composer-update-reporter
-  tests-reporter:
-    name: Tests of eliashaeussler/composer-update-reporter
-    runs-on: ubuntu-latest
-    if: ${{ github.actor != 'renovate[bot]' }}
-    steps:
-      - id: set-branch
-        run: echo "branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
-      - id: set-sha
-        run: echo "sha=${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_OUTPUT
-      - name: Trigger workflow
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: 'Tests for composer-update-check'
-          token: ${{ secrets.PAT_REPORTER_TRIGGER }}
-          repo: eliashaeussler/composer-update-reporter
-          ref: 'main'
-          inputs: '{ "update-check-branch": "${{ steps.set-branch.outputs.branch }}", "update-check-sha": "${{ steps.set-sha.outputs.sha }}" }'
+          file: ${{ steps.download.outputs.download-path }}/clover.xml

@@ -10,7 +10,7 @@ jobs:
     env:
       COMPOSE_FILE: docs/build/docker-compose.yaml
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -21,7 +21,7 @@ jobs:
         run: docker-compose run --rm docs build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rendered-docs
           path: site/
@@ -30,19 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: render
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Download artifact
         id: download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: rendered-docs
           path: site/
 
       # Upload
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
