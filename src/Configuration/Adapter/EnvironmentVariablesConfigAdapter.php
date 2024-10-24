@@ -149,7 +149,7 @@ final class EnvironmentVariablesConfigAdapter implements ConfigAdapter
         }
     }
 
-    private function isTrue(string|null $value): bool
+    private function isTrue(?string $value): bool
     {
         if (null === $value) {
             return false;

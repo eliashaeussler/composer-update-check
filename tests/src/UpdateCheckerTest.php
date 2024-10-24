@@ -54,7 +54,7 @@ final class UpdateCheckerTest extends Framework\TestCase
         $this->testApplication = Fixtures\TestApplication::normal()->boot();
         $this->io = new IO\BufferIO(verbosity: Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        $container = Src\Tests\Fixtures\ContainerFactory::make($this->testApplication);
+        $container = Fixtures\ContainerFactory::make($this->testApplication);
         $container->set(IO\IOInterface::class, $this->io);
 
         $this->composer = $container->get(Composer::class);
@@ -93,7 +93,7 @@ final class UpdateCheckerTest extends Framework\TestCase
     {
         $this->testApplication->useEmpty();
 
-        $subject = Src\Tests\Fixtures\ContainerFactory::make($this->testApplication)->get(Src\UpdateChecker::class);
+        $subject = Fixtures\ContainerFactory::make($this->testApplication)->get(Src\UpdateChecker::class);
 
         self::assertEquals(new Src\Entity\Result\UpdateCheckResult([]), $subject->run($this->config));
     }
@@ -103,7 +103,7 @@ final class UpdateCheckerTest extends Framework\TestCase
     {
         $this->testApplication->useErroneous();
 
-        $container = Src\Tests\Fixtures\ContainerFactory::make($this->testApplication);
+        $container = Fixtures\ContainerFactory::make($this->testApplication);
         $container->set(IO\IOInterface::class, $this->io);
 
         $subject = $container->get(Src\UpdateChecker::class);

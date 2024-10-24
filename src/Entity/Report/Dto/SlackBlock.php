@@ -68,8 +68,8 @@ final class SlackBlock implements JsonSerializable
      * @see https://api.slack.com/reference/block-kit/blocks#section
      */
     public static function section(
-        SlackBlockElement $text = null,
-        array $fields = null,
+        ?SlackBlockElement $text = null,
+        ?array $fields = null,
     ): self {
         return new self('section', $text, $fields);
     }
