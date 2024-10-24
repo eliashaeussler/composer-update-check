@@ -21,37 +21,45 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
 use CuyZ\Valinor;
-use EliasHaeussler\ComposerUpdateCheck\Configuration;
-use EliasHaeussler\ComposerUpdateCheck\Exception;
-use SplFileObject;
+
+use function implode;
+use function sprintf;
 
 /**
- * JsonConfigAdapter.
+ * EnvironmentVariablesAreInvalid.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class JsonConfigAdapter extends FileBasedConfigAdapter
+final class EnvironmentVariablesAreInvalid extends Exception
 {
     /**
-     * @throws Exception\ConfigFileHasErrors
-     * @throws Exception\ConfigFileIsInvalid
+     * @param array<string, string> $nameMapping
      */
-    public function resolve(): Configuration\ComposerUpdateCheckConfig
+    public function __construct(Valinor\Mapper\MappingError $error, array $nameMapping = [])
     {
-        try {
-            $source = Valinor\Mapper\Source\Source::file(new SplFileObject($this->filename));
-        } catch (Valinor\Mapper\Source\Exception\InvalidSource $exception) {
-            throw new Exception\ConfigFileIsInvalid($this->filename, $exception);
+        $errorMessages = [];
+        $errors = Valinor\Mapper\Tree\Message\Messages::flattenFromNode($error->node())->errors();
+
+        foreach ($errors as $propertyError) {
+            $path = $propertyError->node()->path();
+            $errorMessages[] = sprintf(
+                '  * %s: %s',
+                $nameMapping[$path] ?? $path,
+                $propertyError->toString(),
+            );
         }
 
-        try {
-            return $this->mapper->map(Configuration\ComposerUpdateCheckConfig::class, $source);
-        } catch (Valinor\Mapper\MappingError $error) {
-            throw new Exception\ConfigFileHasErrors($this->filename, $error);
-        }
+        parent::__construct(
+            sprintf(
+                'Some environment variables are invalid:%s%s',
+                PHP_EOL,
+                implode(PHP_EOL, $errorMessages),
+            ),
+            1722683241,
+        );
     }
 }

@@ -1,0 +1,3 @@
+excludePatterns:
+  - 'symfony/http-kernel'
+format: json

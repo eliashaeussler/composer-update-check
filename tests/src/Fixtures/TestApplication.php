@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
 
 use Symfony\Component\Filesystem;
 
+use function basename;
 use function chdir;
 use function dirname;
 use function getcwd;
@@ -43,6 +44,12 @@ final class TestApplication
 {
     private readonly Filesystem\Filesystem $filesystem;
     private readonly string $tempDir;
+
+    /**
+     * @var list<array{string, string}>
+     */
+    private array $additionalFiles = [];
+    private bool $booted = false;
     private ?string $originalDir = null;
 
     private function __construct(
@@ -75,17 +82,33 @@ final class TestApplication
 
     public function boot(): self
     {
+        // Early return if application is already booted
+        if ($this->booted) {
+            return $this;
+        }
+
         $this->originalDir = (string) getcwd();
 
         // Prepare test application
         $this->filesystem->remove($this->tempDir);
         $this->filesystem->mirror($this->path, $this->tempDir);
 
+        // Copy additional files
+        foreach ($this->additionalFiles as [$source, $target]) {
+            $this->filesystem->copy(
+                $source,
+                Filesystem\Path::join($this->tempDir, $target),
+            );
+        }
+
         // Switch directory
         chdir($this->tempDir);
 
         // Clean up Composer environment
         $this->filesystem->remove(getcwd().'/vendor');
+
+        // Update boot state
+        $this->booted = true;
 
         return $this;
     }
@@ -97,28 +120,47 @@ final class TestApplication
         }
 
         $this->filesystem->remove($this->tempDir);
+        $this->booted = false;
+    }
+
+    public function reboot(): self
+    {
+        $this->shutdown();
+        $this->boot();
+
+        return $this;
     }
 
     public function useNormal(): self
     {
-        $this->shutdown();
         $this->path = self::normal()->path;
+        $this->reboot();
 
         return $this;
     }
 
     public function useEmpty(): self
     {
-        $this->shutdown();
         $this->path = self::empty()->path;
+        $this->reboot();
 
         return $this;
     }
 
     public function useErroneous(): self
     {
-        $this->shutdown();
         $this->path = self::erroneous()->path;
+        $this->reboot();
+
+        return $this;
+    }
+
+    public function withConfig(string $filename, string $as = null): self
+    {
+        $this->additionalFiles[] = [
+            $filename,
+            $as ?? basename($filename),
+        ];
 
         return $this;
     }

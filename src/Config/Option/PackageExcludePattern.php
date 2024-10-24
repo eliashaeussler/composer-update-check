@@ -21,10 +21,14 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Options;
+namespace EliasHaeussler\ComposerUpdateCheck\Config\Option;
+
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+use Stringable;
 
 use function fnmatch;
 use function preg_match;
+use function str_ends_with;
 use function str_starts_with;
 
 /**
@@ -41,6 +45,8 @@ final class PackageExcludePattern
     private $matchFunction;
 
     /**
+     * @pure
+     *
      * @param callable(string): bool $matchFunction
      */
     private function __construct(callable $matchFunction)
@@ -48,15 +54,23 @@ final class PackageExcludePattern
         $this->matchFunction = $matchFunction;
     }
 
+    /**
+     * @pure
+     *
+     * @throws Exception\RegularExpressionIsInvalid
+     */
     public static function create(string $pattern): self
     {
-        if (str_starts_with($pattern, '/') || str_starts_with($pattern, '#')) {
+        if (self::isRegularExpression($pattern)) {
             return self::byRegularExpression($pattern);
         }
 
         return self::byName($pattern);
     }
 
+    /**
+     * @pure
+     */
     public static function byName(string $name): self
     {
         return new self(
@@ -64,15 +78,37 @@ final class PackageExcludePattern
         );
     }
 
+    /**
+     * @pure
+     *
+     * @throws Exception\RegularExpressionIsInvalid
+     */
     public static function byRegularExpression(string $regex): self
     {
+        if (!self::isRegularExpression($regex)) {
+            throw new Exception\RegularExpressionIsInvalid($regex);
+        }
+
+        if (false === @preg_match($regex, '')) {
+            throw new Exception\RegularExpressionIsInvalid($regex);
+        }
+
         return new self(
             static fn (string $packageName) => 1 === preg_match($regex, $packageName),
         );
     }
 
-    public function matches(string $packageName): bool
+    public function matches(string|Stringable $url): bool
     {
-        return ($this->matchFunction)($packageName);
+        return ($this->matchFunction)((string) $url);
+    }
+
+    /**
+     * @pure
+     */
+    private static function isRegularExpression(string $pattern): bool
+    {
+        return (str_starts_with($pattern, '#') && str_ends_with($pattern, '#'))
+            || (str_starts_with($pattern, '/') && str_ends_with($pattern, '/'));
     }
 }

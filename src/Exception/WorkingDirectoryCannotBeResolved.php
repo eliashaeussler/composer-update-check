@@ -23,21 +23,19 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Exception;
 
-use function sprintf;
-
 /**
- * FileDoesNotExist.
+ * WorkingDirectoryCannotBeResolved.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class FileDoesNotExist extends Exception
+final class WorkingDirectoryCannotBeResolved extends Exception
 {
-    public function __construct(string $filename)
+    public function __construct()
     {
         parent::__construct(
-            sprintf('The file "%s" does not exist.', $filename),
-            1701204856,
+            'Unable to resolve the current working directory.',
+            1722684863,
         );
     }
 }

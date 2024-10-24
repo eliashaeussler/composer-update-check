@@ -21,41 +21,40 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
+namespace EliasHaeussler\ComposerUpdateCheck\Config\Adapter;
 
-use CuyZ\Valinor;
-use EliasHaeussler\ComposerUpdateCheck\Configuration;
-use EliasHaeussler\ComposerUpdateCheck\Exception;
-use Symfony\Component\Yaml;
+use EliasHaeussler\ComposerUpdateCheck\Config;
 
-use function is_iterable;
+use function count;
 
 /**
- * YamlConfigAdapter.
+ * CompositeConfigAdapter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class YamlConfigAdapter extends FileBasedConfigAdapter
+final class CompositeConfigAdapter implements ConfigAdapter
 {
     /**
-     * @throws Exception\ConfigFileHasErrors
-     * @throws Exception\ConfigFileIsInvalid
+     * @param list<ConfigAdapter> $adapters
      */
-    public function resolve(): Configuration\ComposerUpdateCheckConfig
+    public function __construct(
+        private readonly array $adapters,
+    ) {}
+
+    public function get(): Config\ComposerUpdateCheckConfig
     {
-        $yaml = Yaml\Yaml::parseFile($this->filename);
+        $config = new Config\ComposerUpdateCheckConfig();
 
-        if (!is_iterable($yaml)) {
-            throw new Exception\ConfigFileIsInvalid($this->filename);
+        // Avoid config merge if only one adapter is configured
+        if (1 === count($this->adapters)) {
+            return $this->adapters[0]->get();
         }
 
-        $source = Valinor\Mapper\Source\Source::iterable($yaml);
-
-        try {
-            return $this->mapper->map(Configuration\ComposerUpdateCheckConfig::class, $source);
-        } catch (Valinor\Mapper\MappingError $error) {
-            throw new Exception\ConfigFileHasErrors($this->filename, $error);
+        foreach ($this->adapters as $adapter) {
+            $config->merge($adapter->get());
         }
+
+        return $config;
     }
 }
