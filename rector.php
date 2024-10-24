@@ -24,10 +24,9 @@ declare(strict_types=1);
 use EliasHaeussler\RectorConfig\Config\Config;
 use EliasHaeussler\RectorConfig\Entity\Version;
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
-use Rector\Symfony\Symfony53\Rector\Class_\CommandDescriptionToPropertyRector;
+use Rector\ValueObject\PhpVersion;
 
 return static function (RectorConfig $rectorConfig): void {
     Config::create($rectorConfig, PhpVersion::PHP_81)
@@ -43,12 +42,6 @@ return static function (RectorConfig $rectorConfig): void {
                 __DIR__.'/src/DependencyInjection/CompilerPass/ContainerBuilderDebugDumpPass.php',
                 __DIR__.'/src/Event/PostUpdateCheckEvent.php',
                 __DIR__.'/src/Plugin.php',
-            ],
-        )
-        ->skip(
-            CommandDescriptionToPropertyRector::class,
-            [
-                __DIR__.'/src/Command/UpdateCheckCommand.php',
             ],
         )
         ->skip(
