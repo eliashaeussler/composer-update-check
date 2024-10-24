@@ -43,8 +43,8 @@ use function dirname;
 final class ContainerFactory
 {
     public static function make(
-        TestApplication $testApplication = null,
-        IO\IOInterface $io = null,
+        ?TestApplication $testApplication = null,
+        ?IO\IOInterface $io = null,
     ): DependencyInjection\ContainerInterface {
         $containerFactory = new Src\DependencyInjection\ContainerFactory([
             dirname(__DIR__, 2).'/build/config/services.php',

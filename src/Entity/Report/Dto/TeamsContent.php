@@ -67,8 +67,8 @@ final class TeamsContent implements JsonSerializable
     public static function container(
         array $items,
         bool $isVisible = true,
-        string $id = null,
-        Entity\Report\Enum\TeamsSpacing $spacing = null,
+        ?string $id = null,
+        ?Entity\Report\Enum\TeamsSpacing $spacing = null,
     ): self {
         return new self(
             type: 'Container',
@@ -84,7 +84,7 @@ final class TeamsContent implements JsonSerializable
      *
      * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/FactSet.json
      */
-    public static function factSet(array $facts, Entity\Report\Enum\TeamsSpacing $spacing = null): self
+    public static function factSet(array $facts, ?Entity\Report\Enum\TeamsSpacing $spacing = null): self
     {
         return new self(
             type: 'FactSet',
@@ -103,7 +103,7 @@ final class TeamsContent implements JsonSerializable
         array $columns,
         array $rows,
         bool $firstRowAsHeader = false,
-        string $gridStyle = null,
+        ?string $gridStyle = null,
     ): self {
         return new self(
             type: 'Table',
@@ -120,9 +120,9 @@ final class TeamsContent implements JsonSerializable
     public static function textBlock(
         string $text,
         bool $wrap = false,
-        Entity\Report\Enum\TeamsFontSize $size = null,
-        Entity\Report\Enum\TeamsSpacing $spacing = null,
-        Entity\Report\Enum\TeamsFontWeight $weight = null,
+        ?Entity\Report\Enum\TeamsFontSize $size = null,
+        ?Entity\Report\Enum\TeamsSpacing $spacing = null,
+        ?Entity\Report\Enum\TeamsFontWeight $weight = null,
     ): self {
         return new self(
             type: 'TextBlock',

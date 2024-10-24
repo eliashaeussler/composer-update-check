@@ -50,7 +50,7 @@ final class Installer
         private readonly Composer $composer,
     ) {}
 
-    public function runInstall(IO\IOInterface $io = null): int
+    public function runInstall(?IO\IOInterface $io = null): int
     {
         $io ??= new IO\NullIO();
 
@@ -72,7 +72,7 @@ final class Installer
     /**
      * @param list<Entity\Package\Package> $packages
      */
-    public function runUpdate(array $packages, IO\IOInterface $io = null): Entity\Result\ComposerUpdateResult
+    public function runUpdate(array $packages, ?IO\IOInterface $io = null): Entity\Result\ComposerUpdateResult
     {
         $io ??= new IO\NullIO();
 
