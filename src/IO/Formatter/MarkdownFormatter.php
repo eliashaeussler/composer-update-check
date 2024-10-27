@@ -23,39 +23,61 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\IO\Formatter;
 
-use EliasHaeussler\ComposerUpdateCheck\Exception;
+use EliasHaeussler\ComposerUpdateCheck\Entity;
 use Symfony\Component\Console;
+use Twig\Environment;
+use Twig\Loader;
+
+use function dirname;
 
 /**
- * FormatterFactory.
+ * MarkdownFormatter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class FormatterFactory
+final class MarkdownFormatter implements Formatter
 {
+    public const FORMAT = 'markdown';
+
+    private readonly Environment $twig;
+
     public function __construct(
         private ?Console\Style\SymfonyStyle $io = null,
-    ) {}
+    ) {
+        $this->twig = $this->buildTwigEnvironment();
+    }
 
-    /**
-     * @throws Exception\FormatterIsNotSupported
-     */
-    public function make(string $format): Formatter
+    public function formatResult(Entity\Result\UpdateCheckResult $result): void
     {
-        return match ($format) {
-            GitHubFormatter::FORMAT => new GitHubFormatter($this->io),
-            GitLabFormatter::FORMAT => new GitLabFormatter($this->io),
-            HtmlFormatter::FORMAT => new HtmlFormatter($this->io),
-            JsonFormatter::FORMAT => new JsonFormatter($this->io),
-            MarkdownFormatter::FORMAT, 'md' => new MarkdownFormatter($this->io),
-            TextFormatter::FORMAT => new TextFormatter($this->io),
-            default => throw new Exception\FormatterIsNotSupported($format),
-        };
+        // Early return if IO is missing
+        if (null === $this->io) {
+            return;
+        }
+
+        $markdown = $this->twig->render('update-check-report.md.twig', [
+            'result' => $result,
+        ]);
+
+        $this->io->writeln($markdown);
     }
 
     public function setIO(Console\Style\SymfonyStyle $io): void
     {
         $this->io = $io;
+    }
+
+    public static function getFormat(): string
+    {
+        return self::FORMAT;
+    }
+
+    private function buildTwigEnvironment(): Environment
+    {
+        $loader = new Loader\FilesystemLoader([
+            dirname(__DIR__, 3).'/templates',
+        ]);
+
+        return new Environment($loader);
     }
 }
