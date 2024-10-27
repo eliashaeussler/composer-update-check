@@ -43,8 +43,10 @@ final class PackageExcludePattern
     /**
      * @param callable(string): bool $matchFunction
      */
-    private function __construct(callable $matchFunction)
-    {
+    private function __construct(
+        callable $matchFunction,
+        private readonly string $pattern,
+    ) {
         $this->matchFunction = $matchFunction;
     }
 
@@ -61,6 +63,7 @@ final class PackageExcludePattern
     {
         return new self(
             static fn (string $packageName) => fnmatch($name, $packageName),
+            $name,
         );
     }
 
@@ -68,11 +71,17 @@ final class PackageExcludePattern
     {
         return new self(
             static fn (string $packageName) => 1 === preg_match($regex, $packageName),
+            $regex,
         );
     }
 
     public function matches(string $packageName): bool
     {
         return ($this->matchFunction)($packageName);
+    }
+
+    public function getPattern(): string
+    {
+        return $this->pattern;
     }
 }
