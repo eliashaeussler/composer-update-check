@@ -39,13 +39,13 @@ final class UpdateCheckResult
     private readonly array $outdatedPackages;
 
     /**
-     * @var list<Entity\Package\Package>
+     * @var list<Entity\Package\ExcludedPackage>
      */
     private readonly array $excludedPackages;
 
     /**
      * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
-     * @param list<Entity\Package\Package>         $excludedPackages
+     * @param list<Entity\Package\ExcludedPackage> $excludedPackages
      */
     public function __construct(
         array $outdatedPackages,
@@ -70,7 +70,7 @@ final class UpdateCheckResult
     }
 
     /**
-     * @return list<Entity\Package\Package>
+     * @return list<Entity\Package\ExcludedPackage>
      */
     public function getExcludedPackages(): array
     {

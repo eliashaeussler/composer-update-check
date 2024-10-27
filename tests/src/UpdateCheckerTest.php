@@ -130,8 +130,15 @@ final class UpdateCheckerTest extends Framework\TestCase
         $expected = new Src\Entity\Result\UpdateCheckResult(
             [],
             [
-                new Src\Entity\Package\InstalledPackage('doctrine/dbal'),
-                new Src\Entity\Package\InstalledPackage('symfony/http-kernel'),
+                new Src\Entity\Package\ExcludedPackage(
+                    'doctrine/dbal',
+                    Src\Entity\Package\ExcludeReason::NoDev,
+                ),
+                new Src\Entity\Package\ExcludedPackage(
+                    'symfony/http-kernel',
+                    Src\Entity\Package\ExcludeReason::Pattern,
+                    Src\Configuration\Options\PackageExcludePattern::byName('symfony/*'),
+                ),
             ],
         );
 
