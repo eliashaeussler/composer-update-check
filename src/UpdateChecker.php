@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateCheck;
 
 use Composer\IO;
 
+use function array_fill_keys;
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -87,8 +88,8 @@ final class UpdateChecker
     }
 
     /**
-     * @param list<Entity\Package\Package> $packages
-     * @param list<Entity\Package\Package> $excludedPackages
+     * @param list<Entity\Package\Package>         $packages
+     * @param list<Entity\Package\ExcludedPackage> $excludedPackages
      *
      * @throws Exception\ComposerInstallFailed
      * @throws Exception\ComposerUpdateFailed
@@ -145,7 +146,7 @@ final class UpdateChecker
     }
 
     /**
-     * @return array{list<Entity\Package\Package>, list<Entity\Package\Package>}
+     * @return array{list<Entity\Package\Package>, list<Entity\Package\ExcludedPackage>}
      */
     private function resolvePackagesForUpdateCheck(Configuration\ComposerUpdateCheckConfig $config): array
     {
@@ -163,7 +164,7 @@ final class UpdateChecker
         if ($config->areDevPackagesIncluded()) {
             $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
         } else {
-            $excludedPackages = $requiredDevPackages;
+            $excludedPackages = array_fill_keys($requiredDevPackages, null);
 
             $this->io->writeError(['', '🚫 Skipped dev-requirements'], true, IO\IOInterface::VERBOSE);
 
@@ -184,7 +185,7 @@ final class UpdateChecker
 
         return [
             $this->mapPackageNamesToPackage($requiredPackages),
-            $this->mapPackageNamesToPackage($excludedPackages),
+            $this->mapExcludedPackages($excludedPackages),
         ];
     }
 
@@ -192,7 +193,7 @@ final class UpdateChecker
      * @param array<non-empty-string>                           $packages
      * @param list<Configuration\Options\PackageExcludePattern> $excludePatterns
      *
-     * @return array<non-empty-string>
+     * @return array<non-empty-string, Configuration\Options\PackageExcludePattern>
      */
     private function removeByExcludePatterns(
         array &$packages,
@@ -206,7 +207,7 @@ final class UpdateChecker
             function (string $package) use (&$excludedPackages, $excludePatterns, &$outputWasWritten) {
                 foreach ($excludePatterns as $excludePattern) {
                     if ($excludePattern->matches($package)) {
-                        $excludedPackages[] = $package;
+                        $excludedPackages[$package] = $excludePattern;
 
                         if ($this->io->isVerbose()) {
                             if (!$outputWasWritten) {
@@ -255,6 +256,27 @@ final class UpdateChecker
             static fn (string $packageName) => new Entity\Package\InstalledPackage($packageName),
             $packageNames,
         );
+    }
+
+    /**
+     * @param array<non-empty-string, Configuration\Options\PackageExcludePattern|null> $excludedPackages
+     *
+     * @return array<Entity\Package\ExcludedPackage>
+     */
+    private function mapExcludedPackages(array $excludedPackages): array
+    {
+        $packages = [];
+
+        foreach ($excludedPackages as $packageName => $excludePattern) {
+            $excludeReason = null === $excludePattern
+                ? Entity\Package\ExcludeReason::NoDev
+                : Entity\Package\ExcludeReason::Pattern
+            ;
+
+            $packages[] = new Entity\Package\ExcludedPackage($packageName, $excludeReason, $excludePattern);
+        }
+
+        return $packages;
     }
 
     private function dispatchPostUpdateCheckEvent(Entity\Result\UpdateCheckResult $result): void

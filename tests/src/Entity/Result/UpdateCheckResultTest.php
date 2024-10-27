@@ -59,15 +59,13 @@ final class UpdateCheckResultTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function constructorSortsExcludedPackages(): void
     {
-        $bazPackage = new Src\Entity\Package\OutdatedPackage(
+        $bazPackage = new Src\Entity\Package\ExcludedPackage(
             'baz/baz',
-            new Src\Entity\Version('1.5.0'),
-            new Src\Entity\Version('1.7.2'),
+            Src\Entity\Package\ExcludeReason::NoDev,
         );
-        $fooPackage = new Src\Entity\Package\OutdatedPackage(
+        $fooPackage = new Src\Entity\Package\ExcludedPackage(
             'foo/foo',
-            new Src\Entity\Version('1.0.0'),
-            new Src\Entity\Version('1.0.5'),
+            Src\Entity\Package\ExcludeReason::NoDev,
         );
 
         $actual = new Src\Entity\Result\UpdateCheckResult([], [$fooPackage, $bazPackage]);
