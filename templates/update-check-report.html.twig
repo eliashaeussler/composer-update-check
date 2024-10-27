@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Update check report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container my-5 px-0">
+    <main>
+        <h1 class="mb-3">
+            Update check report
+
+            {% if result.rootPackage %}
+                <span class="fw-light fs-2 text-light-emphasis ms-2">{{ result.rootPackage.name }}</span>
+            {% endif %}
+        </h1>
+
+        {% if result.outdatedPackages is empty %}
+            <div class="alert alert-success d-flex align-items-center shadow-sm" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill flex-shrink-0 me-2" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                <div>All packages are up to date.</div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning d-flex align-items-center shadow-sm" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill flex-shrink-0 me-2" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4m.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+                </svg>
+                <div>
+                    {% if result.outdatedPackages|length == 1 %}
+                        1 package is outdated.
+                    {% else %}
+                        {{ result.outdatedPackages|length }} packages are outdated.
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if result.outdatedPackages %}
+            <h2 class="mt-5 mb-3">Outdated packages</h2>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for outdatedPackage in result.outdatedPackages %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-header border-3 {% if outdatedPackage.insecure %}border-danger{% endif %}">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <span class="lead">{{ outdatedPackage.name }}</span>
+                                    </div>
+                                    {% if outdatedPackage.insecure %}
+                                        <div class="col text-end flex-grow-0">
+                                            <a href="#sa-{{ outdatedPackage.name }}">
+                                                <span class="badge text-bg-danger">insecure</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-7">Outdated version</dt>
+                                        <dd class="col-sm-5 d-flex align-items-center">
+                                            {{ outdatedPackage.outdatedVersion }}
+
+                                            {% if outdatedPackage.insecure %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill text-danger ms-1" viewBox="0 0 16 16">
+                                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                                </svg>
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-7">New version</dt>
+                                        <dd class="col-sm-5">{{ outdatedPackage.newVersion }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if result.securityAdvisories %}
+            <h2 class="mt-5 mb-3">Security Advisories</h2>
+
+            {% set renderedPackageTitles = {} %}
+
+            {% for securityAdvisory in result.securityAdvisories %}
+                {% if securityAdvisory.packageName not in renderedPackageTitles %}
+                    {% set renderedPackageTitles = renderedPackageTitles|merge([securityAdvisory.packageName]) %}
+
+                    <h3 id="sa-{{ securityAdvisory.packageName }}" class="mt-4 mb-3 fs-4">
+                        {{ securityAdvisory.packageName }}
+                    </h3>
+                {% endif %}
+
+                {% if securityAdvisory.severity.value == 'critical' %}
+                    {% set severityColor = 'danger' %}
+                {% elseif securityAdvisory.severity.value == 'high' %}
+                    {% set severityColor = 'warning' %}
+                {% elseif securityAdvisory.severity.value == 'medium' %}
+                    {% set severityColor = 'info' %}
+                {% else %}
+                    {% set severityColor = 'secondary' %}
+                {% endif %}
+
+                <div class="card shadow-sm">
+                    <div class="card-header border-3 border-{{ severityColor }}">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <span class="lead">{{ securityAdvisory.sanitizedTitle }}</span>
+                            </div>
+                            <div class="col text-end flex-grow-0">
+                                <span class="badge border border-{{ severityColor }} text-{{ severityColor }}">
+                                    {{ securityAdvisory.advisoryId }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Reported at</dt>
+                                <dd class="col-sm-9">{{ securityAdvisory.reportedAt|date('D, d M y H:i:s O') }}</dd>
+
+                                <dt class="col-sm-3">Severity</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge text-bg-{{ severityColor }}">{{ securityAdvisory.severity.name }}</span>
+                                </dd>
+
+                                <dt class="col-sm-3">Affected versions</dt>
+                                <dd class="col-sm-9">
+                                    <code>{{ securityAdvisory.affectedVersions }}</code>
+                                </dd>
+
+                                {% if securityAdvisory.cve %}
+                                    <dt class="col-sm-3">CVE</dt>
+                                    <dd class="col-sm-9">
+                                        <a href="https://www.cve.org/CVERecord?id={{ securityAdvisory.cve }}">
+                                            {{ securityAdvisory.cve }}
+                                        </a>
+                                    </dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+
+                        {% if securityAdvisory.link %}
+                            <a href="{{ securityAdvisory.link }}" class="btn btn-secondary mt-2">Read more</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if result.excludedPackages %}
+            <h2 class="mt-5 mb-3">Excluded packages</h2>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for excludedPackage in result.excludedPackages %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-header border-3">
+                                <span class="lead">{{ excludedPackage.name }}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    {% if excludedPackage.excludeReason.name == 'NoDev' %}
+                                        Excluded by <code>--no-dev</code> configuration option.
+                                    {% elseif excludedPackage.excludeReason.name == 'Pattern' %}
+                                        Excluded by pattern <code>{{ excludedPackage.excludePattern.pattern }}</code>.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+    <footer class="mt-5">
+        <small class="text-muted">
+            Generated by <a href="https://github.com/eliashaeussler/composer-update-check">eliashaeussler/composer-update-check</a>
+            at {{ 'now'|date('D, d M y H:i:s O') }}.
+        </small>
+    </footer>
+</div>
+
+</body>
+</html>
