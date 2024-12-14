@@ -76,11 +76,13 @@ final class CommandInputConfigAdapter implements ConfigAdapter
         }
 
         if ($this->input->hasOption('reporter') && is_array($this->input->getOption('reporter'))) {
+            /* @phpstan-ignore argument.type */
             $this->enableReporters($config, $this->input->getOption('reporter'));
         }
 
         if ($this->input->hasOption('disable-reporter') && is_array($this->input->getOption('disable-reporter'))) {
             foreach ($this->input->getOption('disable-reporter') as $name) {
+                /* @phpstan-ignore argument.type */
                 $config->disableReporter($name);
             }
         }
@@ -124,6 +126,7 @@ final class CommandInputConfigAdapter implements ConfigAdapter
                 throw new Exception\ReporterOptionsAreInvalid($name);
             }
 
+            /* @phpstan-ignore return.type */
             return $options;
         } catch (JsonException) {
             throw new Exception\ReporterOptionsAreInvalid($name);

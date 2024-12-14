@@ -24,6 +24,9 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck\Configuration\Adapter;
 
 use EliasHaeussler\ComposerUpdateCheck\Configuration;
+use EliasHaeussler\ComposerUpdateCheck\Exception;
+
+use function is_callable;
 
 /**
  * PhpConfigAdapter.
@@ -33,10 +36,17 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration;
  */
 final class PhpConfigAdapter extends FileBasedConfigAdapter
 {
+    /**
+     * @throws Exception\ConfigFileIsInvalid
+     */
     public function resolve(): Configuration\ComposerUpdateCheckConfig
     {
         $config = new Configuration\ComposerUpdateCheckConfig();
         $closure = require $this->filename;
+
+        if (!is_callable($closure)) {
+            throw new Exception\ConfigFileIsInvalid($this->filename);
+        }
 
         // Call closure with config object
         $closure($config);

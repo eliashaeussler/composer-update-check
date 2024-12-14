@@ -31,6 +31,9 @@ use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\OptionsResolver;
 
+use function assert;
+use function is_string;
+
 /**
  * SlackReporter.
  *
@@ -61,6 +64,9 @@ final class SlackReporter implements Reporter
 
         // Resolve configuration options
         ['url' => $url] = $this->resolver->resolve($options);
+
+        // Make PHPStan happy
+        assert(is_string($url));
 
         // Create report
         $report = Entity\Report\SlackReport::create($result);
