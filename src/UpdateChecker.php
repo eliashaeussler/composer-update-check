@@ -29,6 +29,7 @@ use function array_fill_keys;
 use function array_keys;
 use function array_map;
 use function array_merge;
+use function array_values;
 
 /**
  * UpdateChecker.
@@ -184,7 +185,7 @@ final class UpdateChecker
         }
 
         return [
-            $this->mapPackageNamesToPackage($requiredPackages),
+            array_values($this->mapPackageNamesToPackage($requiredPackages)),
             $this->mapExcludedPackages($excludedPackages),
         ];
     }
@@ -261,7 +262,7 @@ final class UpdateChecker
     /**
      * @param array<non-empty-string, Configuration\Options\PackageExcludePattern|null> $excludedPackages
      *
-     * @return array<Entity\Package\ExcludedPackage>
+     * @return list<Entity\Package\ExcludedPackage>
      */
     private function mapExcludedPackages(array $excludedPackages): array
     {

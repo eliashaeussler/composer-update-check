@@ -76,6 +76,7 @@ final class ChainedConfigAdapter implements ConfigAdapter
 
         foreach ($other->getReporters() as $name => $options) {
             $currentOptions = $config->getReporters()[$name] ?? [];
+            /** @var array<string, mixed> $mergedOptions */
             $mergedOptions = array_replace_recursive($currentOptions, $options);
 
             $config->enableReporter($name, $mergedOptions);

@@ -134,8 +134,10 @@ final class UpdateCheckCommandTest extends Framework\TestCase
 
         self::assertIsArray($actualJson);
         self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
+        self::assertIsArray($actualJson['outdatedPackages']);
         self::assertCount(1, $actualJson['outdatedPackages']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][0]);
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
@@ -155,8 +157,10 @@ final class UpdateCheckCommandTest extends Framework\TestCase
 
         self::assertIsArray($actualJson);
         self::assertSame('1 package is outdated (skipped 1 package).', $actualJson['status']);
+        self::assertIsArray($actualJson['outdatedPackages']);
         self::assertCount(1, $actualJson['outdatedPackages']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][0]);
         self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][0]['newVersion']);
@@ -181,13 +185,16 @@ final class UpdateCheckCommandTest extends Framework\TestCase
 
         self::assertIsArray($actualJson);
         self::assertSame('2 packages are outdated.', $actualJson['status']);
+        self::assertIsArray($actualJson['outdatedPackages']);
         self::assertCount(2, $actualJson['outdatedPackages']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][0]);
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
         self::assertFalse($actualJson['outdatedPackages'][0]['insecure']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][1]);
         self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);
@@ -261,12 +268,15 @@ final class UpdateCheckCommandTest extends Framework\TestCase
 
         self::assertIsArray($actualJson);
         self::assertSame('2 packages are outdated.', $actualJson['status']);
+        self::assertIsArray($actualJson['outdatedPackages']);
         self::assertCount(2, $actualJson['outdatedPackages']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][0]);
         self::assertSame('doctrine/dbal', $actualJson['outdatedPackages'][0]['name']);
         self::assertSame('3.1.3', $actualJson['outdatedPackages'][0]['outdatedVersion']);
         self::assertNotSame('3.1.3', $actualJson['outdatedPackages'][0]['newVersion']);
 
+        self::assertIsArray($actualJson['outdatedPackages'][1]);
         self::assertSame('symfony/http-kernel', $actualJson['outdatedPackages'][1]['name']);
         self::assertSame('v5.4.19', $actualJson['outdatedPackages'][1]['outdatedVersion']);
         self::assertNotSame('v5.4.19', $actualJson['outdatedPackages'][1]['newVersion']);

@@ -31,6 +31,9 @@ use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\OptionsResolver;
 
+use function assert;
+use function is_string;
+
 /**
  * MattermostReporter.
  *
@@ -61,6 +64,11 @@ final class MattermostReporter implements Reporter
 
         // Resolve configuration options
         ['url' => $url, 'channel' => $channel, 'username' => $username] = $this->resolver->resolve($options);
+
+        // Make PHPStan happy
+        assert(is_string($url));
+        assert(is_string($channel));
+        assert(is_string($username) || null === $username);
 
         // Create report
         $report = Entity\Report\MattermostReport::create($channel, $username, $result);

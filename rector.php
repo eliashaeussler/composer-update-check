@@ -25,7 +25,6 @@ use EliasHaeussler\RectorConfig\Config\Config;
 use EliasHaeussler\RectorConfig\Entity\Version;
 use Rector\Config\RectorConfig;
 use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
-use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\ValueObject\PhpVersion;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -41,12 +40,6 @@ return static function (RectorConfig $rectorConfig): void {
             [
                 __DIR__.'/src/DependencyInjection/CompilerPass/ContainerBuilderDebugDumpPass.php',
                 __DIR__.'/src/Event/PostUpdateCheckEvent.php',
-                __DIR__.'/src/Plugin.php',
-            ],
-        )
-        ->skip(
-            ContainerGetToConstructorInjectionRector::class,
-            [
                 __DIR__.'/src/Plugin.php',
             ],
         )

@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection;
 use Symfony\Component\Filesystem;
 
 use function array_unique;
+use function array_values;
 use function dirname;
 
 /**
@@ -53,10 +54,12 @@ final class ContainerFactory
     {
         $defaultConfigurationFiles = $this->getDefaultConfigurationFiles();
 
-        $this->configs = array_unique([
-            ...$defaultConfigurationFiles,
-            ...$configs,
-        ]);
+        $this->configs = array_values(
+            array_unique([
+                ...$defaultConfigurationFiles,
+                ...$configs,
+            ]),
+        );
     }
 
     /**

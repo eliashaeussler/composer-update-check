@@ -31,6 +31,9 @@ use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\OptionsResolver;
 
+use function assert;
+use function is_string;
+
 /**
  * TeamsReporter.
  *
@@ -61,6 +64,10 @@ final class TeamsReporter implements Reporter
 
         // Resolve configuration options
         ['url' => $url, 'additionalData' => $additionalData] = $this->resolver->resolve($options);
+
+        // Make PHPStan happy
+        assert(is_string($url));
+        assert(is_string($additionalData));
 
         // Create report
         $report = Entity\Report\TeamsReport::create($result, $additionalData);
