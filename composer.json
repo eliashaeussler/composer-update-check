@@ -19,7 +19,7 @@
 		"rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
 	},
 	"require": {
-		"php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+		"php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
 		"ext-json": "*",
 		"composer-plugin-api": "^2.2",
 		"composer/semver": "^1.0 || ^2.0 || ^3.0",
