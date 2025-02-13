@@ -237,7 +237,7 @@ final class UpdateCheckCommandTest extends Framework\TestCase
             '--disable-reporter' => ['dummy'],
         ]);
 
-        self::assertCount(0, $reporter->reportedResults);
+        self::assertSame([], $reporter->reportedResults);
         self::assertCount(1, $reporter2->reportedResults);
     }
 
