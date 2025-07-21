@@ -3,7 +3,7 @@
 	"extends": [
 		"local>eliashaeussler/renovate-config"
 	],
-	"baseBranches": [
+	"baseBranchPatterns": [
 		"2.x"
 	],
 	"constraints": {
