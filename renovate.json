@@ -3,9 +3,6 @@
 	"extends": [
 		"local>eliashaeussler/renovate-config"
 	],
-	"baseBranches": [
-		"2.x"
-	],
 	"constraints": {
 		"php": "8.1.*"
 	}

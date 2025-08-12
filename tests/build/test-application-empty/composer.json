@@ -1,0 +1,7 @@
+{
+	"config": {
+		"allow-plugins": {
+			"eliashaeussler/composer-update-check": true
+		}
+	}
+}

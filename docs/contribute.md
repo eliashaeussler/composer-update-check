@@ -22,13 +22,26 @@ composer install
 Code quality can be checked by running the following commands:
 
 ```bash
-# Run linters
+# All linters
 composer lint
+
+# Specific linters
 composer lint:composer
+composer lint:editorconfig
 composer lint:php
 
-# Run static code analysis
+# Fix all CGL issues
+composer fix
+
+# Fix specific CGL issues
+composer fix:composer
+composer fix:editorconfig
+composer fix:php
+
+# All static code analyzers
 composer sca
+
+# Specific static code analyzers
 composer sca:php
 ```
 
@@ -43,22 +56,6 @@ composer test
 
 # Run tests and generate code coverage
 composer test:coverage
-```
-
-## :octicons-server-24: Run Docker tests
-
-All test applications can also be executed with the generated Docker
-images. All available parameters for the `update-check` command can be passed.
-
-```bash
-# Run tests for the Docker image using Composer 2.x
-./bin/run-docker-tests.sh --composer-version 2
-
-# Run tests for the Docker image using Composer 2.x and PHP 8.0
-./bin/run-docker-tests.sh --composer-version 2 --php-version "8.0"
-
-# Run tests with optional parameters
-./bin/run-docker-tests.sh --composer-version 2 --security-scan --no-dev
 ```
 
 ## :technologist: Simulate application
