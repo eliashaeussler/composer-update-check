@@ -40,6 +40,7 @@ return PHPStanConfig\Config\Config::create(__DIR__)
         'src',
         'tests/src',
     )
+    ->with('vendor/cuyz/valinor/qa/PHPStan/valinor-phpstan-suppress-pure-errors.php')
     ->withBaseline()
     ->maxLevel()
     ->withSets($symfonySet)
