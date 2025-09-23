@@ -26,6 +26,7 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests;
 use Composer\Composer;
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck as Src;
+use EliasHaeussler\DeepClosureComparator;
 use GuzzleHttp\Exception;
 use GuzzleHttp\Handler;
 use InvalidArgumentException;
@@ -142,7 +143,7 @@ final class UpdateCheckerTest extends Framework\TestCase
             ],
         );
 
-        self::assertEquals($expected, $this->subject->run($this->config));
+        DeepClosureComparator\DeepClosureAssert::assertEquals($expected, $this->subject->run($this->config));
 
         $output = $this->io->getOutput();
 

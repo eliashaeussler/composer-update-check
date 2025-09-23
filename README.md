@@ -5,7 +5,7 @@
 # Composer update check plugin
 
 [![Coverage](https://img.shields.io/coverallsCoverage/github/eliashaeussler/composer-update-check?logo=coveralls)](https://coveralls.io/github/eliashaeussler/composer-update-check)
-[![Maintainability](https://api.codeclimate.com/v1/badges/882ab3bb81b87d2b4a6d/maintainability)](https://codeclimate.com/github/eliashaeussler/composer-update-check/maintainability)
+[![Maintainability](https://qlty.sh/gh/eliashaeussler/projects/composer-update-check/maintainability.svg)](https://qlty.sh/gh/eliashaeussler/projects/composer-update-check)
 [![Tests](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
 [![Release](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml)

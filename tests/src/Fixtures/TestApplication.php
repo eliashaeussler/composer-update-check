@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Tests\Fixtures;
 
+use Symfony\Component\DependencyInjection;
 use Symfony\Component\Filesystem;
 
 use function chdir;
@@ -39,6 +40,7 @@ use function tempnam;
  *
  * @internal
  */
+#[DependencyInjection\Attribute\Exclude]
 final class TestApplication
 {
     private readonly Filesystem\Filesystem $filesystem;
