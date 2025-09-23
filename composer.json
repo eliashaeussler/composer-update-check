@@ -23,7 +23,7 @@
 		"ext-json": "*",
 		"composer-plugin-api": "^2.2",
 		"composer/semver": "^1.0 || ^2.0 || ^3.0",
-		"cuyz/valinor": "^1.7",
+		"cuyz/valinor": "^2.0",
 		"guzzlehttp/guzzle": "^7.0",
 		"guzzlehttp/psr7": "^2.0",
 		"psr/http-client": "^1.0",

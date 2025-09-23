@@ -160,7 +160,7 @@ final class UpdateCheckCommand extends Command\BaseCommand
 
     private function displayMappingErrors(Exception\ConfigFileHasErrors $exception): void
     {
-        $errors = Valinor\Mapper\Tree\Message\Messages::flattenFromNode($exception->error->node())->errors();
+        $errors = $exception->error->messages();
 
         $this->io->error($exception->getMessage());
         $this->io->writeln('The following errors occurred:');
@@ -171,6 +171,6 @@ final class UpdateCheckCommand extends Command\BaseCommand
 
     private function formatErrorMessage(Valinor\Mapper\Tree\Message\NodeMessage $message): string
     {
-        return sprintf('<comment>%s</comment>: %s', $message->node()->path(), $message->toString());
+        return sprintf('<comment>%s</comment>: %s', $message->path(), $message->toString());
     }
 }
