@@ -24,17 +24,6 @@ declare(strict_types=1);
 use EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
 use EliasHaeussler\PHPStanConfig;
 
-$containerFactory = new DependencyInjection\ContainerFactory([
-    __DIR__.'/tests/build/config/services.php',
-]);
-$container = $containerFactory->make(true);
-$containerXmlFile = $container->getParameter('debug.container_xml_filename');
-
-$symfonySet = PHPStanConfig\Set\SymfonySet::create()
-    ->withConsoleApplicationLoader('tests/build/phpstan/console-application.php')
-    ->withContainerXmlPath($containerXmlFile)
-;
-
 return PHPStanConfig\Config\Config::create(__DIR__)
     ->in(
         'src',
@@ -43,7 +32,13 @@ return PHPStanConfig\Config\Config::create(__DIR__)
     ->with('vendor/cuyz/valinor/qa/PHPStan/valinor-phpstan-suppress-pure-errors.php')
     ->withBaseline()
     ->maxLevel()
-    ->withSets($symfonySet)
+    ->withSet(static function (PHPStanConfig\Set\SymfonySet $set) {
+        $containerFactory = new DependencyInjection\ContainerFactory([__DIR__.'/tests/build/config/services.php']);
+        $containerXmlFile = $containerFactory->make(true)->getParameter('debug.container_xml_filename');
+
+        $set->withConsoleApplicationLoader('tests/build/phpstan/console-application.php');
+        $set->withContainerXmlPath($containerXmlFile);
+    })
     ->useCacheDir('.build/cache/phpstan')
     ->toArray()
 ;
