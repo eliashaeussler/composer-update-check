@@ -38,7 +38,7 @@
 	},
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.0",
-		"composer/composer": "^2.2",
+		"composer/composer": ">= 2.2.0 < 2.9.0 || >= 2.9.2 < 3.0.0",
 		"eliashaeussler/deep-closure-comparator": "^1.2",
 		"eliashaeussler/php-cs-fixer-config": "^3.0",
 		"eliashaeussler/phpstan-config": "^3.0",
