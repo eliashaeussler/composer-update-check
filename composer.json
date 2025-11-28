@@ -19,7 +19,7 @@
 		"rss": "https://github.com/eliashaeussler/composer-update-check/releases.atom"
 	},
 	"require": {
-		"php": "~8.2.0 || ~8.3.0 || ~8.4.0",
+		"php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
 		"ext-json": "*",
 		"composer-plugin-api": "^2.2",
 		"composer/semver": "^1.0 || ^2.0 || ^3.0",
@@ -39,10 +39,10 @@
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.0",
 		"composer/composer": "^2.2",
-		"eliashaeussler/deep-closure-comparator": "^1.1",
-		"eliashaeussler/php-cs-fixer-config": "^2.0",
-		"eliashaeussler/phpstan-config": "^2.4",
-		"eliashaeussler/rector-config": "^3.0",
+		"eliashaeussler/deep-closure-comparator": "^1.2",
+		"eliashaeussler/php-cs-fixer-config": "^3.0",
+		"eliashaeussler/phpstan-config": "^3.0",
+		"eliashaeussler/rector-config": "^3.1",
 		"ergebnis/composer-normalize": "^2.39",
 		"php-http/discovery": "^1.19",
 		"php-http/httplug": "^2.4",
