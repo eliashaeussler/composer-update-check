@@ -6,6 +6,7 @@
 	"baseBranchPatterns": [
 		"2.x"
 	],
+	"useBaseBranchConfig": "merge",
 	"constraints": {
 		"php": "8.1.*"
 	}
