@@ -293,7 +293,7 @@ final class UpdateCheckCommandTest extends Framework\TestCase
 
         $command = $this->container->get(Src\Command\UpdateCheckCommand::class);
         $application = new Application();
-        $application->add($command);
+        $application->addCommands([$command]);
 
         $this->commandTester = new Console\Tester\CommandTester($command);
     }
