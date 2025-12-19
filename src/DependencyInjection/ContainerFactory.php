@@ -40,12 +40,12 @@ use function dirname;
  *
  * @internal
  */
-final class ContainerFactory
+final readonly class ContainerFactory
 {
     /**
      * @var list<string>
      */
-    private readonly array $configs;
+    private array $configs;
 
     /**
      * @param list<string> $configs
@@ -96,7 +96,6 @@ final class ContainerFactory
         return match (Filesystem\Path::getExtension($filename, true)) {
             'php' => new DependencyInjection\Loader\PhpFileLoader($container, $locator),
             'yaml', 'yml' => new DependencyInjection\Loader\YamlFileLoader($container, $locator),
-            'xml' => new DependencyInjection\Loader\XmlFileLoader($container, $locator),
             default => throw new Exception\ConfigFileIsNotSupported($filename),
         };
     }
