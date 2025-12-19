@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace EliasHaeussler\ComposerUpdateCheck\Composer;
 
+use Composer\Advisory\AuditConfig;
 use Composer\Composer;
 use Composer\DependencyResolver;
 use Composer\Factory;
@@ -62,7 +63,13 @@ final class Installer
             ->setDevMode()
         ;
 
-        if (method_exists($installer, 'setAudit')) {
+        if (method_exists($installer, 'setAuditConfig')) {
+            // Composer >= 2.9
+            $installer->setAuditConfig(
+                AuditConfig::fromConfig($composer->getConfig(), false),
+            );
+        } elseif (method_exists($installer, 'setAudit')) {
+            // Composer < 2.9
             $installer->setAudit(false);
         }
 
@@ -111,7 +118,13 @@ final class Installer
             ->setUpdateAllowTransitiveDependencies(DependencyResolver\Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
 
-        if (method_exists($installer, 'setAudit')) {
+        if (method_exists($installer, 'setAuditConfig')) {
+            // Composer >= 2.9
+            $installer->setAuditConfig(
+                AuditConfig::fromConfig($composer->getConfig(), false),
+            );
+        } elseif (method_exists($installer, 'setAudit')) {
+            // Composer < 2.9
             $installer->setAudit(false);
         }
 
