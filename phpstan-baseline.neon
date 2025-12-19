@@ -1,7 +1,16 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to function method_exists\(\) with Composer\\Installer and ''setAudit'' will always evaluate to true\.$#'
+			message: '''
+				#^Call to deprecated method setAudit\(\) of class Composer\\Installer\:
+				Use setAuditConfig instead of calling this$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: src/Composer/Installer.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Composer\\Installer and ''setAuditConfig'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Composer/Installer.php
