@@ -31,17 +31,17 @@ use EliasHaeussler\ComposerUpdateCheck\Entity;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class UpdateCheckResult
+final readonly class UpdateCheckResult
 {
     /**
      * @var list<Entity\Package\OutdatedPackage>
      */
-    private readonly array $outdatedPackages;
+    private array $outdatedPackages;
 
     /**
      * @var list<Entity\Package\ExcludedPackage>
      */
-    private readonly array $excludedPackages;
+    private array $excludedPackages;
 
     /**
      * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
@@ -50,7 +50,7 @@ final class UpdateCheckResult
     public function __construct(
         array $outdatedPackages,
         array $excludedPackages = [],
-        private readonly ?Entity\Package\InstalledPackage $rootPackage = null,
+        private ?Entity\Package\InstalledPackage $rootPackage = null,
     ) {
         $this->outdatedPackages = $this->sortPackages($outdatedPackages);
         $this->excludedPackages = $this->sortPackages($excludedPackages);

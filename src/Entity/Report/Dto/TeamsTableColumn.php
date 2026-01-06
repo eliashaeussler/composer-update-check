@@ -33,13 +33,13 @@ use JsonSerializable;
  *
  * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/TableColumnDefinition.json
  */
-final class TeamsTableColumn implements JsonSerializable
+final readonly class TeamsTableColumn implements JsonSerializable
 {
     /**
      * @param positive-int $width
      */
     public function __construct(
-        public readonly int $width,
+        public int $width,
     ) {}
 
     /**

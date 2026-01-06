@@ -40,10 +40,10 @@ use function trim;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class CommandInputConfigAdapter implements ConfigAdapter
+final readonly class CommandInputConfigAdapter implements ConfigAdapter
 {
     public function __construct(
-        private readonly Console\Input\InputInterface $input,
+        private Console\Input\InputInterface $input,
     ) {}
 
     /**

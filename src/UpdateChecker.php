@@ -37,14 +37,14 @@ use function array_values;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class UpdateChecker
+final readonly class UpdateChecker
 {
     public function __construct(
-        private readonly \Composer\Composer $composer,
-        private readonly Composer\Installer $installer,
-        private readonly IO\IOInterface $io,
-        private readonly Security\SecurityScanner $securityScanner,
-        private readonly Reporter\ReporterFactory $reporterFactory,
+        private \Composer\Composer $composer,
+        private Composer\Installer $installer,
+        private IO\IOInterface $io,
+        private Security\SecurityScanner $securityScanner,
+        private Reporter\ReporterFactory $reporterFactory,
     ) {}
 
     /**

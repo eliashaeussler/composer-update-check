@@ -33,11 +33,11 @@ use JsonSerializable;
  *
  * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/Fact.json
  */
-final class TeamsFact implements JsonSerializable
+final readonly class TeamsFact implements JsonSerializable
 {
     public function __construct(
-        public readonly string $title,
-        public readonly string $value,
+        public string $title,
+        public string $value,
     ) {}
 
     /**

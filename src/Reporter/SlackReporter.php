@@ -40,15 +40,15 @@ use function is_string;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SlackReporter implements Reporter
+final readonly class SlackReporter implements Reporter
 {
     public const NAME = 'slack';
 
-    private readonly OptionsResolver\OptionsResolver $resolver;
+    private OptionsResolver\OptionsResolver $resolver;
 
     public function __construct(
-        private readonly Client $client,
-        private readonly IO\IOInterface $io,
+        private Client $client,
+        private IO\IOInterface $io,
     ) {
         $this->resolver = $this->createOptionsResolver();
     }

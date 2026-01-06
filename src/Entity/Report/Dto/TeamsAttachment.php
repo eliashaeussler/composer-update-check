@@ -31,14 +31,14 @@ use JsonSerializable;
  * @author Elias Häußler <e.haeussler@familie-redlich.de>
  * @license GPL-3.0-or-later
  */
-final class TeamsAttachment implements JsonSerializable
+final readonly class TeamsAttachment implements JsonSerializable
 {
     /**
      * @param array<string, mixed> $content
      */
     private function __construct(
-        public readonly string $contentType,
-        public readonly array $content,
+        public string $contentType,
+        public array $content,
     ) {}
 
     /**

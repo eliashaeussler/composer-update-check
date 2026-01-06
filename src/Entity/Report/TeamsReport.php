@@ -34,7 +34,7 @@ use function sprintf;
  * @author Elias Häußler <e.haeussler@familie-redlich.de>
  * @license GPL-3.0-or-later
  */
-final class TeamsReport implements JsonSerializable
+final readonly class TeamsReport implements JsonSerializable
 {
     private const SECURITY_ADVISORIES_CONTAINER_ID = 'securityAdvisories';
 
@@ -42,8 +42,8 @@ final class TeamsReport implements JsonSerializable
      * @param list<Dto\TeamsAttachment> $attachments
      */
     private function __construct(
-        public readonly string $type,
-        public readonly array $attachments,
+        public string $type,
+        public array $attachments,
     ) {}
 
     public static function create(Entity\Result\UpdateCheckResult $result, string $additionalData = ''): self

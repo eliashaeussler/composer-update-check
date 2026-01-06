@@ -34,7 +34,7 @@ use function array_filter;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class TeamsContent implements JsonSerializable
+final readonly class TeamsContent implements JsonSerializable
 {
     /**
      * @param list<TeamsTableColumn>|null $columns
@@ -43,20 +43,20 @@ final class TeamsContent implements JsonSerializable
      * @param list<TeamsTableRow>|null    $rows
      */
     private function __construct(
-        public readonly string $type,
-        public readonly ?array $columns = null,
-        public readonly ?array $facts = null,
-        public readonly ?bool $firstRowAsHeader = null,
-        public readonly ?string $gridStyle = null,
-        public readonly ?string $id = null,
-        public readonly ?bool $isVisible = null,
-        public readonly ?array $items = null,
-        public readonly ?array $rows = null,
-        public readonly ?Entity\Report\Enum\TeamsFontSize $size = null,
-        public readonly ?Entity\Report\Enum\TeamsSpacing $spacing = null,
-        public readonly ?string $text = null,
-        public readonly ?Entity\Report\Enum\TeamsFontWeight $weight = null,
-        public readonly ?bool $wrap = null,
+        public string $type,
+        public ?array $columns = null,
+        public ?array $facts = null,
+        public ?bool $firstRowAsHeader = null,
+        public ?string $gridStyle = null,
+        public ?string $id = null,
+        public ?bool $isVisible = null,
+        public ?array $items = null,
+        public ?array $rows = null,
+        public ?Entity\Report\Enum\TeamsFontSize $size = null,
+        public ?Entity\Report\Enum\TeamsSpacing $spacing = null,
+        public ?string $text = null,
+        public ?Entity\Report\Enum\TeamsFontWeight $weight = null,
+        public ?bool $wrap = null,
     ) {}
 
     /**

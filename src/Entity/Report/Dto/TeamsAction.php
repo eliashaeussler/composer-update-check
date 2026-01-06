@@ -33,16 +33,16 @@ use function array_filter;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class TeamsAction implements JsonSerializable
+final readonly class TeamsAction implements JsonSerializable
 {
     /**
      * @param list<string>|null $targetElements
      */
     private function __construct(
-        public readonly string $type,
-        public readonly string $id,
-        public readonly ?array $targetElements = null,
-        public readonly ?string $title = null,
+        public string $type,
+        public string $id,
+        public ?array $targetElements = null,
+        public ?string $title = null,
     ) {}
 
     /**
