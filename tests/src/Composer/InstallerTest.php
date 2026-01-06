@@ -40,18 +40,18 @@ use function count;
 #[Framework\Attributes\CoversClass(Src\Composer\Installer::class)]
 final class InstallerTest extends Framework\TestCase
 {
-    private Tests\Fixtures\TestApplication $testApplication;
+    /**
+     * @var list<Tests\Fixtures\TestApplication>
+     */
+    private array $testApplications = [];
+
     private IO\BufferIO $io;
     private Src\Composer\Installer $subject;
 
     protected function setUp(): void
     {
-        $this->testApplication = Tests\Fixtures\TestApplication::normal()->boot();
-
-        $container = Tests\Fixtures\ContainerFactory::make($this->testApplication);
-
         $this->io = new IO\BufferIO();
-        $this->subject = $container->get(Src\Composer\Installer::class);
+        $this->subject = $this->createSubject();
     }
 
     #[Framework\Attributes\Test]
@@ -85,6 +85,29 @@ final class InstallerTest extends Framework\TestCase
         }
     }
 
+    #[Framework\Attributes\Test]
+    public function runUpdateIncludesSha1IfPrettyVersionDoesNotChange(): void
+    {
+        $subject = $this->createSubject(Tests\Fixtures\TestApplication::sourceRef());
+
+        // Ensure dependencies are installed
+        $subject->runInstall($this->io);
+
+        $actual = $subject->runUpdate(
+            [
+                new Src\Entity\Package\InstalledPackage('roave/security-advisories'),
+            ],
+            $this->io,
+        );
+
+        self::assertSame(0, $actual->getExitCode());
+        self::assertTrue($actual->isSuccessful());
+        self::assertCount(1, $actual->getOutdatedPackages());
+        self::assertSame('roave/security-advisories', $actual->getOutdatedPackages()[0]->getName());
+        self::assertSame('58efaa4d8f20cd5fcaf511da110c6ad31a1263e1', $actual->getOutdatedPackages()[0]->getOutdatedVersion()->sha1());
+        self::assertNotSame('58efaa4d8f20cd5fcaf511da110c6ad31a1263e1', $actual->getOutdatedPackages()[0]->getNewVersion()->sha1());
+    }
+
     /**
      * @return Generator<string, array{list<Src\Entity\Package\Package>, list<non-empty-string>}>
      */
@@ -114,6 +137,22 @@ final class InstallerTest extends Framework\TestCase
 
     protected function tearDown(): void
     {
-        $this->testApplication->shutdown();
+        foreach ($this->testApplications as $testApplication) {
+            $testApplication->shutdown();
+        }
+    }
+
+    private function createSubject(?Tests\Fixtures\TestApplication $testApplication = null): Src\Composer\Installer
+    {
+        $testApplication ??= Tests\Fixtures\TestApplication::normal();
+        $container = Tests\Fixtures\ContainerFactory::make($testApplication);
+
+        if (!$testApplication->isBooted()) {
+            $testApplication->boot();
+        }
+
+        $this->testApplications[] = $testApplication;
+
+        return $container->get(Src\Composer\Installer::class);
     }
 }

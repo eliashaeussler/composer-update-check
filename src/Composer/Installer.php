@@ -162,10 +162,18 @@ final class Installer
                 $name = $initial->getName();
 
                 if ($this->isSuitableUpdate($initial, $target)) {
+                    $includeSha1 = $initial->getPrettyVersion() === $target->getPrettyVersion();
+
                     $this->outdatedPackages[$name] = new Entity\Package\OutdatedPackage(
                         $name,
-                        new Entity\Version($initial->getPrettyVersion()),
-                        new Entity\Version($target->getPrettyVersion()),
+                        new Entity\Version(
+                            $initial->getPrettyVersion(),
+                            $includeSha1 ? ($initial->getDistReference() ?? $initial->getSourceReference()) : null,
+                        ),
+                        new Entity\Version(
+                            $target->getPrettyVersion(),
+                            $includeSha1 ? ($target->getDistReference() ?? $target->getSourceReference()) : null,
+                        ),
                     );
                 }
 
@@ -186,7 +194,19 @@ final class Installer
                     return false;
                 }
 
-                return $initial->getPrettyVersion() !== $target->getPrettyVersion();
+                if ($initial->getPrettyVersion() !== $target->getPrettyVersion()) {
+                    return true;
+                }
+
+                if ($initial->getSourceReference() !== $target->getSourceReference()) {
+                    return true;
+                }
+
+                if ($initial->getDistReference() !== $target->getDistReference()) {
+                    return true;
+                }
+
+                return false;
             }
         };
     }
