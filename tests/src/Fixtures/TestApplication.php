@@ -29,6 +29,7 @@ use Symfony\Component\Filesystem;
 use function chdir;
 use function dirname;
 use function getcwd;
+use function is_dir;
 use function sys_get_temp_dir;
 use function tempnam;
 
@@ -75,6 +76,13 @@ final class TestApplication
         );
     }
 
+    public static function sourceRef(): self
+    {
+        return new self(
+            dirname(__DIR__, 2).'/build/test-application-source-ref',
+        );
+    }
+
     public function boot(): self
     {
         $this->originalDir = (string) getcwd();
@@ -94,11 +102,17 @@ final class TestApplication
 
     public function shutdown(): void
     {
-        if (null !== $this->originalDir) {
+        if (null !== $this->originalDir && is_dir($this->originalDir)) {
             chdir($this->originalDir);
         }
 
         $this->filesystem->remove($this->tempDir);
+        $this->originalDir = null;
+    }
+
+    public function isBooted(): bool
+    {
+        return null !== $this->originalDir;
     }
 
     public function useNormal(): self
@@ -121,6 +135,14 @@ final class TestApplication
     {
         $this->shutdown();
         $this->path = self::erroneous()->path;
+
+        return $this;
+    }
+
+    public function useSourceRef(): self
+    {
+        $this->shutdown();
+        $this->path = self::sourceRef()->path;
 
         return $this;
     }

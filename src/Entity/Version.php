@@ -25,6 +25,9 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity;
 
 use Stringable;
 
+use function sprintf;
+use function substr;
+
 /**
  * Version.
  *
@@ -35,15 +38,37 @@ final class Version implements Stringable
 {
     public function __construct(
         private readonly string $version,
+        private readonly ?string $sha1 = null,
     ) {}
 
-    public function toString(): string
+    public function prettyVersion(): string
     {
         return $this->version;
     }
 
+    public function sha1(bool $short = false): ?string
+    {
+        if (null === $this->sha1) {
+            return null;
+        }
+
+        return $short ? substr($this->sha1, 0, 7) : $this->sha1;
+    }
+
+    public function toString(): string
+    {
+        $versionString = $this->version;
+        $sha1 = $this->sha1(true);
+
+        if ('' !== (string) $sha1) {
+            $versionString .= sprintf(' (%s)', $sha1);
+        }
+
+        return $versionString;
+    }
+
     public function __toString(): string
     {
-        return $this->version;
+        return $this->toString();
     }
 }

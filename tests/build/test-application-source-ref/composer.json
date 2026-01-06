@@ -1,0 +1,10 @@
+{
+	"require": {
+		"roave/security-advisories": "dev-latest"
+	},
+	"config": {
+		"allow-plugins": {
+			"eliashaeussler/composer-update-check": true
+		}
+	}
+}
