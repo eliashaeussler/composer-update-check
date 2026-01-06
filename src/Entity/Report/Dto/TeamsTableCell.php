@@ -33,13 +33,13 @@ use JsonSerializable;
  *
  * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/TableCell.json
  */
-final class TeamsTableCell implements JsonSerializable
+final readonly class TeamsTableCell implements JsonSerializable
 {
     /**
      * @param list<TeamsContent> $items
      */
     public function __construct(
-        public readonly array $items,
+        public array $items,
     ) {}
 
     /**

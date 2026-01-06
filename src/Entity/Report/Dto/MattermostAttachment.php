@@ -33,11 +33,11 @@ use JsonSerializable;
  *
  * @see https://developers.mattermost.com/integrate/reference/message-attachments/
  */
-final class MattermostAttachment implements JsonSerializable
+final readonly class MattermostAttachment implements JsonSerializable
 {
     public function __construct(
-        public readonly string $color,
-        public readonly string $text,
+        public string $color,
+        public string $text,
     ) {}
 
     /**

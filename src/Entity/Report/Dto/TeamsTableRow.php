@@ -35,16 +35,16 @@ use function array_filter;
  *
  * @see https://github.com/microsoft/AdaptiveCards/blob/main/schemas/src/elements/TableRow.json
  */
-final class TeamsTableRow implements JsonSerializable
+final readonly class TeamsTableRow implements JsonSerializable
 {
     /**
      * @param list<TeamsTableCell> $cells
      */
     public function __construct(
-        public readonly array $cells,
-        public readonly ?string $spacing = null,
-        public readonly ?string $horizontalCellContentAlignment = null,
-        public readonly ?string $verticalCellContentAlignment = null,
+        public array $cells,
+        public ?string $spacing = null,
+        public ?string $horizontalCellContentAlignment = null,
+        public ?string $verticalCellContentAlignment = null,
     ) {}
 
     /**

@@ -32,14 +32,14 @@ use Symfony\Component\DependencyInjection;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class ReporterFactory
+final readonly class ReporterFactory
 {
     /**
      * @param DependencyInjection\ServiceLocator<Reporter> $reporters
      */
     public function __construct(
         #[DependencyInjection\Attribute\AutowireLocator('reporter', defaultIndexMethod: 'getName')]
-        private readonly DependencyInjection\ServiceLocator $reporters,
+        private DependencyInjection\ServiceLocator $reporters,
     ) {}
 
     /**

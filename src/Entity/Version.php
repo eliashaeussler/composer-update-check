@@ -34,11 +34,11 @@ use function substr;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class Version implements Stringable
+final readonly class Version implements Stringable
 {
     public function __construct(
-        private readonly string $version,
-        private readonly ?string $sha1 = null,
+        private string $version,
+        private ?string $sha1 = null,
     ) {}
 
     public function prettyVersion(): string

@@ -37,17 +37,17 @@ use function sprintf;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SecurityAdvisory implements JsonSerializable
+final readonly class SecurityAdvisory implements JsonSerializable
 {
     public function __construct(
-        private readonly string $packageName,
-        private readonly string $advisoryId,
-        private readonly string $affectedVersions,
-        private readonly string $title,
-        private readonly DateTimeImmutable $reportedAt,
-        private readonly SeverityLevel $severity,
-        private readonly ?string $cve = null,
-        private readonly ?Message\UriInterface $link = null,
+        private string $packageName,
+        private string $advisoryId,
+        private string $affectedVersions,
+        private string $title,
+        private DateTimeImmutable $reportedAt,
+        private SeverityLevel $severity,
+        private ?string $cve = null,
+        private ?Message\UriInterface $link = null,
     ) {}
 
     public function getPackageName(): string

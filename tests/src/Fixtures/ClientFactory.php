@@ -34,10 +34,10 @@ use GuzzleHttp\Handler;
  *
  * @internal
  */
-final class ClientFactory
+final readonly class ClientFactory
 {
     public function __construct(
-        private readonly Handler\MockHandler $handler,
+        private Handler\MockHandler $handler,
     ) {}
 
     public function make(): Client

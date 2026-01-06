@@ -37,17 +37,17 @@ use function str_repeat;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class MattermostReport implements JsonSerializable
+final readonly class MattermostReport implements JsonSerializable
 {
     /**
      * @param list<Dto\MattermostAttachment> $attachments
      */
     private function __construct(
-        public readonly string $channel,
-        public readonly string $text,
-        public readonly array $attachments,
-        public readonly ?string $iconEmoji = null,
-        public readonly ?string $username = null,
+        public string $channel,
+        public string $text,
+        public array $attachments,
+        public ?string $iconEmoji = null,
+        public ?string $username = null,
     ) {}
 
     public static function create(

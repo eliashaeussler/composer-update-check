@@ -31,15 +31,15 @@ use EliasHaeussler\ComposerUpdateCheck\Configuration;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class ExcludedPackage implements Package
+final readonly class ExcludedPackage implements Package
 {
     /**
      * @param non-empty-string $name
      */
     public function __construct(
-        private readonly string $name,
-        private readonly ExcludeReason $excludeReason,
-        private readonly ?Configuration\Options\PackageExcludePattern $excludePattern = null,
+        private string $name,
+        private ExcludeReason $excludeReason,
+        private ?Configuration\Options\PackageExcludePattern $excludePattern = null,
     ) {}
 
     public function getName(): string

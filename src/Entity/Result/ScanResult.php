@@ -32,13 +32,13 @@ use EliasHaeussler\ComposerUpdateCheck\Entity;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class ScanResult
+final readonly class ScanResult
 {
     /**
      * @param array<string, list<Entity\Security\SecurityAdvisory>> $securityAdvisories
      */
     public function __construct(
-        private readonly array $securityAdvisories,
+        private array $securityAdvisories,
     ) {}
 
     /**

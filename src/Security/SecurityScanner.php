@@ -37,12 +37,12 @@ use Spatie\Packagist;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SecurityScanner
+final readonly class SecurityScanner
 {
-    private readonly Valinor\Mapper\TreeMapper $mapper;
+    private Valinor\Mapper\TreeMapper $mapper;
 
     public function __construct(
-        private readonly Packagist\PackagistClient $client,
+        private Packagist\PackagistClient $client,
     ) {
         $this->mapper = $this->createMapper();
     }

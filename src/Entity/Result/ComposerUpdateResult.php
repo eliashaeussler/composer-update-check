@@ -31,15 +31,15 @@ use EliasHaeussler\ComposerUpdateCheck\Entity;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class ComposerUpdateResult
+final readonly class ComposerUpdateResult
 {
     /**
      * @param non-negative-int                     $exitCode
      * @param list<Entity\Package\OutdatedPackage> $outdatedPackages
      */
     public function __construct(
-        private readonly int $exitCode,
-        private readonly array $outdatedPackages,
+        private int $exitCode,
+        private array $outdatedPackages,
     ) {}
 
     /**

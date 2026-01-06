@@ -31,17 +31,17 @@ use JsonSerializable;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SlackBlock implements JsonSerializable
+final readonly class SlackBlock implements JsonSerializable
 {
     /**
      * @param list<SlackBlockElement>|null $fields
      * @param list<SlackBlockElement>|null $elements
      */
     private function __construct(
-        public readonly string $type,
-        public readonly ?SlackBlockElement $text = null,
-        public readonly ?array $fields = null,
-        public readonly ?array $elements = null,
+        public string $type,
+        public ?SlackBlockElement $text = null,
+        public ?array $fields = null,
+        public ?array $elements = null,
     ) {}
 
     /**

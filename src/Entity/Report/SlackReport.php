@@ -36,7 +36,7 @@ use function sprintf;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class SlackReport implements JsonSerializable
+final readonly class SlackReport implements JsonSerializable
 {
     private const MAX_BLOCKS = 45;
 
@@ -44,7 +44,7 @@ final class SlackReport implements JsonSerializable
      * @param list<Dto\SlackBlock> $blocks
      */
     private function __construct(
-        public readonly array $blocks,
+        public array $blocks,
     ) {}
 
     public static function create(Entity\Result\UpdateCheckResult $result): self

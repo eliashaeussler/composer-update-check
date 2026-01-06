@@ -29,13 +29,13 @@ namespace EliasHaeussler\ComposerUpdateCheck\Entity\Package;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class InstalledPackage implements Package
+final readonly class InstalledPackage implements Package
 {
     /**
      * @param non-empty-string $name
      */
     public function __construct(
-        private readonly string $name,
+        private string $name,
     ) {}
 
     public function getName(): string
