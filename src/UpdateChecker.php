@@ -46,11 +46,11 @@ final readonly class UpdateChecker
     public function __construct(
         private \Composer\Composer $composer,
         private Composer\Installer $installer,
-        private IO\IOInterface $io,
+        IO\IOInterface $io,
         private Security\SecurityScanner $securityScanner,
         private Reporter\ReporterFactory $reporterFactory,
     ) {
-        $this->taskRunner = new TaskRunner\TaskRunner($this->io);
+        $this->taskRunner = new TaskRunner\TaskRunner($io);
     }
 
     /**
@@ -74,7 +74,6 @@ final readonly class UpdateChecker
             $this->taskRunner->run(
                 '🚨 Looking up security advisories',
                 fn () => $this->securityScanner->scanAndOverlayResult($result),
-                Console\Output\OutputInterface::VERBOSITY_VERBOSE,
             );
         }
 
@@ -104,51 +103,39 @@ final readonly class UpdateChecker
             return new Entity\Result\UpdateCheckResult([], $excludedPackages, $this->lookupRootPackage());
         }
 
-        // Ensure dependencies are installed
-        $this->installDependencies();
-
-        $result = $this->taskRunner->run(
+        return $this->taskRunner->run(
             '⏳ Checking for outdated packages',
-            function (TaskRunner\RunnerContext $context) use ($packages) {
+            function (TaskRunner\RunnerContext $context) use ($packages, $excludedPackages) {
                 $io = new IO\BufferIO();
 
+                // Ensure dependencies are installed
+                $exitCode = $this->installer->runInstall($io);
+
+                // Handle install failures
+                if ($exitCode > 0) {
+                    $context->output->write($io->getOutput());
+
+                    throw new Exception\ComposerInstallFailed($exitCode);
+                }
+
                 // Run Composer installer
+                $io = new IO\BufferIO();
                 $result = $this->installer->runUpdate($packages, $io);
 
-                // Handle installer failures
+                // Handle update failures
                 if (!$result->isSuccessful()) {
                     $context->output->write($io->getOutput());
 
                     throw new Exception\ComposerUpdateFailed($result->getExitCode());
                 }
 
-                return $result;
+                return new Entity\Result\UpdateCheckResult(
+                    $result->getOutdatedPackages(),
+                    $excludedPackages,
+                    $this->lookupRootPackage(),
+                );
             },
-            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
         );
-
-        return new Entity\Result\UpdateCheckResult(
-            $result->getOutdatedPackages(),
-            $excludedPackages,
-            $this->lookupRootPackage(),
-        );
-    }
-
-    /**
-     * @throws Exception\ComposerInstallFailed
-     */
-    private function installDependencies(): void
-    {
-        // Run Composer installer
-        $io = new IO\BufferIO();
-        $exitCode = $this->installer->runInstall($io);
-
-        // Handle installer failures
-        if ($exitCode > 0) {
-            $this->io->writeError($io->getOutput());
-
-            throw new Exception\ComposerInstallFailed($exitCode);
-        }
     }
 
     /**
@@ -186,7 +173,6 @@ final readonly class UpdateChecker
                     $this->mapExcludedPackages($excludedPackages),
                 ];
             },
-            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
         );
     }
 
