@@ -30,7 +30,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
-use Symfony\Component\Console;
 use Symfony\Component\OptionsResolver;
 
 use function assert;
@@ -92,7 +91,6 @@ final readonly class MattermostReporter implements Reporter
 
                 return $context->successful;
             },
-            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
         );
     }
 
