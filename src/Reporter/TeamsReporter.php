@@ -25,10 +25,12 @@ namespace EliasHaeussler\ComposerUpdateCheck\Reporter;
 
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck\Entity;
+use EliasHaeussler\TaskRunner;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\RequestOptions;
+use Symfony\Component\Console;
 use Symfony\Component\OptionsResolver;
 
 use function assert;
@@ -45,12 +47,14 @@ final readonly class TeamsReporter implements Reporter
     public const NAME = 'teams';
 
     private OptionsResolver\OptionsResolver $resolver;
+    private TaskRunner\TaskRunner $taskRunner;
 
     public function __construct(
         private Client $client,
         private IO\IOInterface $io,
     ) {
         $this->resolver = $this->createOptionsResolver();
+        $this->taskRunner = new TaskRunner\TaskRunner($this->io);
     }
 
     public function report(Entity\Result\UpdateCheckResult $result, array $options): bool
@@ -73,24 +77,22 @@ final readonly class TeamsReporter implements Reporter
         $report = Entity\Report\TeamsReport::create($result, $additionalData);
 
         // Send report
-        try {
-            $this->io->writeError('📤 Sending report to Teams... ', false, IO\IOInterface::VERBOSE);
+        return $this->taskRunner->run(
+            '📤 Sending report to Teams',
+            function (TaskRunner\RunnerContext $context) use ($url, $report) {
+                try {
+                    $response = $this->client->post($url, [
+                        RequestOptions::JSON => $report,
+                    ]);
+                    $context->successful = 202 === $response->getStatusCode();
+                } catch (Exception\GuzzleException) {
+                    $context->successful = false;
+                }
 
-            $response = $this->client->post($url, [
-                RequestOptions::JSON => $report,
-            ]);
-            $successful = 202 === $response->getStatusCode();
-        } catch (Exception\GuzzleException) {
-            $successful = false;
-        }
-
-        if ($successful) {
-            $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
-        } else {
-            $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
-        }
-
-        return $successful;
+                return $context->successful;
+            },
+            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
+        );
     }
 
     /**

@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateCheck;
 
 use Composer\IO;
+use EliasHaeussler\TaskRunner;
+use Symfony\Component\Console;
 
 use function array_fill_keys;
 use function array_keys;
@@ -39,13 +41,17 @@ use function array_values;
  */
 final readonly class UpdateChecker
 {
+    private TaskRunner\TaskRunner $taskRunner;
+
     public function __construct(
         private \Composer\Composer $composer,
         private Composer\Installer $installer,
         private IO\IOInterface $io,
         private Security\SecurityScanner $securityScanner,
         private Reporter\ReporterFactory $reporterFactory,
-    ) {}
+    ) {
+        $this->taskRunner = new TaskRunner\TaskRunner($this->io);
+    }
 
     /**
      * @throws Exception\ComposerInstallFailed
@@ -65,15 +71,11 @@ final readonly class UpdateChecker
 
         // Overlay security scan
         if ($config->shouldPerformSecurityScan() && [] !== $result->getOutdatedPackages()) {
-            try {
-                $this->io->writeError('🚨 Looking up security advisories... ', false, IO\IOInterface::VERBOSE);
-                $this->securityScanner->scanAndOverlayResult($result);
-                $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
-            } catch (Exception\PackagistResponseHasErrors|Exception\UnableToFetchSecurityAdvisories $exception) {
-                $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
-
-                throw $exception;
-            }
+            $this->taskRunner->run(
+                '🚨 Looking up security advisories',
+                fn () => $this->securityScanner->scanAndOverlayResult($result),
+                Console\Output\OutputInterface::VERBOSITY_VERBOSE,
+            );
         }
 
         // Dispatch event
@@ -105,22 +107,25 @@ final readonly class UpdateChecker
         // Ensure dependencies are installed
         $this->installDependencies();
 
-        // Show progress
-        $this->io->writeError('⏳ Checking for outdated packages... ', false, IO\IOInterface::VERBOSE);
+        $result = $this->taskRunner->run(
+            '⏳ Checking for outdated packages',
+            function (TaskRunner\RunnerContext $context) use ($packages) {
+                $io = new IO\BufferIO();
 
-        // Run Composer installer
-        $io = new IO\BufferIO();
-        $result = $this->installer->runUpdate($packages, $io);
+                // Run Composer installer
+                $result = $this->installer->runUpdate($packages, $io);
 
-        // Handle installer failures
-        if (!$result->isSuccessful()) {
-            $this->io->writeError('<error>Failed</error>', true, IO\IOInterface::VERBOSE);
-            $this->io->writeError($io->getOutput());
+                // Handle installer failures
+                if (!$result->isSuccessful()) {
+                    $context->output->write($io->getOutput());
 
-            throw new Exception\ComposerUpdateFailed($result->getExitCode());
-        }
+                    throw new Exception\ComposerUpdateFailed($result->getExitCode());
+                }
 
-        $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
+                return $result;
+            },
+            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
+        );
 
         return new Entity\Result\UpdateCheckResult(
             $result->getOutdatedPackages(),
@@ -151,43 +156,38 @@ final readonly class UpdateChecker
      */
     private function resolvePackagesForUpdateCheck(Configuration\ComposerUpdateCheckConfig $config): array
     {
-        $this->io->writeError('📦 Resolving packages... ', false, IO\IOInterface::VERBOSE);
+        return $this->taskRunner->run(
+            '📦 Resolving packages',
+            function (TaskRunner\RunnerContext $context) use ($config) {
+                $rootPackage = $this->composer->getPackage();
+                /** @var array<non-empty-string> $requiredPackages */
+                $requiredPackages = array_keys($rootPackage->getRequires());
+                /** @var array<non-empty-string> $requiredDevPackages */
+                $requiredDevPackages = array_keys($rootPackage->getDevRequires());
+                $excludedPackages = [];
 
-        $outputWasWritten = false;
-        $rootPackage = $this->composer->getPackage();
-        /** @var array<non-empty-string> $requiredPackages */
-        $requiredPackages = array_keys($rootPackage->getRequires());
-        /** @var array<non-empty-string> $requiredDevPackages */
-        $requiredDevPackages = array_keys($rootPackage->getDevRequires());
-        $excludedPackages = [];
+                // Handle dev-packages
+                if ($config->areDevPackagesIncluded()) {
+                    $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
+                } else {
+                    $excludedPackages = array_fill_keys($requiredDevPackages, null);
 
-        // Handle dev-packages
-        if ($config->areDevPackagesIncluded()) {
-            $requiredPackages = array_merge($requiredPackages, $requiredDevPackages);
-        } else {
-            $excludedPackages = array_fill_keys($requiredDevPackages, null);
+                    $context->output->writeln('🚫 Skipped dev-requirements', Console\Output\OutputInterface::VERBOSITY_VERBOSE);
+                }
 
-            $this->io->writeError(['', '🚫 Skipped dev-requirements'], true, IO\IOInterface::VERBOSE);
+                // Remove packages by exclude patterns
+                $excludedPackages = array_merge(
+                    $excludedPackages,
+                    $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns(), $context->output),
+                );
 
-            if ($this->io->isVerbose()) {
-                $outputWasWritten = true;
-            }
-        }
-
-        // Remove packages by exclude patterns
-        $excludedPackages = array_merge(
-            $excludedPackages,
-            $this->removeByExcludePatterns($requiredPackages, $config->getExcludePatterns(), $outputWasWritten),
+                return [
+                    array_values($this->mapPackageNamesToPackage($requiredPackages)),
+                    $this->mapExcludedPackages($excludedPackages),
+                ];
+            },
+            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
         );
-
-        if (!$outputWasWritten) {
-            $this->io->writeError('<info>Done</info>', true, IO\IOInterface::VERBOSE);
-        }
-
-        return [
-            array_values($this->mapPackageNamesToPackage($requiredPackages)),
-            $this->mapExcludedPackages($excludedPackages),
-        ];
     }
 
     /**
@@ -199,26 +199,21 @@ final readonly class UpdateChecker
     private function removeByExcludePatterns(
         array &$packages,
         array $excludePatterns,
-        bool &$outputWasWritten = false,
+        Console\Output\OutputInterface $output,
     ): array {
         $excludedPackages = [];
 
         $packages = array_filter(
             $packages,
-            function (string $package) use (&$excludedPackages, $excludePatterns, &$outputWasWritten) {
+            static function (string $package) use (&$excludedPackages, $excludePatterns, $output) {
                 foreach ($excludePatterns as $excludePattern) {
                     if ($excludePattern->matches($package)) {
                         $excludedPackages[$package] = $excludePattern;
 
-                        if ($this->io->isVerbose()) {
-                            if (!$outputWasWritten) {
-                                $this->io->writeError('', true, IO\IOInterface::VERBOSE);
-                            }
-
-                            $outputWasWritten = true;
-                        }
-
-                        $this->io->writeError(sprintf('🚫 Skipped <info>%s</info>', $package), true, IO\IOInterface::VERBOSE);
+                        $output->writeln(
+                            sprintf('🚫 Skipped <info>%s</info>', $package),
+                            Console\Output\OutputInterface::VERBOSITY_VERBOSE,
+                        );
 
                         return false;
                     }
