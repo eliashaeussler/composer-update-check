@@ -12,38 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ["8.2", "8.3", "8.4", "8.5"]
-        composer-version: ["2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"]
+        # We test only 2.2 (LTS) and latest version, since all other versions are insecure
+        composer-version: ["2.2", "2.9"]
         dependencies: ["highest", "lowest"]
-
-        # Avoid incompatible interface implementations in Composer v2.6 & symfony/console v7
-        include:
-          - php-version: "8.2"
-            composer-version: "2.6"
-            dependencies: "highest"
-            composer-extra-options: '--with="symfony/console:^6.0"'
-          - php-version: "8.3"
-            composer-version: "2.6"
-            dependencies: "highest"
-            composer-extra-options: '--with="symfony/console:^6.0"'
-          - php-version: "8.4"
-            composer-version: "2.6"
-            dependencies: "highest"
-            composer-extra-options: '--with="symfony/console:^6.0"'
-          - php-version: "8.5"
-            composer-version: "2.6"
-            dependencies: "highest"
-            composer-extra-options: '--with="symfony/console:^6.0"'
-
-        # Avoid testing PHP 8.4/8.5 with incompatible Composer versions
         exclude:
           - php-version: "8.4"
             composer-version: "2.2"
-          - php-version: "8.4"
-            composer-version: "2.3"
           - php-version: "8.5"
             composer-version: "2.2"
-          - php-version: "8.5"
-            composer-version: "2.3"
 
     steps:
       - uses: actions/checkout@v6
@@ -63,7 +39,7 @@ jobs:
         uses: ramsey/composer-install@4.0.0
         with:
           dependency-versions: ${{ matrix.dependencies }}
-          composer-options: '--with="composer/composer:~${{ matrix.composer-version }}.0" ${{ matrix.composer-extra-options }}'
+          composer-options: '--with="composer/composer:~${{ matrix.composer-version }}.0"'
 
       # Run tests
       - name: Run tests
