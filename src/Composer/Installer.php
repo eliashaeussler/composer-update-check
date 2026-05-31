@@ -63,15 +63,7 @@ final readonly class Installer
             ->setDevMode()
         ;
 
-        if (method_exists($installer, 'setAuditConfig')) {
-            // Composer >= 2.9
-            $installer->setAuditConfig(
-                AuditConfig::fromConfig($composer->getConfig(), false),
-            );
-        } elseif (method_exists($installer, 'setAudit')) {
-            // Composer < 2.9
-            $installer->setAudit(false);
-        }
+        $this->disableAudit($installer, $composer);
 
         return $installer->run();
     }
@@ -118,15 +110,7 @@ final readonly class Installer
             ->setUpdateAllowTransitiveDependencies(DependencyResolver\Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS)
         ;
 
-        if (method_exists($installer, 'setAuditConfig')) {
-            // Composer >= 2.9
-            $installer->setAuditConfig(
-                AuditConfig::fromConfig($composer->getConfig(), false),
-            );
-        } elseif (method_exists($installer, 'setAudit')) {
-            // Composer < 2.9
-            $installer->setAudit(false);
-        }
+        $this->disableAudit($installer, $composer);
 
         return new Entity\Result\ComposerUpdateResult(
             $installer->run(),
@@ -233,5 +217,23 @@ final readonly class Installer
         $composer->getAutoloadGenerator()->setRunScripts(false);
 
         return $composer;
+    }
+
+    private function disableAudit(ComposerInstaller $installer, Composer $composer): void
+    {
+        if (method_exists($installer, 'setAuditConfig')) {
+            if (method_exists(AuditConfig::class, 'fromConfig')) {
+                // Composer 2.9
+                $auditConfig = AuditConfig::fromConfig($composer->getConfig(), false);
+            } else {
+                // Composer >= 2.10
+                $auditConfig = new AuditConfig(false);
+            }
+
+            $installer->setAuditConfig($auditConfig);
+        } elseif (method_exists($installer, 'setAudit')) {
+            // Composer < 2.9
+            $installer->setAudit(false);
+        }
     }
 }

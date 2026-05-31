@@ -6,11 +6,17 @@ parameters:
 				Use setAuditConfig instead of calling this$#
 			'''
 			identifier: method.deprecated
-			count: 2
+			count: 1
 			path: src/Composer/Installer.php
 
 		-
 			message: '#^Call to function method_exists\(\) with Composer\\Installer and ''setAuditConfig'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 2
+			count: 1
+			path: src/Composer/Installer.php
+
+		-
+			message: '#^Parameter \#1 \$auditConfig of method Composer\\Installer\:\:setAuditConfig\(\) expects Composer\\Advisory\\AuditConfig, mixed given\.$#'
+			identifier: argument.type
+			count: 1
 			path: src/Composer/Installer.php
