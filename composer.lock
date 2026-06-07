@@ -2842,16 +2842,16 @@
         },
         {
             "name": "eliashaeussler/deep-closure-comparator",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eliashaeussler/deep-closure-comparator.git",
-                "reference": "293b22e4a393d00743f63c70945426d9f5d373d8"
+                "reference": "7c1897e338c2b72dbe0c8245de84ad311ff4a702"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eliashaeussler/deep-closure-comparator/zipball/293b22e4a393d00743f63c70945426d9f5d373d8",
-                "reference": "293b22e4a393d00743f63c70945426d9f5d373d8",
+                "url": "https://api.github.com/repos/eliashaeussler/deep-closure-comparator/zipball/7c1897e338c2b72dbe0c8245de84ad311ff4a702",
+                "reference": "7c1897e338c2b72dbe0c8245de84ad311ff4a702",
                 "shasum": ""
             },
             "require": {
@@ -2891,9 +2891,10 @@
             "description": "Provides a PHPUnit comparator to assert equality of closures",
             "support": {
                 "issues": "https://github.com/eliashaeussler/deep-closure-comparator/issues",
-                "source": "https://github.com/eliashaeussler/deep-closure-comparator/tree/1.2.2"
+                "source": "https://github.com/eliashaeussler/deep-closure-comparator/tree/1.2.3"
             },
-            "time": "2026-02-11T17:38:18+00:00"
+            "abandoned": "sebastian/comparator",
+            "time": "2026-06-07T17:43:45+00:00"
         },
         {
             "name": "eliashaeussler/php-cs-fixer-config",
