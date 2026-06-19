@@ -1,64 +1,103 @@
 # How to contribute
 
-Contributions to the Composer update check plugin are very welcome. :slight_smile:
+Thanks for considering contributing to this project. Contributions of any size are highly appreciated.
 
-Please follow the guide on this page if you want to contribute. Make sure
-that all required code quality checks are green. If you need help, feel free
-to file an issue and I will try to assist you wherever needed.
+To keep the code base consistent and maintainable, please follow the workflow described below before
+submitting a pull request.
 
-## :octicons-terminal-24: Preparation
+## Requirements
+
+- PHP >= 8.2
+
+## Preparation
 
 ```bash
 # Clone repository
 git clone https://github.com/eliashaeussler/composer-update-check.git
 cd composer-update-check
 
-# Install Composer dependencies
+# Install dependencies
 composer install
 ```
 
-## :octicons-file-code-24: Check code quality
+## Development workflow
 
-Code quality can be checked by running the following commands:
+A typical contribution workflow looks like this:
+
+1. Apply automatic fixes.
+2. Run all checks.
+3. Run the test suite.
+4. Submit a pull request.
+
+### Apply automatic fixes
+
+Use the following commands to normalize and format the code base:
 
 ```bash
-# All linters
-composer lint
-
-# Specific linters
-composer lint:composer
-composer lint:editorconfig
-composer lint:php
-
-# Fix all CGL issues
+# Apply all automatic fixes
 composer fix
 
-# Fix specific CGL issues
+# Apply specific fixes
 composer fix:composer
 composer fix:editorconfig
 composer fix:php
-
-# All static code analyzers
-composer sca
-
-# Specific static code analyzers
-composer sca:php
 ```
 
-## :octicons-bug-24: Run tests
+### Run checks
 
-Unit tests can be executed using the provided Composer script `test`.
-You can pass all available arguments to PHPUnit.
+Use `composer check` to run the full code quality pipeline locally. This command bundles dependency analysis,
+static analysis, coding style checks, and Rector in dry-run mode so that potential refactorings can be reviewed
+without changing files.
+
+```bash
+# Run all checks
+composer check
+
+# Run specific checks
+composer check:deps
+composer check:refactor
+composer check:static
+composer check:style
+
+# Run specific style checks
+composer check:style:composer
+composer check:style:editorconfig
+composer check:style:php
+```
+
+### Run refactorings
+
+Refactorings are intentionally separated from regular checks because they may change the code base.
+
+```bash
+# Run all configured refactorings
+composer refactor
+
+# Run specific refactorings
+composer refactor:php
+```
+
+### Run tests
+
+Run the full test suite before opening a pull request:
 
 ```bash
 # Run tests
 composer test
 
-# Run tests and generate code coverage
+# Run tests with code coverage
 composer test:coverage
 ```
 
-## :technologist: Simulate application
+## Coverage reports
+
+Code coverage reports are written to `build/tests/coverage`. Open the latest HTML report with:
+
+```bash
+open build/tests/coverage/html/index.html
+```
+
+## Simulate application
 
 A Composer script `simulate` exists which lets you run the Composer
 command `update-check`. All parameters passed to the script will be
@@ -79,7 +118,7 @@ Alternatively, this script can be called without Composer context:
 ./bin/simulate-application.sh
 ```
 
-## :material-file-document-edit-outline: Build documentation
+## Build documentation
 
 ```bash
 # Build documentation and watch for changes
@@ -88,3 +127,12 @@ composer docs
 # Build documentation for production use
 composer docs:build
 ```
+
+## Pull requests
+
+Once the changes are ready, please [submit a pull request](https://github.com/eliashaeussler/composer-update-check/compare)
+and describe what was changed and why. Ideally, the pull request references an issue that describes the
+problem being solved.
+
+All documented code quality tools are executed automatically for pull requests across the currently
+supported PHP versions. For details, refer to the [GitHub Actions workflows]({{ repository.blob }}/.github/workflows).

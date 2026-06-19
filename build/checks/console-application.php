@@ -21,20 +21,19 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\PhpCsFixerConfig;
-use Symfony\Component\Finder;
+namespace EliasHaeussler\ComposerUpdateCheck;
 
-$header = PhpCsFixerConfig\Rules\Header::create(
-    'eliashaeussler/composer-update-check',
-    PhpCsFixerConfig\Package\Type::ComposerPackage,
-    PhpCsFixerConfig\Package\Author::create('Elias Häußler', 'elias@haeussler.dev'),
-    PhpCsFixerConfig\Package\CopyrightRange::from(2020),
-    PhpCsFixerConfig\Package\License::GPL3OrLater,
-);
+use Composer\Composer;
+use Composer\IO;
+use Symfony\Component\Console;
 
-return PhpCsFixerConfig\Config::create()
-    ->withRule($header)
-    ->withFinder(
-        static fn (Finder\Finder $finder) => $finder->in(__DIR__),
-    )
-;
+require_once dirname(__DIR__, 2).'/vendor/autoload.php';
+
+$container = (new DependencyInjection\ContainerFactory())->make();
+$container->set(Composer::class, new Composer());
+$container->set(IO\IOInterface::class, new IO\NullIO());
+
+$application = new Console\Application();
+$application->add($container->get(Command\UpdateCheckCommand::class));
+
+return $application;
