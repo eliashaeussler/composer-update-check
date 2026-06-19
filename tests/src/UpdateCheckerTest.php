@@ -26,7 +26,6 @@ namespace EliasHaeussler\ComposerUpdateCheck\Tests;
 use Composer\Composer;
 use Composer\IO;
 use EliasHaeussler\ComposerUpdateCheck as Src;
-use EliasHaeussler\DeepClosureComparator;
 use GuzzleHttp\Exception;
 use GuzzleHttp\Handler;
 use InvalidArgumentException;
@@ -123,6 +122,7 @@ final class UpdateCheckerTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
+    #[Framework\Attributes\IgnorePhpunitWarnings('Comparing closures for equality is problematic because there is no reliable way to determine whether two closures are equal')]
     public function runReturnsEmptyUpdateCheckResultIfOutdatedPackagesAreSkipped(): void
     {
         $this->config->excludePackageByName('symfony/*');
@@ -143,7 +143,7 @@ final class UpdateCheckerTest extends Framework\TestCase
             ],
         );
 
-        DeepClosureComparator\DeepClosureAssert::assertEquals($expected, $this->subject->run($this->config));
+        self::assertEquals($expected, $this->subject->run($this->config));
 
         $output = $this->io->getOutput();
 

@@ -21,28 +21,20 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\RectorConfig\Config\Config;
-use EliasHaeussler\RectorConfig\Entity\Version;
-use Rector\Config\RectorConfig;
-use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
-use Rector\ValueObject\PhpVersion;
+use EliasHaeussler\PhpCsFixerConfig;
+use Symfony\Component\Finder;
 
-return static function (RectorConfig $rectorConfig): void {
-    Config::create($rectorConfig, PhpVersion::PHP_82)
-        ->in(
-            __DIR__.'/src',
-            __DIR__.'/tests/src',
-        )
-        ->withSymfony(Version::createMinor(5, 4))
-        ->withPHPUnit()
-        ->skip(
-            AnnotationToAttributeRector::class,
-            [
-                __DIR__.'/src/DependencyInjection/CompilerPass/ContainerBuilderDebugDumpPass.php',
-                __DIR__.'/src/Event/PostUpdateCheckEvent.php',
-                __DIR__.'/src/Plugin.php',
-            ],
-        )
-        ->apply()
-    ;
-};
+$header = PhpCsFixerConfig\Rules\Header::create(
+    'eliashaeussler/composer-update-check',
+    PhpCsFixerConfig\Package\Type::ComposerPackage,
+    PhpCsFixerConfig\Package\Author::create('Elias Häußler', 'elias@haeussler.dev'),
+    PhpCsFixerConfig\Package\CopyrightRange::from(2020),
+    PhpCsFixerConfig\Package\License::GPL3OrLater,
+);
+
+return PhpCsFixerConfig\Config::create()
+    ->withRule($header)
+    ->withFinder(
+        static fn (Finder\Finder $finder) => $finder->in(dirname(__DIR__, 2)),
+    )
+;

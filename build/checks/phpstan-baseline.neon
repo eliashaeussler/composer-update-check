@@ -7,16 +7,22 @@ parameters:
 			'''
 			identifier: method.deprecated
 			count: 1
-			path: src/Composer/Installer.php
+			path: ../../src/Composer/Installer.php
 
 		-
 			message: '#^Call to function method_exists\(\) with Composer\\Installer and ''setAuditConfig'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/Composer/Installer.php
+			path: ../../src/Composer/Installer.php
 
 		-
 			message: '#^Parameter \#1 \$auditConfig of method Composer\\Installer\:\:setAuditConfig\(\) expects Composer\\Advisory\\AuditConfig, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Composer/Installer.php
+			path: ../../src/Composer/Installer.php
+
+		-
+			message: '#^Attribute class PHPUnit\\Framework\\Attributes\\IgnorePhpunitWarnings does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: ../../tests/src/UpdateCheckerTest.php

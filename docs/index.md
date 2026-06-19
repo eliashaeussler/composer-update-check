@@ -4,10 +4,7 @@ hide:
 ---
 
 [![Coverage](https://img.shields.io/coverallsCoverage/github/eliashaeussler/composer-update-check?logo=coveralls)](https://coveralls.io/github/eliashaeussler/composer-update-check)
-[![Maintainability](https://qlty.sh/gh/eliashaeussler/projects/composer-update-check/maintainability.svg)](https://qlty.sh/gh/eliashaeussler/projects/composer-update-check)
-[![Tests](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/tests.yaml)
-[![CGL](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/cgl.yaml)
-[![Release](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/release.yaml)
+[![CI](https://img.shields.io/github/actions/workflow/status/eliashaeussler/composer-update-check/ci.yaml?label=CI&logo=github)](https://github.com/eliashaeussler/composer-update-check/actions/workflows/ci.yaml)
 [![Latest Stable Version](https://poser.pugx.org/eliashaeussler/composer-update-check/v)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![Total Downloads](https://poser.pugx.org/eliashaeussler/composer-update-check/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-check)
 [![License](https://poser.pugx.org/eliashaeussler/composer-update-check/license)](license.md)

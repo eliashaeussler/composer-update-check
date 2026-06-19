@@ -21,24 +21,15 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\DependencyInjection;
-use EliasHaeussler\PHPStanConfig;
+use PHPUnit\Framework;
+use ShipMonk\ComposerDependencyAnalyser;
 
-return PHPStanConfig\Config\Config::create(__DIR__)
-    ->in(
-        'src',
-        'tests/src',
-    )
-    ->with('vendor/cuyz/valinor/qa/PHPStan/valinor-phpstan-suppress-pure-errors.php')
-    ->withBaseline()
-    ->maxLevel()
-    ->withSet(static function (PHPStanConfig\Set\SymfonySet $set) {
-        $containerFactory = new DependencyInjection\ContainerFactory([__DIR__.'/tests/build/config/services.php']);
-        $containerXmlFile = $containerFactory->make(true)->getParameter('debug.container_xml_filename');
+$config = new ComposerDependencyAnalyser\Config\Configuration();
+$config->ignoreErrorsOnPackage('composer/composer', [
+    ComposerDependencyAnalyser\Config\ErrorType::DEV_DEPENDENCY_IN_PROD,
+]);
+$config->ignoreUnknownClasses([
+    Framework\Attributes\IgnorePhpunitWarnings::class,
+]);
 
-        $set->withConsoleApplicationLoader('tests/build/phpstan/console-application.php');
-        $set->withContainerXmlPath($containerXmlFile);
-    })
-    ->useCacheDir('.build/cache/phpstan')
-    ->toArray()
-;
+return $config;
