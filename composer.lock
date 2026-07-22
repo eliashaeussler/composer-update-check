@@ -805,22 +805,22 @@
         },
         {
             "name": "spatie/packagist-api",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/packagist-api.git",
-                "reference": "0ce5b849df19338f44902008ebc1f9e9e166a1b6"
+                "reference": "b81df6323f6f20d75f81568bf84643937041961a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/packagist-api/zipball/0ce5b849df19338f44902008ebc1f9e9e166a1b6",
-                "reference": "0ce5b849df19338f44902008ebc1f9e9e166a1b6",
+                "url": "https://api.github.com/repos/spatie/packagist-api/zipball/b81df6323f6f20d75f81568bf84643937041961a",
+                "reference": "b81df6323f6f20d75f81568bf84643937041961a",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^3.0",
                 "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.0",
+                "guzzlehttp/guzzle": "^7.0 || ^8.0",
                 "php": "^8.2"
             },
             "require-dev": {
@@ -865,7 +865,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/packagist-api/tree/2.1.1"
+                "source": "https://github.com/spatie/packagist-api/tree/2.1.2"
             },
             "funding": [
                 {
@@ -877,7 +877,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-21T09:22:04+00:00"
+            "time": "2026-07-22T21:23:11+00:00"
         },
         {
             "name": "symfony/config",
