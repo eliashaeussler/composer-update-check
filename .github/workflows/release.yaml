@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: eliashaeussler/gha/.github/actions/checkout@b0714479731d62333bd8accf44a87f1bc18ad46f # 1.1.8
+        uses: eliashaeussler/gha/.github/actions/checkout@d2e7ebdd6859ae0ad7e705b84a467b9e66d5b857 # 1.1.11
 
       - name: 'Build docs'
         env:
@@ -36,12 +36,12 @@ jobs:
 
       - name: 'Deploy docs'
         id: deploy
-        uses: eliashaeussler/gha/.github/actions/deploy-pages@b0714479731d62333bd8accf44a87f1bc18ad46f # 1.1.8
+        uses: eliashaeussler/gha/.github/actions/deploy-pages@d2e7ebdd6859ae0ad7e705b84a467b9e66d5b857 # 1.1.11
         with:
           base-path: 'site'
 
   release:
     name: 'Create release'
-    uses: eliashaeussler/gha/.github/workflows/github-release.yaml@b0714479731d62333bd8accf44a87f1bc18ad46f # 1.1.8
+    uses: eliashaeussler/gha/.github/workflows/github-release.yaml@d2e7ebdd6859ae0ad7e705b84a467b9e66d5b857 # 1.1.11
     permissions:
       contents: write
